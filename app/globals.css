@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Design tokens. A new design file = new values here, nothing else changes.
+   Look: clean and calm, Notion-like. Warm off-white, white cards, hairline
+   borders, 10px radius, generous spacing. Mobile-first.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --canvas: #fbfaf8;
+  --surface: #ffffff;
+  --surface-2: #f6f5f2;
+  --line: #eceae6;
+  --ink: #1c1b19;
+  --ink-2: #5c5952;
+  --ink-3: #8e8b84;
+  --accent: #1c1b19;
+  --ink-hover: #322f2b;
+  --canvas-blur: rgba(251, 250, 248, 0.85);
+  --surface-blur: rgba(255, 255, 255, 0.95);
+
+  --hot: #e5484d;
+  --warm: #f5a524;
+  --low: #8e8e8e;
+  --escalate: #7c3aed;
+  --ok: #30a46c;
+
+  --radius: 10px;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Inter, Roboto, sans-serif;
+}
+
+* { border-color: var(--line); }
+
+html, body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .card {
+    @apply bg-surface border border-line rounded-card;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-chip border px-2 py-0.5 text-[11px] font-medium leading-5 whitespace-nowrap;
+  }
+  .label {
+    @apply text-[11px] uppercase tracking-wider text-ink-3 font-medium;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-card border border-line bg-surface px-3 py-1.5 text-sm font-medium
+           text-ink transition-colors hover:bg-surface-2 disabled:opacity-40 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply bg-ink text-white border-ink hover:bg-[var(--ink-hover)];
+  }
+  .input {
+    @apply w-full rounded-card border border-line bg-surface px-3 py-2 text-sm outline-none
+           placeholder:text-ink-3 focus:border-ink-3;
+  }
+  .kv {
+    @apply flex flex-col gap-0.5;
+  }
+}
+
+/* Grade chips always carry a text label as well as colour. */
+.grade-HOT       { color: #fff; background: var(--hot);      border-color: var(--hot); }
+.grade-WARM      { color: #43300a; background: var(--warm);  border-color: var(--warm); }
+.grade-LOW       { color: #fff; background: var(--low);      border-color: var(--low); }
+.grade-ESCALATE  { color: #fff; background: var(--escalate); border-color: var(--escalate); }
+.grade-NOT_ENQUIRY { color: var(--ink-2); background: var(--surface-2); border-color: var(--line); }
+
+.fit-fits    { color: #14532d; background: #e7f6ee; border-color: #c7ead8; }
+.fit-close   { color: #6b4300; background: #fdf3e0; border-color: #f6e2bd; }
+.fit-below   { color: #7f1d1d; background: #fdecec; border-color: #f7d3d3; }
+.fit-unknown { color: var(--ink-2); background: var(--surface-2); border-color: var(--line); }
+
+.scrollbar-thin::-webkit-scrollbar { height: 8px; width: 8px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #e2dfd9; border-radius: 99px; }

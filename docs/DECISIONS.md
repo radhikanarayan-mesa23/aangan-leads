@@ -1,0 +1,51 @@
+# Decisions
+
+Append-only. The latest entry wins over `CLAUDE.md`; when they conflict, say so.
+
+---
+
+## 2026-10-08 — `rubric.md` v1.0 filled from the source files
+
+**Decision.** `rubric.md` was filled from `source/services.md`, `source/pricing.md` and `source/qualified.md`. From here it is the single source for grading; code reads it rather than restating it (`lib/rubric.ts` is the only parser).
+
+**What the sources settled.** Scope and the not-offered list, the Pune + PCMC service area, the 6-week minimum lead time, the per-sq-ft bands, the ₹3.5L–₹8L single-room band, and Nikhil's five criteria including "if budget is not mentioned, treat as qualified".
+
+**What they did not settle** — carried as `ASSUME` in `rubric.md` §14 and still open: working days (Mon–Sat assumed), which fringe localities count as "adjoining", whether painting-only is explicitly declined, whether the single-room band is right for a kitchen-only job, the large-job threshold (2,000 sq ft assumed), and what to do with an office over the 3,000 sq ft cap.
+
+**Status.** Drafted and running. **Not yet approved by Nikhil** — approval still to be logged here.
+
+**Rejected.** Hardcoding the criteria in TypeScript. It is faster, but then `rubric.md` becomes documentation rather than the source, and the two drift apart within a week.
+
+---
+
+## 2026-10-08 — Postgres over the Supabase SDK, because the database may be Neon
+
+**Decision.** All data access goes through `pg` and a single `DATABASE_URL`. Auth is our own magic link: a one-time token row exchanged for a signed httpOnly cookie, with roles from `users.role`.
+
+**Why.** The database choice is still open between Neon and Supabase. A plain Postgres URL works with both, so the decision can be made later without touching application code.
+
+**Consequences.** Supabase Auth and RLS are not in the hot path. The RLS policies are written and kept in `migrations/002_rls_supabase.sql`, applied with `npm run db:migrate -- --supabase` if the project lands on Supabase. Until then, hard rule 5 is enforced twice in our own code: `middleware.ts` and `requireOwner()`.
+
+**Rejected.** Committing to the Supabase SDK now and rewriting later. Also rejected: an ORM — the queries are few and explicit SQL reads better here.
+
+---
+
+## 2026-10-08 — Code has the last word on the grade
+
+**Decision.** Gemini supplies judgement (what the caller meant, whether this is a real project, tone). Code supplies arithmetic and lookups — location against the served list, scope against the offered list, budget fit against the estimate, the timeline against the 6-week minimum — and `lib/grading.ts` recomputes C1–C4 and re-applies the ladder. Disagreements are stored in `gemini_grade` and surfaced on the card and in the health strip.
+
+**Why.** The expensive failure is a false LOW on an ₹8–14 lakh project. Arithmetic should not be delegated to a model when the inputs are already extracted.
+
+**Evidence.** The seeded Kothrud call is exactly this case: Gemini reads it as HOT, the code computes ₹14L against a ₹16.2L minimum, lands on `close`, and regrades it WARM.
+
+**Rejected.** Trusting Gemini's grade and only logging disagreements.
+
+---
+
+## 2026-10-08 — Seeds run through the real grader
+
+**Decision.** `seed/calls.ts` carries transcripts and the extraction Gemini would return, but **not** the grade. `scripts/seed.ts` runs the real `gradeLead()` over them and asserts the expected outcome.
+
+**Why.** Hand-labelled seed data looks right and proves nothing. This way the seeded board is evidence that `rubric.md` behaves, and `npm run check` is a fast regression test with no database and no API key.
+
+**Rejected.** Seeding grades directly as literal values.

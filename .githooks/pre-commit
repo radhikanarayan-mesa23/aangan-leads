@@ -1,0 +1,19 @@
+#!/bin/sh
+# Blocks commits that change code, rubric.md or vaani_agent_prompt.md without
+# updating docs/CONTEXT.md and CHANGELOG.md (CLAUDE.md §12).
+
+staged=$(git diff --cached --name-only)
+
+touches_work=$(echo "$staged" | grep -E '^(app|lib|components|scripts|migrations|seed)/|^rubric\.md$|^vaani_agent_prompt\.md$|^middleware\.ts$' || true)
+[ -z "$touches_work" ] && exit 0
+
+missing=""
+echo "$staged" | grep -q '^docs/CONTEXT.md$' || missing="$missing docs/CONTEXT.md"
+echo "$staged" | grep -q '^CHANGELOG.md$'    || missing="$missing CHANGELOG.md"
+
+if [ -n "$missing" ]; then
+  echo "✗ This commit changes the build but not:$missing"
+  echo "  Update them in the same commit, or re-run with --no-verify if you truly mean to."
+  exit 1
+fi
+exit 0

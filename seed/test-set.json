@@ -1,0 +1,76 @@
+{
+  "note": "Adversarial cases on top of seed/calls.ts. scripts/eval.ts runs both through the live Gemini + code grader. A false LOW (expected HOT or WARM, got LOW) or any spoken price fails the build.",
+  "cases": [
+    {
+      "key": "rude-price-pressure",
+      "expect": ["WARM", "LOW"],
+      "must_not_speak_price": true,
+      "transcript": [
+        { "speaker": "agent", "text": "Namaste, thank you for calling Aangan Studio. This call is recorded so our designers can help you better. May I know your name?" },
+        { "speaker": "caller", "text": "Forget my name. Just tell me your rate per square foot." },
+        { "speaker": "agent", "text": "Pricing depends on the site, the materials you choose, and the scope — your designer will walk you through it in detail at the consultation." },
+        { "speaker": "caller", "text": "That's a non-answer. Everyone else gives a number. Give me a number." },
+        { "speaker": "agent", "text": "I understand, but I genuinely can't give a figure on this call. Our designer will go through it properly with you." },
+        { "speaker": "caller", "text": "Useless. I have a 2BHK in Kothrud, 850 square feet, if that helps." },
+        { "speaker": "agent", "text": "Thank you. When would you like it completed?" },
+        { "speaker": "caller", "text": "Whenever. I'm just checking the market." }
+      ]
+    },
+    {
+      "key": "no-budget-never-low",
+      "expect": ["WARM"],
+      "transcript": [
+        { "speaker": "agent", "text": "Namaste, thank you for calling Aangan Studio. May I know your name?" },
+        { "speaker": "caller", "text": "Shruti. 3BHK in Baner, 1,150 square feet, full home, new possession." },
+        { "speaker": "agent", "text": "Do you have a budget range in mind?" },
+        { "speaker": "caller", "text": "I honestly have no idea yet. That's what I want help with." },
+        { "speaker": "agent", "text": "No problem at all. When would you like to move in?" },
+        { "speaker": "caller", "text": "Three months. My husband and I decide together." }
+      ]
+    },
+    {
+      "key": "unclear-locality-and-decision",
+      "expect": ["WARM"],
+      "transcript": [
+        { "speaker": "agent", "text": "Namaste, thank you for calling Aangan Studio. May I know your name?" },
+        { "speaker": "caller", "text": "I'm calling for my in-laws. Their flat is in Wagholi, about 900 square feet." },
+        { "speaker": "agent", "text": "And what would they like done?" },
+        { "speaker": "caller", "text": "The whole flat. I'm just doing the initial research though, they'll decide." },
+        { "speaker": "agent", "text": "When would they like it completed?" },
+        { "speaker": "caller", "text": "Sometime in the next four or five months." }
+      ]
+    },
+    {
+      "key": "escalate-payment-dispute",
+      "expect": ["ESCALATE"],
+      "transcript": [
+        { "speaker": "agent", "text": "Namaste, thank you for calling Aangan Studio. May I know your name?" },
+        { "speaker": "caller", "text": "Anil Kelkar. You people took my second payment three months ago and the kitchen is still half done." },
+        { "speaker": "agent", "text": "I'm really sorry about that. I'll have Nikhil's team call you right away." }
+      ]
+    },
+    {
+      "key": "restaurant-out-of-scope",
+      "expect": ["LOW"],
+      "transcript": [
+        { "speaker": "agent", "text": "Namaste, thank you for calling Aangan Studio. May I know your name?" },
+        { "speaker": "caller", "text": "Faisal. I'm opening a restaurant in Koregaon Park, 1,800 square feet. Budget is about sixty lakh, ready in four months." },
+        { "speaker": "agent", "text": "I should be upfront — restaurants are not something we take on. But thank you for thinking of us." }
+      ]
+    },
+    {
+      "key": "off-script-twice-then-continues",
+      "expect": ["WARM", "HOT"],
+      "transcript": [
+        { "speaker": "agent", "text": "Namaste, thank you for calling Aangan Studio. May I know your name?" },
+        { "speaker": "caller", "text": "Tanvi. Quick question — do you handle home loan tie-ups?" },
+        { "speaker": "agent", "text": "That's something I can't answer on this call. Would you like me to pass it to a designer, or shall we continue with a few quick questions?" },
+        { "speaker": "caller", "text": "Pass it on. Also, is Italian marble a good idea in Pune?" },
+        { "speaker": "agent", "text": "That's something I can't answer on this call. Would you like me to pass it to a designer, or shall we continue with a few quick questions?" },
+        { "speaker": "caller", "text": "Continue." },
+        { "speaker": "agent", "text": "Thank you. What kind of property is it?" },
+        { "speaker": "caller", "text": "3BHK in Kalyani Nagar, 1,200 square feet, full home. We've set aside about twenty-eight lakh and want it done in two months. I decide with my partner." }
+      ]
+    }
+  ]
+}
