@@ -67,4 +67,4 @@ npm run replay                  # push a seeded call through the real pipeline
 npm run eval                    # needs GEMINI_API_KEY
 ```
 
-Deploy: Vercel, set every key above, point cron-job.org at `/api/cron?secret=$CRON_SECRET` every 10 minutes.
+Deploy: pushes to `main` on `radhikanarayan-mesa23/aangan-leads` deploy automatically to the Vercel project `aangan-leads`. `SESSION_SECRET`, `CRON_SECRET`, `GEMINI_MODEL` and the three cost variables are already set there. Point cron-job.org at `/api/cron?secret=$CRON_SECRET` every 10 minutes once the database is live.

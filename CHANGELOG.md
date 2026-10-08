@@ -54,3 +54,8 @@
 - **Fixed — callback punctuality lied.** The health strip counted a promise that was not yet due as already missed.
 - **Fixed — hard rule 3 was violated.** `callback_due_at` was written for every unbooked lead, including callers the agent had politely declined. The promise is now read from the transcript, so it is stored exactly as spoken: out-of-area, advice-only and deadline callers get none, and the existing-client escalation keeps its "right away".
 - A missing or unreachable database now renders a setup page explaining what to do, instead of a 500.
+
+## phase-4.5 — deploy
+- Private GitHub repo `radhikanarayan-mesa23/aangan-leads`, Vercel project linked to it.
+- **Next.js 15.1.6 → 15.5.27.** Vercel refused the first build: 15.1.6 carries CVE-2025-66478. Same App Router API, no code changes needed.
+- A deploy without `DATABASE_URL` now shows the setup page rather than failing.
