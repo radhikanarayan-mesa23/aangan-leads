@@ -34,6 +34,7 @@ export function Board({ leads, users, me, openLeadId }: Props) {
   const [grade, setGrade] = useState<string>('all');
   const [mine, setMine] = useState(false);
   const [locality, setLocality] = useState('all');
+  const [since, setSince] = useState('all');
   const [designer, setDesigner] = useState('all');
   const [openId, setOpenId] = useState<string | undefined>(openLeadId);
   const [dragging, setDragging] = useState<BoardLead | null>(null);
@@ -51,13 +52,18 @@ export function Board({ leads, users, me, openLeadId }: Props) {
       .filter((l) => (grade === 'all' ? true : l.grade === grade))
       .filter((l) => (mine ? l.assigned_to === me.email : true))
       .filter((l) => (locality === 'all' ? true : l.locality === locality))
+      .filter((l) => {
+        if (since === 'all') return true;
+        const days = since === 'today' ? 1 : Number(since);
+        return Date.now() - new Date(l.created_at).getTime() <= days * 86_400_000;
+      })
       .filter((l) => (designer === 'all' ? true : l.assigned_to === designer))
       .sort((a, b) => {
         const g = (GRADE_ORDER[a.grade ?? ''] ?? 9) - (GRADE_ORDER[b.grade ?? ''] ?? 9);
         if (g !== 0) return g;
         return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
       });
-  }, [leads, pending, grade, mine, locality, designer, me.email]);
+  }, [leads, pending, grade, mine, locality, designer, since, me.email]);
 
   const byStage = useMemo(() => {
     const map = new Map<Stage, BoardLead[]>();
@@ -140,6 +146,12 @@ export function Board({ leads, users, me, openLeadId }: Props) {
           {localities.map((l) => (
             <option key={l} value={l}>{l}</option>
           ))}
+        </select>
+        <select className="input w-auto" value={since} onChange={(e) => setSince(e.target.value)}>
+          <option value="all">Any date</option>
+          <option value="today">Last 24 hours</option>
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
         </select>
         {me.role === 'owner' && (
           <select className="input w-auto" value={designer} onChange={(e) => setDesigner(e.target.value)}>

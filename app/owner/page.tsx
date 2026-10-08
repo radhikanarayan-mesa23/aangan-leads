@@ -41,7 +41,7 @@ export default async function OwnerPage() {
           value={`${k.month.mix.HOT} / ${k.month.mix.WARM} / ${k.month.mix.LOW}`}
           sub={k.month.mix.ESCALATE ? `${k.month.mix.ESCALATE} escalated` : 'none escalated'}
         />
-        <Kpi label="Answered live" value={`${k.month.answered}%`} sub="calls that got a real conversation" />
+        <Kpi label="Answered in under 5 min" value={`${k.month.answered}%`} sub="picked up on the first ring; share that became a real conversation" />
         <Kpi label="Total AI cost" value={inr(Math.round(k.month.cost))} sub={`${inr(Math.round(k.costPerLead))} per lead`} delta={deltaCost} invert />
         <Kpi label="Cost per hot lead" value={inr(Math.round(k.costPerHot))} sub={`${k.month.hot} hot this month`} />
         <Kpi label="Pipeline value" value={inr(k.pipeline)} sub="internal estimate midpoints, open leads" internal />

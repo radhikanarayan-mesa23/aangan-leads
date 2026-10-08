@@ -67,8 +67,9 @@ export function kpis(rows: Row[]) {
   const cost = (set: Row[]) => set.reduce((a, r) => a + Number(r.cost_inr ?? 0), 0);
   const hot = (set: Row[]) => set.filter((r) => r.grade === 'HOT').length;
 
-  // Every call is picked up by the agent, so "answered" means the caller got a
-  // real conversation rather than a dropped or silent call.
+  // The brief asks for "% answered within 5 min". The agent picks up on the
+  // first ring, so the only way a caller is not answered in time is a call that
+  // dropped, errored or stayed silent. That is what this measures.
   const answered = (set: Row[]) =>
     set.length === 0
       ? 100

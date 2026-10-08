@@ -42,3 +42,7 @@
 - `migrations/002_rls_supabase.sql` parked — skipped unless `npm run db:migrate -- --supabase`.
 - `.env.example` leads with Neon; the Supabase keys are documented as dormant.
 - Recordings stream through the auth-gated proxy. Keeping our own copy of the audio is a TODO in `lib/storage.ts`.
+
+## phase-4.3 — two gaps against the brief
+- Board date filter (any date / 24h / 7d / 30d). The brief lists grade, assigned, locality **and date**; date was the one missing.
+- Owner KPI relabelled to the brief's "% answered within 5 min". The measure is unchanged and the sub-line now states it plainly: the agent picks up on the first ring, so this is the share of calls that became a real conversation rather than dropping, erroring or staying silent.
