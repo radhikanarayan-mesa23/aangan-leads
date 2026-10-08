@@ -3,7 +3,7 @@ import { pool, sql } from '../lib/db';
 import { SEED_CALLS } from '../seed/calls';
 import { gradeLead } from '../lib/grading';
 import { llmCost, vaaniCost } from '../lib/cost';
-import { callbackPromise, nextWorkingDays, slotInstant } from '../lib/time';
+import { nextWorkingDays, slotInstant, spokenCallbackPromise } from '../lib/time';
 import { GeminiOutputSchema } from '../lib/schema';
 
 function at(daysAgo: number, hourIST: number): Date {
@@ -20,8 +20,8 @@ function pastSlot(callAt: Date, daysAfter: number, hourIST: number): Date {
   return d;
 }
 
-async function main() {
-  console.log(`Seeding ${SEED_CALLS.length} calls through the real grading code…\n`);
+export async function seedAll(log = console.log) {
+  log(`Seeding ${SEED_CALLS.length} calls through the real grading code…\n`);
   await sql('delete from lead_events where lead_id in (select id from leads where vani_call_id like $1)', ['seed-%']);
   await sql('delete from leads where vani_call_id like $1', ['seed-%']);
 
@@ -45,7 +45,8 @@ async function main() {
           : pastSlot(started, Math.abs(call.booked_days_ahead), call.booked_hour ?? 14);
 
     const stage = call.stage ?? (bookedAt ? 'Consultation booked' : 'New');
-    const promise = callbackPromise(started);
+    // Only the callers the agent actually promised a callback to get one.
+    const promise = spokenCallbackPromise(call.transcript, started);
 
     const rows = await sql<{ id: string; ticket_no: string }>(
       `insert into leads (
@@ -89,8 +90,8 @@ async function main() {
         parsed.handoff_note,
         JSON.stringify(parsed.insights),
         bookedAt,
-        bookedAt ? null : promise.dueAt,
-        stage !== 'New' && !bookedAt ? new Date(started.getTime() + 40 * 60_000) : null,
+        bookedAt ? null : (promise?.dueAt ?? null),
+        promise && stage !== 'New' && !bookedAt ? new Date(started.getTime() + 40 * 60_000) : null,
         stage,
         call.assigned_to ?? null,
         call.lost_reason ?? null,
@@ -131,20 +132,27 @@ async function main() {
 
     const ok = call.expect.startsWith(verdict.grade);
     if (!ok) mismatches++;
-    console.log(
+    log(
       `${ok ? '✓' : '✗'} ${lead.ticket_no}  ${verdict.grade.padEnd(11)} ${call.caller_name.padEnd(18)} ${verdict.budget_fit.padEnd(8)} ${
         verdict.disagreed_with_gemini ? `(code overrode Gemini's ${verdict.gemini_grade})` : ''
       }`
     );
-    if (!ok) console.log(`    expected: ${call.expect}`);
+    if (!ok) log(`    expected: ${call.expect}`);
   }
 
-  console.log(`\n${SEED_CALLS.length} leads seeded. ${mismatches} unexpected grade(s).`);
-  await pool().end();
-  if (mismatches) process.exit(1);
+  log(`\n${SEED_CALLS.length} leads seeded. ${mismatches} unexpected grade(s).`);
+  return mismatches;
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+// Only talk to a real database when run directly, not when imported by a test.
+if (process.argv[1] && /seed\.ts$/.test(process.argv[1])) {
+  seedAll()
+    .then(async (mismatches) => {
+      await pool().end();
+      if (mismatches) process.exit(1);
+    })
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
+}

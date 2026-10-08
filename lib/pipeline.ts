@@ -2,7 +2,7 @@ import { sql, one } from './db';
 import { gradeWithGemini } from './gemini';
 import { gradeLead } from './grading';
 import { llmCost, vaaniCost } from './cost';
-import { callbackPromise } from './time';
+import { callbackPromise, spokenCallbackPromise } from './time';
 import { copyRecording } from './storage';
 import { isQuietHours, leadMessage, sendTelegram } from './telegram';
 import { logEvent, logStepError, type LeadRow } from './leads';
@@ -152,9 +152,19 @@ export async function processLead(leadId: string): Promise<void> {
   try {
     const fresh = await one<LeadRow>('select * from leads where id = $1', [leadId]);
     if (fresh && !fresh.booked_at && fresh.grade !== 'NOT_ENQUIRY') {
-      const promise = callbackPromise(new Date(fresh.started_at ?? fresh.created_at));
-      await sql('update leads set callback_due_at = $2 where id = $1 and callback_due_at is null', [leadId, promise.dueAt]);
-      await logEvent({ lead_id: leadId, type: 'callback', note: promise.spoken });
+      const callAt = new Date(fresh.started_at ?? fresh.created_at);
+      // What the agent actually said wins. Only fall back to the time-of-day
+      // rule when the lead was eligible for a callback and the transcript is
+      // missing or unreadable — never for a caller who was declined.
+      const declined = ['OUT_OF_AREA', 'OUT_OF_SCOPE', 'ADVICE_ONLY'].some((f) => fresh.flags?.includes(f));
+      const promise =
+        spokenCallbackPromise(fresh.transcript as { speaker: string; text: string }[], callAt) ??
+        (declined || fresh.transcript?.length ? null : callbackPromise(callAt));
+
+      if (promise) {
+        await sql('update leads set callback_due_at = $2 where id = $1 and callback_due_at is null', [leadId, promise.dueAt]);
+        await logEvent({ lead_id: leadId, type: 'callback', note: promise.spoken });
+      }
     }
   } catch (e) {
     await logStepError(leadId, 'callback', e);

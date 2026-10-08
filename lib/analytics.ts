@@ -222,10 +222,12 @@ export function team(rows: Row[], users: { email: string; name: string; role: st
 export function health(rows: Row[]) {
   const month = window(rows, 30);
   const graded = month.filter((r) => r.grade && r.gemini_grade);
-  const callbacks = rows.filter((r) => r.callback_due_at);
-  const onTime = callbacks.filter(
-    (r) => (r.callback_done_at ?? r.first_contact_at) && new Date(r.callback_done_at ?? r.first_contact_at!) <= new Date(r.callback_due_at!)
-  );
+  // Only judge a promise once it has been kept or has actually come due. A
+  // callback owed in forty minutes is not a miss, and counting it as one made
+  // the health strip read red on a board that was behaving.
+  const answered = (r: Row) => r.callback_done_at ?? r.first_contact_at;
+  const callbacks = rows.filter((r) => r.callback_due_at && (answered(r) || new Date(r.callback_due_at!) < new Date()));
+  const onTime = callbacks.filter((r) => answered(r) && new Date(answered(r)!) <= new Date(r.callback_due_at!));
   return {
     pricesSpoken: month.filter((r) => r.price_mentioned).length,
     callbacksOnTime: callbacks.length ? Math.round((onTime.length / callbacks.length) * 100) : 100,

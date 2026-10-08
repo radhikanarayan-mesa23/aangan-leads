@@ -4,6 +4,7 @@ import { createSession, findUser, SESSION_COOKIE } from '@/lib/auth';
 import { sql } from '@/lib/db';
 import { randomUUID } from 'node:crypto';
 import { env } from '@/lib/env';
+import { SetupNeeded } from '@/components/SetupNeeded';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +36,7 @@ async function signInDirect(formData: FormData) {
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<Record<string, string>> }) {
   const sp = await searchParams;
+  if (!process.env.DATABASE_URL) return <SetupNeeded />;
   const devMode = process.env.NODE_ENV !== 'production';
 
   return (

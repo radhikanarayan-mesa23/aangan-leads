@@ -2,7 +2,7 @@
 -- Plain Postgres. Runs on Neon or Supabase unchanged.
 -- ASSUME: DATABASE_URL points at a Postgres 15+ database.
 
-create extension if not exists "pgcrypto";
+-- gen_random_uuid() is core from Postgres 13 onward, so no extension is needed.
 
 -- ---------------------------------------------------------------- users
 create table if not exists users (

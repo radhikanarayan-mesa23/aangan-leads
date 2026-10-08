@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { currentUser } from '@/lib/auth';
 import { sql } from '@/lib/db';
 import { Chrome } from '@/components/Chrome';
+import { SetupNeeded } from '@/components/SetupNeeded';
 import { nextWorkingDays, SLOT_HOURS, slotInstant, fmtIST } from '@/lib/time';
 import { GradeChip } from '@/components/Chips';
 import Link from 'next/link';
@@ -13,10 +14,15 @@ export default async function CalendarPage() {
   if (!user) redirect('/login');
 
   const days = nextWorkingDays(new Date(), 6);
-  const booked = await sql<{ id: string; ticket_no: string; caller_name: string | null; grade: string | null; booked_at: string }>(
-    `select id, ticket_no, caller_name, grade, booked_at from leads
-     where booked_at is not null and booked_at >= now() - interval '1 day'`
-  );
+  let booked;
+  try {
+    booked = await sql<{ id: string; ticket_no: string; caller_name: string | null; grade: string | null; booked_at: string }>(
+      `select id, ticket_no, caller_name, grade, booked_at from leads
+       where booked_at is not null and booked_at >= now() - interval '1 day'`
+    );
+  } catch (e) {
+    return <SetupNeeded detail={String(e)} />;
+  }
   const byIso = new Map(booked.map((b) => [new Date(b.booked_at).toISOString(), b]));
 
   return (

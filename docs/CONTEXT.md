@@ -50,7 +50,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 
 ## Known gaps
 
-- No database has been touched yet, so migrations and seeds are unverified at runtime.
+- No **Neon** database has been touched yet. The schema, the seed and every query are verified against an embedded Postgres via `npm run verify:db` (34 checks), so what remains unproven is only Neon-specific: TLS, the pooled endpoint and connection limits.
 - `scripts/eval.ts` has never run against the live model.
 - Recording playback is untested without a real recording URL.
 
@@ -60,6 +60,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 npm install
 cp .env.example .env            # add DATABASE_URL at minimum
 npm run check                   # grading over the seeds, no DB or API key needed
+npm run verify:db               # schema + every query against an embedded Postgres
 npm run db:migrate && npm run db:seed
 npm run dev                     # http://localhost:3000, sign in as nikhil@aanganstudio.in
 npm run replay                  # push a seeded call through the real pipeline

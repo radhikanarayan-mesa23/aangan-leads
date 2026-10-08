@@ -46,3 +46,11 @@
 ## phase-4.3 — two gaps against the brief
 - Board date filter (any date / 24h / 7d / 30d). The brief lists grade, assigned, locality **and date**; date was the one missing.
 - Owner KPI relabelled to the brief's "% answered within 5 min". The measure is unchanged and the sub-line now states it plainly: the agent picks up on the first ring, so this is the share of calls that became a real conversation rather than dropping, erroring or staying silent.
+
+## phase-4.4 — verified against a real Postgres
+- `npm run verify:db` — the whole schema and every query run against an embedded Postgres (PGlite), no server and no network. 34 checks: migration, seeding, `text[]` and `jsonb` round-trips, the unique index that blocks a double booking, webhook idempotency, the mid-call placeholder merge, stage moves, `step_errors` appends, and every owner-dashboard analytic.
+- `lib/db.ts` gained a `setExecutor` test seam so the real `lib/` queries run unchanged under the harness.
+- Dropped the `pgcrypto` extension: `gen_random_uuid()` has been core since Postgres 13.
+- **Fixed — callback punctuality lied.** The health strip counted a promise that was not yet due as already missed.
+- **Fixed — hard rule 3 was violated.** `callback_due_at` was written for every unbooked lead, including callers the agent had politely declined. The promise is now read from the transcript, so it is stored exactly as spoken: out-of-area, advice-only and deadline callers get none, and the existing-client escalation keeps its "right away".
+- A missing or unreachable database now renders a setup page explaining what to do, instead of a 500.

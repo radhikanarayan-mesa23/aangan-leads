@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { currentUser } from '@/lib/auth';
 import { listUsers } from '@/lib/leads';
 import { Chrome } from '@/components/Chrome';
+import { SetupNeeded } from '@/components/SetupNeeded';
 import { InternalBadge } from '@/components/Chips';
 import { CostVsRevenue, FunnelChart, Heatmap, LeadsOverTime, LocalityChart, SourceChart } from '@/components/OwnerCharts';
 import { byLocality, bySource, costVsRevenue, funnel, health, heatmap, insights, kpis, leadsOverTime, loadRows, loadStageReach, team } from '@/lib/analytics';
@@ -15,7 +16,12 @@ export default async function OwnerPage() {
   if (!user) redirect('/login');
   if (user.role !== 'owner') redirect('/board?denied=owner');
 
-  const [rows, users, reach] = await Promise.all([loadRows(), listUsers(), loadStageReach()]);
+  let rows, users, reach;
+  try {
+    [rows, users, reach] = await Promise.all([loadRows(), listUsers(), loadStageReach()]);
+  } catch (e) {
+    return <SetupNeeded detail={String(e)} />;
+  }
   const k = kpis(rows);
   const h = health(rows);
   const bullets = insights(rows);

@@ -83,5 +83,36 @@ export function callbackPromise(now = new Date()): { dueAt: Date; spoken: string
   return { dueAt: slotInstant(nextKey, 11), spoken: 'A designer will call you by 11am tomorrow.' };
 }
 
+/**
+ * Hard rule 3: the callback promise is stored **exactly as spoken**. So we read
+ * it out of the transcript rather than inferring one. A caller who was politely
+ * declined on the call was promised nothing, and inventing a promise for them
+ * makes the punctuality metric lie.
+ */
+export function spokenCallbackPromise(
+  transcript: { speaker: string; text: string }[] | null | undefined,
+  callAt: Date
+): { dueAt: Date; spoken: string } | null {
+  for (const turn of transcript ?? []) {
+    if (turn.speaker !== 'agent') continue;
+    const t = turn.text;
+
+    // Existing-client escalation — the strongest promise the agent can make.
+    if (/call you (back )?right away|call you straight away/i.test(t)) {
+      return { dueAt: new Date(callAt.getTime() + 15 * 60 * 1000), spoken: t.trim() };
+    }
+    if (/call you within (an|1|the) hour|call you within 1 hour/i.test(t)) {
+      return { dueAt: new Date(callAt.getTime() + 60 * 60 * 1000), spoken: t.trim() };
+    }
+    if (/by 11\s?am tomorrow/i.test(t)) {
+      const todayKey = formatInTimeZone(callAt, TZ, 'yyyy-MM-dd');
+      const days = nextWorkingDays(new Date(callAt.getTime() + 6 * 60 * 60 * 1000), 3);
+      const nextKey = days.find((d) => d > todayKey) ?? days[0];
+      return { dueAt: slotInstant(nextKey, 11), spoken: t.trim() };
+    }
+  }
+  return null;
+}
+
 export const fmtIST = (d: Date | string | null | undefined, pattern = 'd MMM, h:mma') =>
   d ? formatInTimeZone(new Date(d), TZ, pattern) : '—';

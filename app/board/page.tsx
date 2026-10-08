@@ -4,6 +4,7 @@ import { listLeads, listUsers } from '@/lib/leads';
 import { toBoardLead } from '@/lib/view';
 import { Board } from '@/components/Board';
 import { Chrome } from '@/components/Chrome';
+import { SetupNeeded } from '@/components/SetupNeeded';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +13,12 @@ export default async function BoardPage({ searchParams }: { searchParams: Promis
   if (!user) redirect('/login');
   const sp = await searchParams;
 
-  const [rows, users] = await Promise.all([listLeads(), listUsers()]);
+  let rows, users;
+  try {
+    [rows, users] = await Promise.all([listLeads(), listUsers()]);
+  } catch (e) {
+    return <SetupNeeded detail={String(e)} />;
+  }
   const names = Object.fromEntries(users.map((u) => [u.email, u.name]));
   const leads = rows.map((r) => toBoardLead(r, names));
 
