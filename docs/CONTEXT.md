@@ -13,6 +13,12 @@ _Updated 2026-10-08._
 - **Cron** — `GET /api/cron`: queued pushes, hot-lead nudges, overdue callbacks, HubSpot retries, 9pm digest.
 - **HubSpot** — client, stage map, `scripts/hubspot-setup.ts`, deal created on the first move out of New, retried by cron.
 
+## Fixed in the review pass (2026-10-08)
+
+Nested buttons on the board card (which also broke dragging), `upsertCall` not
+coalescing over a mid-call placeholder row, seeded past bookings landing off the
+slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
+
 ## In progress / next step
 
 1. **Waiting on `DATABASE_URL`** (Neon or Supabase) — nothing has been run against a real database yet. First commands once it lands: `npm run db:migrate && npm run db:seed`.
@@ -40,6 +46,7 @@ _Updated 2026-10-08._
 - `lib/storage.ts` — recordings are copied to Supabase Storage only when those keys exist; otherwise the source URL stays server-side and is proxied.
 - `rubric.md` §14 — six questions for Nikhil (working days, fringe localities, painting, single-room band, large threshold, office cap).
 - `source/enquiries.pdf` is image-only; no text could be extracted, so no real transcript informed the seeds.
+- The project folder was renamed to `~/Desktop/ai-building/vaani` (the old name ended in a space, which broke tooling).
 
 ## Known gaps
 

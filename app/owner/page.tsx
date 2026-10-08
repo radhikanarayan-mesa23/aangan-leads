@@ -4,7 +4,7 @@ import { listUsers } from '@/lib/leads';
 import { Chrome } from '@/components/Chrome';
 import { InternalBadge } from '@/components/Chips';
 import { CostVsRevenue, FunnelChart, Heatmap, LeadsOverTime, LocalityChart, SourceChart } from '@/components/OwnerCharts';
-import { byLocality, bySource, costVsRevenue, funnel, health, heatmap, insights, kpis, leadsOverTime, loadRows, team } from '@/lib/analytics';
+import { byLocality, bySource, costVsRevenue, funnel, health, heatmap, insights, kpis, leadsOverTime, loadRows, loadStageReach, team } from '@/lib/analytics';
 import { inr } from '@/lib/pricing';
 import { cn } from '@/lib/utils';
 
@@ -15,7 +15,7 @@ export default async function OwnerPage() {
   if (!user) redirect('/login');
   if (user.role !== 'owner') redirect('/board?denied=owner');
 
-  const [rows, users] = await Promise.all([loadRows(), listUsers()]);
+  const [rows, users, reach] = await Promise.all([loadRows(), listUsers(), loadStageReach()]);
   const k = kpis(rows);
   const h = health(rows);
   const bullets = insights(rows);
@@ -78,7 +78,7 @@ export default async function OwnerPage() {
           <LeadsOverTime data={leadsOverTime(rows)} />
         </Panel>
         <Panel title="Funnel" note="drop-off at each step">
-          <FunnelChart data={funnel(rows)} />
+          <FunnelChart data={funnel(rows, reach)} />
         </Panel>
         <Panel title="Where leads come from" note="by locality — the darker bar is hot">
           <LocalityChart data={byLocality(rows)} />

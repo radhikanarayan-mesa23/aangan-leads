@@ -30,3 +30,9 @@
 - Charts: leads over time by grade, funnel with drop-off, locality, source, cost vs revenue, hour × weekday heatmap, team table.
 - `GET /api/cron`: queued pushes, hot-lead nudges, overdue callbacks, HubSpot retries, 9pm digest.
 - `scripts/hubspot-setup.ts`.
+
+## phase-4.1 — review pass, four defects fixed
+- **Board card:** the card body was a `<button>` wrapping the Claim `<button>` — invalid nesting, and its `onPointerDown` guard swallowed the drag gesture everywhere except the 12px padding ring. The card is now a single draggable element with click and Enter/Space to open; Claim stops propagation on its own.
+- **`upsertCall`:** a row created mid-call by `/api/vaani/tools/book` holds only a name and a slot. The webhook's `on conflict` now coalesces caller name, number, email, start time, booking and cost instead of leaving the placeholder's gaps.
+- **Seeded bookings:** past consultations were written at the call timestamp rather than a slot hour, so they missed the calendar grid and two could collide on the unique index on `booked_at`. They now land on a real slot hour, N days after the call.
+- **Funnel:** every lost lead was credited with reaching Contacted regardless of how far it got, so per-stage drop-off was wrong. It is now computed from `lead_events`, counting the furthest stage each lead ever entered.

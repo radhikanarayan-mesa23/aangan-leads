@@ -13,6 +13,13 @@ function at(daysAgo: number, hourIST: number): Date {
   return d;
 }
 
+/** A consultation that already happened: N days after the call, on a slot hour. */
+function pastSlot(callAt: Date, daysAfter: number, hourIST: number): Date {
+  const d = new Date(callAt.getTime() + daysAfter * 86_400_000);
+  d.setUTCHours(hourIST - 5, 30, 0, 0);
+  return d;
+}
+
 async function main() {
   console.log(`Seeding ${SEED_CALLS.length} calls through the real grading code…\n`);
   await sql('delete from lead_events where lead_id in (select id from leads where vani_call_id like $1)', ['seed-%']);
@@ -26,12 +33,16 @@ async function main() {
     const verdict = gradeLead(parsed);
 
     const started = at(call.daysAgo, call.hourIST);
+    // A positive booked_days_ahead is an upcoming slot on the shared calendar;
+    // a negative one is a consultation that already happened, that many days
+    // after the call. Both must sit on a slot hour so the calendar lines up and
+    // the unique index on booked_at cannot collide.
     const bookedAt =
-      call.booked_days_ahead != null
-        ? call.booked_days_ahead >= 0
+      call.booked_days_ahead == null
+        ? null
+        : call.booked_days_ahead >= 0
           ? slotInstant(workingDays[Math.min(call.booked_days_ahead, workingDays.length - 1)], call.booked_hour ?? 14)
-          : new Date(started.getTime() + Math.abs(call.booked_days_ahead) * 0) // past bookings: keep near the call
-        : null;
+          : pastSlot(started, Math.abs(call.booked_days_ahead), call.booked_hour ?? 14);
 
     const stage = call.stage ?? (bookedAt ? 'Consultation booked' : 'New');
     const promise = callbackPromise(started);

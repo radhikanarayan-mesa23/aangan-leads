@@ -27,7 +27,17 @@ export async function upsertCall(call: NormalisedCall): Promise<LeadRow> {
        transcript = case when jsonb_array_length(excluded.transcript) > 0 then excluded.transcript else leads.transcript end,
        duration_s = coalesce(excluded.duration_s, leads.duration_s),
        ended_reason = coalesce(excluded.ended_reason, leads.ended_reason),
-       recording_source_url = coalesce(excluded.recording_source_url, leads.recording_source_url)
+       recording_source_url = coalesce(excluded.recording_source_url, leads.recording_source_url),
+       -- /tools/book may have created this row mid-call with only a name and a
+       -- slot. Fill the gaps from the webhook, but never blank out what is set.
+       caller_name = coalesce(leads.caller_name, excluded.caller_name),
+       caller_number = coalesce(leads.caller_number, excluded.caller_number),
+       caller_email = coalesce(leads.caller_email, excluded.caller_email),
+       started_at = coalesce(leads.started_at, excluded.started_at),
+       booked_at = coalesce(leads.booked_at, excluded.booked_at),
+       calcom_booking_id = coalesce(leads.calcom_booking_id, excluded.calcom_booking_id),
+       off_script_count = greatest(leads.off_script_count, excluded.off_script_count),
+       vaani_cost_inr = greatest(leads.vaani_cost_inr, excluded.vaani_cost_inr)
      returning *`,
     [
       call.vani_call_id,

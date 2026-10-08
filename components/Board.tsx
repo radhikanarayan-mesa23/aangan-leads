@@ -162,10 +162,10 @@ export function Board({ leads, users, me, openLeadId }: Props) {
       >
         <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-thin -mx-4 px-4 sm:-mx-6 sm:px-6">
           {STAGES.map((stage) => (
-            <Column key={stage} stage={stage} leads={byStage.get(stage) ?? []} onOpen={setOpenId} me={me} />
+            <Column key={stage} stage={stage} leads={byStage.get(stage) ?? []} onOpen={setOpenId} />
           ))}
         </div>
-        <DragOverlay>{dragging ? <Card lead={dragging} me={me} dragging /> : null}</DragOverlay>
+        <DragOverlay>{dragging ? <Card lead={dragging} dragging /> : null}</DragOverlay>
       </DndContext>
 
       {open && (
@@ -185,12 +185,10 @@ function Column({
   stage,
   leads,
   onOpen,
-  me,
 }: {
   stage: Stage;
   leads: BoardLead[];
   onOpen: (id: string) => void;
-  me: Props['me'];
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: stage });
   return (
@@ -207,7 +205,7 @@ function Column({
         )}
       >
         {leads.map((l) => (
-          <Card key={l.id} lead={l} me={me} onOpen={onOpen} />
+          <Card key={l.id} lead={l} onOpen={onOpen} />
         ))}
         {leads.length === 0 && <p className="text-xs text-ink-3 px-1 py-3">Nothing here.</p>}
       </div>
@@ -217,68 +215,71 @@ function Column({
 
 function Card({
   lead,
-  me,
   onOpen,
   dragging,
 }: {
   lead: BoardLead;
-  me: Props['me'];
   onOpen?: (id: string) => void;
   dragging?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: lead.id });
   const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined;
 
+  // The whole card is both the drag handle and the open target. dnd-kit's
+  // pointer sensor needs 6px of movement before it claims the gesture, so a
+  // plain click still falls through to onClick.
   return (
     <article
       ref={setNodeRef}
       style={style}
+      onClick={() => onOpen?.(lead.id)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onOpen?.(lead.id);
+        }
+      }}
       className={cn(
-        'card p-3 shadow-card cursor-grab active:cursor-grabbing select-none',
+        'card p-3 shadow-card cursor-grab active:cursor-grabbing select-none text-left',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink-3',
         (isDragging || dragging) && 'opacity-90 shadow-pop rotate-[0.6deg]'
       )}
       {...listeners}
       {...attributes}
     >
-      <button
-        className="w-full text-left"
-        onClick={() => onOpen?.(lead.id)}
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <p className="font-medium text-sm truncate">{lead.caller_name ?? 'Unnamed caller'}</p>
-            <p className="text-[11px] text-ink-3 tabular-nums">{lead.ticket_no}</p>
-          </div>
-          <GradeChip grade={lead.grade} />
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="font-medium text-sm truncate">{lead.caller_name ?? 'Unnamed caller'}</p>
+          <p className="text-[11px] text-ink-3 tabular-nums">{lead.ticket_no}</p>
         </div>
+        <GradeChip grade={lead.grade} />
+      </div>
 
-        <p className="mt-2 text-xs text-ink-2 leading-relaxed">
-          {[lead.locality, lead.property_type, humanScope(lead.scope), lead.carpet_area_sqft ? `${lead.carpet_area_sqft} sq ft` : null]
-            .filter(Boolean)
-            .join(' · ') || 'Details not captured'}
-        </p>
+      <p className="mt-2 text-xs text-ink-2 leading-relaxed">
+        {[lead.locality, lead.property_type, humanScope(lead.scope), lead.carpet_area_sqft ? `${lead.carpet_area_sqft} sq ft` : null]
+          .filter(Boolean)
+          .join(' · ') || 'Details not captured'}
+      </p>
 
-        <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          <FitChip fit={lead.budget_fit} />
-          {lead.booked_at && <span className="chip fit-fits">📅 {fmtIST(lead.booked_at, 'EEE d, h:mma')}</span>}
-          {lead.flags?.includes('PRICE_SPOKEN') && <span className="chip fit-below">price spoken</span>}
-        </div>
+      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+        <FitChip fit={lead.budget_fit} />
+        {lead.booked_at && <span className="chip fit-fits">📅 {fmtIST(lead.booked_at, 'EEE d, h:mma')}</span>}
+        {lead.flags?.includes('PRICE_SPOKEN') && <span className="chip fit-below">price spoken</span>}
+      </div>
 
-        <div className="mt-2.5 flex items-center justify-between text-[11px] text-ink-3">
-          <span>{ageLabel(lead.created_at)} old</span>
-          {lead.assigned_to ? (
-            <span
-              className="grid place-items-center size-5 rounded-full bg-surface-2 border text-[10px] font-medium text-ink-2"
-              title={lead.assigned_to}
-            >
-              {initials(lead.assigned_name ?? lead.assigned_to)}
-            </span>
-          ) : (
-            <ClaimButton leadId={lead.id} />
-          )}
-        </div>
-      </button>
+      <div className="mt-2.5 flex items-center justify-between text-[11px] text-ink-3">
+        <span>{ageLabel(lead.created_at)} old</span>
+        {lead.assigned_to ? (
+          <span
+            className="grid place-items-center size-5 rounded-full bg-surface-2 border text-[10px] font-medium text-ink-2"
+            title={lead.assigned_to}
+          >
+            {initials(lead.assigned_name ?? lead.assigned_to)}
+          </span>
+        ) : (
+          <ClaimButton leadId={lead.id} />
+        )}
+      </div>
     </article>
   );
 }

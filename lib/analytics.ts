@@ -134,17 +134,35 @@ export function bySource(rows: Row[]) {
   return [...map.entries()].map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
 }
 
-export function funnel(rows: Row[]) {
-  // A lead counts toward a stage if it reached it or anything past it.
-  const order = STAGES.filter((s) => s !== 'Not converted');
-  const reachedIndex = (r: Row) => (r.stage === 'Not converted' ? 1 : order.indexOf(r.stage));
-  return order.map((stage, i) => {
-    const count = rows.filter((r) => reachedIndex(r) >= i).length;
-    return { stage, count };
-  }).map((d, i, all) => ({
-    ...d,
-    dropoff: i === 0 || all[i - 1].count === 0 ? 0 : Math.round((1 - d.count / all[i - 1].count) * 100),
-  }));
+/**
+ * Every stage each lead has ever been moved into, from the event log. A lead
+ * that was lost at Proposal must still count toward Proposal in the funnel —
+ * its current stage alone would hide that.
+ */
+export async function loadStageReach(): Promise<Map<string, string[]>> {
+  const rows = await sql<{ lead_id: string; to_stage: string }>(
+    "select lead_id, to_stage from lead_events where type = 'stage_change' and to_stage is not null"
+  );
+  const map = new Map<string, string[]>();
+  for (const r of rows) map.set(r.lead_id, [...(map.get(r.lead_id) ?? []), r.to_stage]);
+  return map;
+}
+
+export function funnel(rows: Row[], reach: Map<string, string[]> = new Map()) {
+  const order: string[] = STAGES.filter((s) => s !== 'Not converted');
+
+  // How far this lead actually got, ignoring the fact that it was later lost.
+  const furthest = (r: Row) => {
+    const seen = [r.stage, ...(reach.get(r.id) ?? [])].filter((s) => s !== 'Not converted');
+    return seen.reduce((best, s) => Math.max(best, order.indexOf(s)), 0);
+  };
+
+  return order
+    .map((stage, i) => ({ stage, count: rows.filter((r) => furthest(r) >= i).length }))
+    .map((d, i, all) => ({
+      ...d,
+      dropoff: i === 0 || all[i - 1].count === 0 ? 0 : Math.round((1 - d.count / all[i - 1].count) * 100),
+    }));
 }
 
 export function costVsRevenue(rows: Row[], months = 6) {
