@@ -1,5 +1,8 @@
--- OPTIONAL: only run this if the database is Supabase and app users authenticate
--- through Supabase Auth. On Neon the app enforces the same separation in
+-- PARKED. The database is Neon (docs/DECISIONS.md, 2026-10-08), so this file
+-- does not run: `scripts/migrate.ts` skips it unless called with --supabase.
+-- It is kept so the move to Supabase stays a one-command change.
+--
+-- Only applicable if app users authenticate through Supabase Auth. On Neon the app enforces the same separation in
 -- middleware + server-side queries (see lib/auth.ts, middleware.ts).
 --
 -- Hard rule 5: designers cannot read owner-only surfaces.

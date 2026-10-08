@@ -6,7 +6,7 @@
 
 ```bash
 npm install
-cp .env.example .env     # DATABASE_URL is the only one needed for the demo
+cp .env.example .env     # DATABASE_URL (Neon, pooled endpoint) is the only one needed
 npm run db:migrate
 npm run db:seed
 npm run dev

@@ -36,3 +36,9 @@
 - **`upsertCall`:** a row created mid-call by `/api/vaani/tools/book` holds only a name and a slot. The webhook's `on conflict` now coalesces caller name, number, email, start time, booking and cost instead of leaving the placeholder's gaps.
 - **Seeded bookings:** past consultations were written at the call timestamp rather than a slot hour, so they missed the calendar grid and two could collide on the unique index on `booked_at`. They now land on a real slot hour, N days after the call.
 - **Funnel:** every lost lead was credited with reaching Contacted regardless of how far it got, so per-stage drop-off was wrong. It is now computed from `lead_events`, counting the furthest stage each lead ever entered.
+
+## phase-4.2 — Neon
+- `DATABASE_URL` targets Neon's pooled endpoint; `lib/db.ts` now verifies TLS properly rather than disabling certificate checks, with `sslmode=no-verify` as the explicit opt-out.
+- `migrations/002_rls_supabase.sql` parked — skipped unless `npm run db:migrate -- --supabase`.
+- `.env.example` leads with Neon; the Supabase keys are documented as dormant.
+- Recordings stream through the auth-gated proxy. Keeping our own copy of the audio is a TODO in `lib/storage.ts`.

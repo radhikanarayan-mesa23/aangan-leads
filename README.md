@@ -6,7 +6,7 @@ Answers every phone enquiry to Aangan Studio — interior design, Pune, ~200 enq
 Caller ─► Vaani voice agent  (vaani_agent_prompt.md, backed by rubric.md)
             │  10 intake questions · never quotes a price · books a slot live
             ▼
-        POST /api/vaani/call-ended ─► Postgres (one row per call)
+        POST /api/vaani/call-ended ─► Postgres on Neon (one row per call)
             ▼
         Gemini Flash (one call, rubric.md as the system prompt)
             ▼  code recomputes the estimate, budget fit and grade — and wins

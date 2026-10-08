@@ -49,3 +49,17 @@ Append-only. The latest entry wins over `CLAUDE.md`; when they conflict, say so.
 **Why.** Hand-labelled seed data looks right and proves nothing. This way the seeded board is evidence that `rubric.md` behaves, and `npm run check` is a fast regression test with no database and no API key.
 
 **Rejected.** Seeding grades directly as literal values.
+
+---
+
+## 2026-10-08 — Neon, not Supabase
+
+**Decision.** Radhika chose Neon. `DATABASE_URL` points at a Neon **pooled** endpoint (`-pooler` in the host).
+
+**What changed.** Nothing in application code — this is what the 8 October "Postgres over the Supabase SDK" decision was written to allow. Only three things moved: `lib/db.ts` now verifies the TLS certificate properly instead of passing `rejectUnauthorized: false` (Neon presents a valid one, and the old setting was weaker than it needed to be), `migrations/002_rls_supabase.sql` is parked and skipped unless `--supabase` is passed, and `.env.example` leads with Neon.
+
+**Consequences.** Hard rule 5 (role separation) rests entirely on `middleware.ts` and `requireOwner()`, since there is no RLS. Both are in place and tested; the RLS file stays for a future move.
+
+Hard rule 9 (private recordings) is met by the auth-gated proxy at `/api/leads/:id/recording` rather than a private bucket with signed URLs — the browser never sees the upstream URL either way. **This is weaker in one respect:** a Vaani recording URL can expire, and we no longer keep our own copy. Noted as a TODO in `lib/storage.ts`; Vercel Blob or S3 is the fix when recordings need to outlive Vaani's retention window.
+
+**Rejected.** `@neondatabase/serverless` over HTTP. It is a better fit for edge functions, but every route here is Node runtime, `pg` against the pooler is sufficient, and it keeps local development identical to production.

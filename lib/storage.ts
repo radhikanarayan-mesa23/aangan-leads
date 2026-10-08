@@ -2,10 +2,14 @@
 // Vaani URL — it asks /api/leads/:id/recording, which is auth-gated and streams
 // the audio server-side.
 //
-// ASSUME: the database may be Neon, so Supabase Storage is optional. When
-// NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are set, the recording is
-// copied into a private bucket and served from there; otherwise we keep the
-// source URL in the row and proxy it.
+// The database is Neon, so there is no Supabase Storage in the normal path:
+// the recording's source URL stays server-side in the row and the audio is
+// streamed through the route. The Supabase branch below is dormant and only
+// wakes up if NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are ever set
+// — keep it, because a Vaani recording URL can expire and a copy outlives it.
+//
+// TODO when recordings matter in production: copy to a bucket of our own
+// (Vercel Blob or S3) so a lead's audio survives Vaani's retention window.
 
 const BUCKET = 'recordings';
 
