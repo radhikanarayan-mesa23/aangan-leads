@@ -30,5 +30,6 @@ See [DEMO.md](DEMO.md) to run it, [docs/CONTEXT.md](docs/CONTEXT.md) for current
 | `lib/pricing.ts` | Internal bands. Never reaches a caller-facing surface |
 | `lib/grading.ts` | C1–C5, the ladder, and the code override on budget maths |
 | `lib/vaani.ts` | The only file that knows Vaani's payload shape |
+| `lib/calendly.ts` | Calendly v2 — availability, booking on the caller's behalf, cancellation |
 | `app/board` · `app/owner` | Designer board and owner dashboard |
 | `scripts/` | `migrate` · `seed` · `replay` · `check-grading` · `eval` · `hubspot-setup` |

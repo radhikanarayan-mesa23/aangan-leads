@@ -69,28 +69,30 @@ agent collects two preferred slots and the webhook books right after the call.
 
 ---
 
-## 4. Calendar — please confirm which product
+## 4. Calendly — booking
 
-The brief says **Cal.com**, and that is what is built. You said *Calendly* —
-they're different products with different APIs. If you want Calendly I need to
-rewrite `lib/calcom.ts`; it's maybe an hour, and worth knowing before you buy a
-plan.
-
-**If Cal.com:**
+Built against Calendly API v2. The agent books **inside the call** — no link for
+the caller to click.
 
 | Key | Where |
 |---|---|
-| `CALCOM_API_KEY` | Cal.com → Settings → Developer → API keys |
-| `CALCOM_EVENT_TYPE_ID` | The numeric id of one **shared** event type: 1 hour, 12/1/2/3/4pm IST, Mon–Sat |
+| `CALENDLY_API_KEY` | Calendly → Integrations & apps → **API & webhooks** → personal access token |
+| `CALENDLY_EVENT_TYPE_URI` | The event type's **full URI**, not its slug. Get it from `GET https://api.calendly.com/event_types?user=<your user URI>`, or send me the token and I'll fetch it. Looks like `https://api.calendly.com/event_types/XXXXXXXX-XXXX-…` |
+| `CALENDLY_LOCATION_KIND` | **Usually leave empty.** Only set it if the event type has a location (`physical`, `google_conference`, …). Calendly rejects the booking if a location is sent for a location-less event type. |
+| `CALENDLY_WEBHOOK_SIGNING_KEY` | Given to you when you create the webhook subscription below |
 
-> Note: Calendly's API cannot create a booking on someone else's behalf the way
-> this flow needs — it's built around the invitee following a link. That is the
-> main reason the brief chose Cal.com.
+**Two things to set up in Calendly:**
 
-**Unblocks:** real consultation bookings. Until then the shared calendar lives in
-our own database, which still prevents double booking.
+1. **One event type** — 60 minutes, and availability limited to **12, 1, 2, 3 and 4pm IST, Mon–Sat**. That is what the agent offers.
+2. **A webhook subscription** for `invitee.created` and `invitee.canceled`, pointing at
+   `https://aangan-leads.vercel.app/api/calendly/webhook`. This is what stops a slot
+   someone booked directly in Calendly from being offered again on the phone.
 
----
+> ⚠️ **This needs a paid Calendly plan.** The Scheduling API returns 403 on a free
+> plan, so booking would silently fail. Worth checking before you go further.
+
+**Unblocks:** real bookings during the call. Until then the shared calendar lives
+in our own database, which still prevents double booking.
 
 ## 5. Telegram — alerts
 

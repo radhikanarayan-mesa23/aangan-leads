@@ -63,3 +63,23 @@ Append-only. The latest entry wins over `CLAUDE.md`; when they conflict, say so.
 Hard rule 9 (private recordings) is met by the auth-gated proxy at `/api/leads/:id/recording` rather than a private bucket with signed URLs — the browser never sees the upstream URL either way. **This is weaker in one respect:** a Vaani recording URL can expire, and we no longer keep our own copy. Noted as a TODO in `lib/storage.ts`; Vercel Blob or S3 is the fix when recordings need to outlive Vaani's retention window.
 
 **Rejected.** `@neondatabase/serverless` over HTTP. It is a better fit for edge functions, but every route here is Node runtime, `pg` against the pooler is sufficient, and it keeps local development identical to production.
+
+---
+
+## 2026-10-09 — Calendly, not Cal.com
+
+**Decision.** Radhika chose Calendly. `lib/calcom.ts` is replaced by `lib/calendly.ts` against Calendly API v2.
+
+**I was wrong when I pushed back.** I argued Calendly could not book on a caller's behalf and that the flow would have to fall back to sending a scheduling link. That was true of the older API and is no longer: Calendly's Scheduling API exposes `POST /invitees`, which creates the booking server-side with no invitee click, and fires the normal invites, reminders and workflows. The caller experience is therefore identical to the Cal.com design — the agent books inside the call.
+
+**Shape.** `GET /event_type_available_times` for availability (max 31-day window), `POST /invitees` to book, `POST /scheduled_events/{uuid}/cancellation` to release. Auth is a personal access token.
+
+**Two constraints that matter.** It needs a **paid** Calendly plan — a free plan returns 403 on booking. And `location` must be omitted entirely for an event type with no location, or Calendly rejects the request; hence `CALENDLY_LOCATION_KIND`, which is deliberately empty by default.
+
+**Improvement over the Cal.com build.** Offered slots are now our 12–4pm IST grid **intersected with Calendly's real availability**, instead of our database alone. If Calendly is unreachable the intersection is skipped rather than failing, so an outage degrades to our own calendar instead of refusing to book.
+
+**New: `POST /api/calendly/webhook`.** Handles `invitee.created` and `invitee.canceled`, signature-verified with a five-minute replay window. This closes a hole the Cal.com build had: a designer booking a slot directly in the calendar would otherwise still be offered to the next caller. A direct booking now holds the slot as its own lead; a cancellation frees the slot and keeps the lead.
+
+**Schema.** `calcom_booking_id` became `calendly_event_uri`, plus `calendly_cancel_url`. Renamed in `001_init.sql` rather than added as a migration, because no database has ever been created from it yet.
+
+**Rejected.** The single-use scheduling-link fallback. It is what you build when the API cannot book for you, and it no longer has to.

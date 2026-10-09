@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { openSlots } from '@/lib/calcom';
+import { openSlots } from '@/lib/calendly';
 import { toolAuthorised } from '@/lib/tool-auth';
 import { takenSlots } from '@/lib/leads';
 
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   if (cache && Date.now() - cache.at < 30_000) return NextResponse.json(cache.body);
 
   const taken = await takenSlots();
-  const slots = openSlots(taken).slice(0, 8);
+  const slots = (await openSlots(taken)).slice(0, 8);
   const body = {
     // What the agent reads aloud, and what it sends back to /book.
     spoken: slots.map((s) => s.spoken),

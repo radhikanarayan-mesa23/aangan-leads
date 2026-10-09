@@ -60,7 +60,8 @@ create table if not exists leads (
   insights            jsonb not null default '{}'::jsonb,
 
   -- booking
-  calcom_booking_id   text,
+  calendly_event_uri  text,
+  calendly_cancel_url text,
   booked_at           timestamptz,
   callback_due_at     timestamptz,
   callback_done_at    timestamptz,

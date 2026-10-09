@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { one, sql } from '@/lib/db';
-import { calcomBook } from '@/lib/calcom';
+import { calendlyBook } from '@/lib/calendly';
 import { spokenSlot } from '@/lib/time';
 import { toolAuthorised } from '@/lib/tool-auth';
 import { logEvent } from '@/lib/leads';
@@ -61,15 +61,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, say: 'That one has just been taken — may I offer you another time?' });
   }
 
-  const booking = await calcomBook({
+  const booking = await calendlyBook({
     startIso: start.toISOString(),
     name: body.name ?? '',
     email: body.email ?? '',
     phone: body.phone,
     ticketNo: lead.ticket_no,
   });
-  if (booking.bookingId) {
-    await sql('update leads set calcom_booking_id = $2 where id = $1', [lead.id, booking.bookingId]);
+
+  if (booking.eventUri) {
+    await sql('update leads set calendly_event_uri = $2, calendly_cancel_url = $3 where id = $1', [
+      lead.id,
+      booking.eventUri,
+      booking.cancelUrl ?? null,
+    ]);
+  } else if (booking.error) {
+    // Calendly refused the slot. Release our hold rather than telling the caller
+    // they are booked for something that does not exist.
+    await sql("update leads set booked_at = null, stage = 'New' where id = $1", [lead.id]);
+    await logEvent({ lead_id: lead.id, type: 'error', note: `Calendly refused the booking: ${booking.error}` }).catch(() => undefined);
+    return NextResponse.json({ ok: false, say: 'That time has just gone — may I offer you another one?' });
   }
   await logEvent({ lead_id: lead.id, type: 'booked', note: `Booked live in the call for ${spokenSlot(start)}.` }).catch(() => undefined);
 

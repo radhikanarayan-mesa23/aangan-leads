@@ -32,7 +32,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 | `DATABASE_URL` | **missing — blocks everything runtime.** Neon, pooled endpoint (`-pooler`) |
 | `GEMINI_API_KEY` | missing — leads store ungraded and fall back to WARM |
 | `TELEGRAM_BOT_TOKEN`, chat ids | missing — pushes are skipped, never crash |
-| `CALCOM_API_KEY`, `CALCOM_EVENT_TYPE_ID` | missing — booking falls back to our own DB, which still prevents double booking |
+| `CALENDLY_API_KEY`, `CALENDLY_EVENT_TYPE_URI` | missing — booking falls back to our own DB, which still prevents double booking. **Needs a paid Calendly plan.** |
 | `HUBSPOT_*` | missing — sync is a no-op |
 | `VAANI_*` | missing — webhook and tools run unauthenticated in development |
 | `SESSION_SECRET`, `CRON_SECRET` | defaulted in development, **must be set in production** |
@@ -42,7 +42,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 - `lib/db.ts` — Neon, decided 2026-10-08. One Postgres URL; nothing above it knows the host.
 - `lib/auth.ts` — our own magic link rather than Supabase Auth. With Neon there is no RLS, so hard rule 5 rests on `middleware.ts` and `requireOwner()` alone; `migrations/002_rls_supabase.sql` is parked.
 - `lib/vaani.ts` — Vaani's call-ended payload shape is unverified; the normaliser accepts the common shapes.
-- `lib/calcom.ts` — Cal.com v2 `/bookings` shape is unverified.
+- `lib/calendly.ts` — written from Calendly's published v2 guide; the exact response envelope of `POST /invitees` is unverified against a live account.
 - `lib/storage.ts` — on Neon, recordings stream through the auth-gated proxy. We keep no copy, so an expiring Vaani URL would lose the audio. TODO: Vercel Blob or S3.
 - `rubric.md` §14 — six questions for Nikhil (working days, fringe localities, painting, single-room band, large threshold, office cap).
 - `source/enquiries.pdf` is image-only; no text could be extracted, so no real transcript informed the seeds.
@@ -60,7 +60,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 npm install
 cp .env.example .env            # add DATABASE_URL at minimum
 npm run check                   # grading over the seeds, no DB or API key needed
-npm run verify:db               # schema + every query against an embedded Postgres
+npm run verify:db               # schema + every query against an embedded Postgres (37 checks)
 npm run db:migrate && npm run db:seed
 npm run dev                     # http://localhost:3000, sign in as nikhil@aanganstudio.in
 npm run replay                  # push a seeded call through the real pipeline

@@ -8,7 +8,7 @@ import { getLead, listEvents, listLeads, listUsers, takenSlots, logEvent } from 
 import { byLocality, bySource, costVsRevenue, funnel, health, heatmap, insights, kpis, leadsOverTime, loadRows, loadStageReach, team } from '../lib/analytics';
 import { upsertCall } from '../lib/pipeline';
 import { normalizeVaniPayload } from '../lib/vaani';
-import { openSlots } from '../lib/calcom';
+import { openSlotsFromDb } from '../lib/calendly';
 import { SEED_CALLS } from '../seed/calls';
 
 /**
@@ -95,7 +95,7 @@ async function main() {
     /unique|duplicate/i
   );
   const taken = await takenSlots();
-  const free = openSlots(taken);
+  const free = openSlotsFromDb(taken);
   ok('open slots exclude the taken ones', free.every((s) => !taken.some((t) => new Date(t).getTime() === new Date(s.iso).getTime())), `${free.length} free`);
 
   // ── hard rule 7: idempotent on vani_call_id ───────────────────────────────
@@ -186,6 +186,34 @@ async function main() {
     'select count(*)::text c from leads where callback_due_at is not null and booked_at is null'
   );
   ok('callback promises stored for unbooked leads', Number(promised[0].c) > 0, `${promised[0].c} promises`);
+
+  // ── Calendly webhook: a slot booked outside the phone agent ───────────────
+  const direct = new Date(Date.now() + 3 * 86_400_000);
+  direct.setUTCHours(9, 30, 0, 0); // 3pm IST
+  const held = await one<{ id: string; ticket_no: string }>(
+    `insert into leads (vani_call_id, caller_name, caller_email, booked_at, stage, started_at,
+                        calendly_event_uri, summary, grade, grade_reason)
+     values ($1,'Walk-in Booking','direct@example.com',$2,'Consultation booked', now(), $3,
+             'Booked directly in Calendly.', 'WARM', 'No transcript to grade.')
+     on conflict (vani_call_id) do nothing
+     returning id, ticket_no`,
+    ['calendly-direct-test', direct.toISOString(), 'https://api.calendly.com/scheduled_events/direct-test']
+  );
+  ok('a Calendly-side booking holds the slot', !!held, held?.ticket_no);
+  const afterHold = await takenSlots();
+  ok('the held slot is no longer offered', !openSlotsFromDb(afterHold).some((s) => new Date(s.iso).getTime() === direct.getTime()));
+
+  await sql(
+    `update leads set booked_at = null, calendly_event_uri = null, calendly_cancel_url = null,
+       stage = case when stage = 'Consultation booked' then 'Contacted' else stage end
+     where calendly_event_uri = $1`,
+    ['https://api.calendly.com/scheduled_events/direct-test']
+  );
+  const released = await one<{ booked_at: string | null; stage: string }>(
+    "select booked_at, stage from leads where vani_call_id = 'calendly-direct-test'"
+  );
+  ok('a Calendly cancellation frees the slot but keeps the lead', released?.booked_at === null && released?.stage === 'Contacted',
+    `stage=${released?.stage}`);
 
   // Hard rule 3, the other half: a caller who was declined on the call was
   // promised nothing, so no promise may be stored against them.

@@ -59,3 +59,11 @@
 - Private GitHub repo `radhikanarayan-mesa23/aangan-leads`, Vercel project linked to it.
 - **Next.js 15.1.6 → 15.5.27.** Vercel refused the first build: 15.1.6 carries CVE-2025-66478. Same App Router API, no code changes needed.
 - A deploy without `DATABASE_URL` now shows the setup page rather than failing.
+
+## phase-5 — Calendly
+- `lib/calcom.ts` → `lib/calendly.ts` against Calendly API v2: `GET /event_type_available_times`, `POST /invitees` (books server-side, no invitee click), `POST /scheduled_events/{uuid}/cancellation`.
+- Offered slots are now our grid **intersected with Calendly's real availability**, degrading to our own calendar if Calendly is unreachable.
+- If Calendly refuses a slot mid-call, our hold is released and the agent offers another time instead of confirming a booking that does not exist.
+- **New `POST /api/calendly/webhook`** (`invitee.created`, `invitee.canceled`), signature-verified with a five-minute replay window. A booking made directly in Calendly now holds the slot; a cancellation frees it without dropping the lead.
+- Schema: `calcom_booking_id` → `calendly_event_uri`, plus `calendly_cancel_url`.
+- `verify:db` is now 37 checks, covering the direct-booking hold and the cancellation release.
