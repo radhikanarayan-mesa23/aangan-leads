@@ -46,6 +46,6 @@ npm run eval      # runs the adversarial set through the live model (needs GEMIN
 |---|---|
 | `GEMINI_API_KEY` | Leads store ungraded and fall back to Warm rather than being lost |
 | `TELEGRAM_BOT_TOKEN` + chat ids | Pushes are skipped; the board is still correct |
-| `CALENDLY_API_KEY` + `CALENDLY_EVENT_TYPE_URI` | Booking uses our own database, which still prevents double booking |
+| `CALCOM_API_KEY` + `CALCOM_EVENT_TYPE_ID` | Booking uses our own database, which still prevents double booking |
 | `HUBSPOT_PRIVATE_APP_TOKEN` | Stage moves log locally and retry when the token arrives |
 | `VAANI_*` | The webhook accepts unauthenticated calls in development only |

@@ -9,13 +9,10 @@ export const env = {
   VAANI_WEBHOOK_SECRET: process.env.VAANI_WEBHOOK_SECRET ?? '',
   VAANI_TOOL_SECRET: process.env.VAANI_TOOL_SECRET ?? '',
 
-  // Calendly v2. CALENDLY_API_KEY is a personal access token; the event type is
-  // its full URI (https://api.calendly.com/event_types/<uuid>).
-  CALENDLY_API_KEY: process.env.CALENDLY_API_KEY ?? '',
-  CALENDLY_EVENT_TYPE_URI: process.env.CALENDLY_EVENT_TYPE_URI ?? '',
-  /** Only set this if the event type HAS a location, e.g. "physical" or "google_conference". */
-  CALENDLY_LOCATION_KIND: process.env.CALENDLY_LOCATION_KIND ?? '',
-  CALENDLY_WEBHOOK_SIGNING_KEY: process.env.CALENDLY_WEBHOOK_SIGNING_KEY ?? '',
+  // Cal.com v2. The event type is the numeric id of one shared studio event.
+  CALCOM_API_KEY: process.env.CALCOM_API_KEY ?? '',
+  CALCOM_EVENT_TYPE_ID: process.env.CALCOM_EVENT_TYPE_ID ?? '',
+  CALCOM_WEBHOOK_SECRET: process.env.CALCOM_WEBHOOK_SECRET ?? '',
 
   GEMINI_API_KEY: process.env.GEMINI_API_KEY ?? '',
   GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
@@ -54,6 +51,6 @@ export const has = {
   db: () => !!env.DATABASE_URL,
   gemini: () => !!env.GEMINI_API_KEY,
   telegram: () => !!env.TELEGRAM_BOT_TOKEN,
-  calendly: () => !!env.CALENDLY_API_KEY && !!env.CALENDLY_EVENT_TYPE_URI,
+  calcom: () => !!env.CALCOM_API_KEY && !!env.CALCOM_EVENT_TYPE_ID,
   hubspot: () => !!env.HUBSPOT_PRIVATE_APP_TOKEN && !!env.HUBSPOT_PIPELINE_ID,
 };

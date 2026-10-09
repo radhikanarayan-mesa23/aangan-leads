@@ -20,7 +20,7 @@ export async function upsertCall(call: NormalisedCall): Promise<LeadRow> {
     `insert into leads (
        vani_call_id, raw_payload, caller_name, caller_number, caller_email,
        started_at, duration_s, ended_reason, recording_source_url, transcript,
-       off_script_count, booked_at, calendly_event_uri, vaani_cost_inr
+       off_script_count, booked_at, calcom_booking_uid, vaani_cost_inr
      ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
      on conflict (vani_call_id) do update set
        raw_payload = excluded.raw_payload,
@@ -35,7 +35,7 @@ export async function upsertCall(call: NormalisedCall): Promise<LeadRow> {
        caller_email = coalesce(leads.caller_email, excluded.caller_email),
        started_at = coalesce(leads.started_at, excluded.started_at),
        booked_at = coalesce(leads.booked_at, excluded.booked_at),
-       calendly_event_uri = coalesce(leads.calendly_event_uri, excluded.calendly_event_uri),
+       calcom_booking_uid = coalesce(leads.calcom_booking_uid, excluded.calcom_booking_uid),
        off_script_count = greatest(leads.off_script_count, excluded.off_script_count),
        vaani_cost_inr = greatest(leads.vaani_cost_inr, excluded.vaani_cost_inr)
      returning *`,
@@ -52,7 +52,7 @@ export async function upsertCall(call: NormalisedCall): Promise<LeadRow> {
       JSON.stringify(transcript),
       countOffScript(transcript),
       call.booked_at,
-      call.calendly_event_uri,
+      call.calcom_booking_uid,
       vaaniCost(call.duration_s, call.cost_inr),
     ]
   );

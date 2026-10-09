@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { openSlots } from '@/lib/calendly';
+import { openSlots } from '@/lib/calcom';
 import { toolAuth } from '@/lib/tool-auth';
 import { takenSlots } from '@/lib/leads';
 

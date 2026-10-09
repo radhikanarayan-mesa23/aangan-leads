@@ -31,7 +31,7 @@ export type LeadRow = {
   summary: string | null;
   handoff_note: string | null;
   insights: Record<string, any>;
-  calendly_event_uri: string | null;
+  calcom_booking_uid: string | null;
   booked_at: string | null;
   callback_due_at: string | null;
   callback_done_at: string | null;

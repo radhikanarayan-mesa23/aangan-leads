@@ -19,7 +19,7 @@ export type NormalisedCall = {
   transcript: TranscriptTurn[];
   /** Slots the agent booked live, or preferences it collected for the fallback path. */
   booked_at: string | null;
-  calendly_event_uri: string | null;
+  calcom_booking_uid: string | null;
   preferred_slots: string[];
   /** Vaani's own cost for the call, if the payload carries one. */
   cost_inr: number | null;
@@ -41,7 +41,7 @@ export function normalizeVaniPayload(raw: any): NormalisedCall {
     recording_url: str(call.recording_url ?? call.recordingUrl ?? call.recording?.url ?? raw?.recording_url),
     transcript: normalizeTranscript(call.transcript ?? call.messages ?? raw?.transcript),
     booked_at: iso(meta.booked_at ?? call.booked_at),
-    calendly_event_uri: str(meta.calendly_event_uri ?? call.calendly_event_uri),
+    calcom_booking_uid: str(meta.calcom_booking_uid ?? call.calcom_booking_uid),
     preferred_slots: arr(meta.preferred_slots ?? call.preferred_slots),
     cost_inr: num(call.cost_inr ?? call.cost ?? raw?.cost_inr),
     raw,

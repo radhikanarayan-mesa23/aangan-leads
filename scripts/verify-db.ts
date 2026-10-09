@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PGlite } from '@electric-sql/pglite';
 import { setExecutor, sql, one } from '../lib/db';
@@ -8,7 +8,7 @@ import { getLead, listEvents, listLeads, listUsers, takenSlots, logEvent } from 
 import { byLocality, bySource, costVsRevenue, funnel, health, heatmap, insights, kpis, leadsOverTime, loadRows, loadStageReach, team } from '../lib/analytics';
 import { upsertCall } from '../lib/pipeline';
 import { normalizeVaniPayload } from '../lib/vaani';
-import { openSlotsFromDb } from '../lib/calendly';
+import { openSlotsFromDb } from '../lib/calcom';
 import { SEED_CALLS } from '../seed/calls';
 
 /**
@@ -39,7 +39,16 @@ async function main() {
   setExecutor(async (text, params) => (await db.query(text, params as unknown[])).rows as Record<string, unknown>[]);
 
   // ── schema ────────────────────────────────────────────────────────────────
-  await db.exec(readFileSync(join(process.cwd(), 'migrations/001_init.sql'), 'utf8'));
+  // Run the whole chain in order, exactly as scripts/migrate.ts does, so the
+  // migrations are tested as a sequence and not just the initial schema.
+  const applied: string[] = [];
+  for (const file of readdirSync(join(process.cwd(), 'migrations'))
+    .filter((f) => f.endsWith('.sql') && !f.includes('rls_supabase'))
+    .sort()) {
+    await db.exec(readFileSync(join(process.cwd(), 'migrations', file), 'utf8'));
+    applied.push(file);
+  }
+  ok('every migration applies in order', applied.length >= 2, applied.join(' → '));
   const tables = await sql<{ table_name: string }>(
     "select table_name from information_schema.tables where table_schema='public' order by 1"
   );
@@ -187,32 +196,32 @@ async function main() {
   );
   ok('callback promises stored for unbooked leads', Number(promised[0].c) > 0, `${promised[0].c} promises`);
 
-  // ── Calendly webhook: a slot booked outside the phone agent ───────────────
+  // ── Cal.com webhook: a slot booked outside the phone agent ───────────────
   const direct = new Date(Date.now() + 3 * 86_400_000);
   direct.setUTCHours(9, 30, 0, 0); // 3pm IST
   const held = await one<{ id: string; ticket_no: string }>(
     `insert into leads (vani_call_id, caller_name, caller_email, booked_at, stage, started_at,
-                        calendly_event_uri, summary, grade, grade_reason)
+                        calcom_booking_uid, summary, grade, grade_reason)
      values ($1,'Walk-in Booking','direct@example.com',$2,'Consultation booked', now(), $3,
-             'Booked directly in Calendly.', 'WARM', 'No transcript to grade.')
+             'Booked directly in Cal.com.', 'WARM', 'No transcript to grade.')
      on conflict (vani_call_id) do nothing
      returning id, ticket_no`,
-    ['calendly-direct-test', direct.toISOString(), 'https://api.calendly.com/scheduled_events/direct-test']
+    ['calcom-direct-test', direct.toISOString(), 'calcom-direct-test-uid']
   );
-  ok('a Calendly-side booking holds the slot', !!held, held?.ticket_no);
+  ok('a Cal.com-side booking holds the slot', !!held, held?.ticket_no);
   const afterHold = await takenSlots();
   ok('the held slot is no longer offered', !openSlotsFromDb(afterHold).some((s) => new Date(s.iso).getTime() === direct.getTime()));
 
   await sql(
-    `update leads set booked_at = null, calendly_event_uri = null, calendly_cancel_url = null,
+    `update leads set booked_at = null, calcom_booking_uid = null, calcom_cancel_url = null,
        stage = case when stage = 'Consultation booked' then 'Contacted' else stage end
-     where calendly_event_uri = $1`,
-    ['https://api.calendly.com/scheduled_events/direct-test']
+     where calcom_booking_uid = $1`,
+    ['calcom-direct-test-uid']
   );
   const released = await one<{ booked_at: string | null; stage: string }>(
-    "select booked_at, stage from leads where vani_call_id = 'calendly-direct-test'"
+    "select booked_at, stage from leads where vani_call_id = 'calcom-direct-test'"
   );
-  ok('a Calendly cancellation frees the slot but keeps the lead', released?.booked_at === null && released?.stage === 'Contacted',
+  ok('a Cal.com cancellation frees the slot but keeps the lead', released?.booked_at === null && released?.stage === 'Contacted',
     `stage=${released?.stage}`);
 
   // Hard rule 3, the other half: a caller who was declined on the call was

@@ -76,3 +76,10 @@ Going public exposed a hole: every webhook treated a missing shared secret as "a
 ## phase-5.2 — live on Neon
 - Neon pooled endpoint wired, schema applied, 14 leads seeded. All grades land as the rubric's worked examples promise, including the code override on AAN-0004.
 - **Fixed — the magic link was printed on the production login page.** With no email provider wired, anyone who knew a team address could have signed in. It is now behind `DEMO_MAGIC_LINK=1`, and with the flag off the form gives the same answer for any address so it cannot be used to discover who is on the team.
+
+## phase-5.3 — back to Cal.com
+- `lib/calendly.ts` → `lib/calcom.ts` against Cal.com API v2, with the version header pinned per endpoint (omitting it returns 404).
+- `POST /api/calendly/webhook` → `POST /api/calcom/webhook`, HMAC-SHA256 over the raw body in `x-cal-signature-256`.
+- `migrations/003_calcom.sql` renames the booking columns on the live Neon database. Idempotent, and safe on a fresh install.
+- `verify:db` now applies the **whole migration chain** in order, not just `001` — 38 checks.
+- Generated `VAANI_WEBHOOK_SECRET`, `VAANI_TOOL_SECRET` and `CALCOM_WEBHOOK_SECRET`; set in Vercel and `.env`, so those endpoints no longer return 503 in production.

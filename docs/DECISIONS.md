@@ -83,3 +83,22 @@ Hard rule 9 (private recordings) is met by the auth-gated proxy at `/api/leads/:
 **Schema.** `calcom_booking_id` became `calendly_event_uri`, plus `calendly_cancel_url`. Renamed in `001_init.sql` rather than added as a migration, because no database has ever been created from it yet.
 
 **Rejected.** The single-use scheduling-link fallback. It is what you build when the API cannot book for you, and it no longer has to.
+
+---
+
+## 2026-10-09 — back to Cal.com
+
+**Decision.** Radhika moved the calendar back to Cal.com. `lib/calendly.ts` is replaced by `lib/calcom.ts` against Cal.com API v2.
+
+**Nothing was lost in the round trip.** The three improvements made while Calendly was in place were carried over rather than reverted:
+1. Offered slots are our 12–4pm IST grid **intersected with the provider's real availability**, degrading to our own calendar if the provider is unreachable.
+2. If the provider refuses a slot mid-call, our hold is released and the agent offers another time instead of confirming a booking that does not exist.
+3. A signature-verified provider webhook, now `POST /api/calcom/webhook` for `BOOKING_CREATED` and `BOOKING_CANCELLED`. This closes the hole the original Cal.com build had: a slot booked directly in the calendar would otherwise still be offered to the next caller.
+
+**Shape.** `GET /v2/slots` (`cal-api-version: 2024-09-04`), `POST /v2/bookings` (`2024-08-13`), `POST /v2/bookings/{uid}/cancel`. The version header is mandatory — omitting it returns 404 and a wrong value silently falls back to an older response shape, so both are pinned as constants. The slots parser accepts both the date-keyed object and the flat array, because the published examples disagree.
+
+**Schema.** `calendly_event_uri` → `calcom_booking_uid`, `calendly_cancel_url` → `calcom_cancel_url`, via `migrations/003_calcom.sql`. This is a real migration, not an edit to `001`, because the database is already live on Neon with 14 rows. It is idempotent and safe on a fresh database.
+
+**Why this is better than the first Cal.com build.** `scripts/verify-db.ts` now applies the whole migration chain in order rather than just the initial schema, so migrations are tested as a sequence.
+
+**Open risk.** Two GitHub issues report `POST /v2/bookings` rejecting a `title` field the docs do not list as required, and `/v2/slots` returning times `/v2/bookings` then refuses. `title` is sent in `bookingFieldsResponses` defensively. Neither is confirmed against a live account — the first real booking is the test.
