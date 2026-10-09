@@ -5,6 +5,7 @@ import { Chrome } from '@/components/Chrome';
 import { SetupNeeded } from '@/components/SetupNeeded';
 import { InternalBadge } from '@/components/Chips';
 import { CostVsRevenue, FunnelChart, Heatmap, LeadsOverTime, LocalityChart, SourceChart } from '@/components/OwnerCharts';
+import { OwnerHero, heroCopy } from '@/components/OwnerHero';
 import { byLocality, bySource, costVsRevenue, funnel, health, heatmap, insights, kpis, leadsOverTime, loadRows, loadStageReach, team } from '@/lib/analytics';
 import { inr } from '@/lib/pricing';
 import { cn } from '@/lib/utils';
@@ -26,14 +27,30 @@ export default async function OwnerPage() {
   const h = health(rows);
   const bullets = insights(rows);
 
+  const hotInNew = rows.filter((r) => r.grade === 'HOT' && r.stage === 'New').length;
+  const awaitingCallback = rows.filter((r) => r.callback_due_at && !r.callback_done_at && !r.first_contact_at).length;
+  const escalations = rows.filter((r) => r.grade === 'ESCALATE' && r.stage === 'New').length;
+  const hero = heroCopy({ hotInNew, awaitingCallback, escalations, pricesSpoken: h.pricesSpoken });
+
   const deltaLeads = pct(k.month.count, k.prevMonth.count);
   const deltaCost = pct(k.month.cost, k.prevMonth.cost);
 
   return (
     <Chrome user={user} active="owner">
-      <div className="mb-5 flex items-end justify-between gap-4 flex-wrap">
+      <OwnerHero
+        headline={hero.headline}
+        sub={hero.sub}
+        stats={[
+          { label: 'leads this month', value: String(k.month.count) },
+          { label: 'hot leads', value: String(k.month.hot) },
+          { label: 'cost per hot lead', value: inr(Math.round(k.costPerHot)) },
+        ]}
+        localities={byLocality(rows, 6).filter((l) => l.name !== 'Not stated')}
+      />
+
+      <div className="mt-6 mb-3 flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Overview</h1>
+          <h2 className="text-base font-semibold tracking-tight">The numbers</h2>
           <p className="text-sm text-ink-2">Last 30 days, with this week alongside. All times IST.</p>
         </div>
         <InternalBadge />

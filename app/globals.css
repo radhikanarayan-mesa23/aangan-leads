@@ -3,30 +3,52 @@
 @tailwind utilities;
 
 /* ───────────────────────────────────────────────────────────────────────────
-   Design tokens. A new design file = new values here, nothing else changes.
-   Look: clean and calm, Notion-like. Warm off-white, white cards, hairline
-   borders, 10px radius, generous spacing. Mobile-first.
+   Design tokens. A new design = new values here, nothing else changes.
+
+   Palette taken from the Show Prime badge: deep navy ground, royal blue
+   gradient, silver-periwinkle highlights. The page itself stays light and cool
+   so dense data reads easily; the weight goes into a dark hero band and the
+   navy ink, which is where "premium" actually comes from — restraint, not
+   decoration.
    ─────────────────────────────────────────────────────────────────────────── */
 :root {
-  --canvas: #fbfaf8;
+  /* brand ramp */
+  --navy-950: #050B22;
+  --navy-900: #0A1232;
+  --navy-800: #111C4A;
+  --navy-700: #1B2C73;
+  --blue-600: #2742C4;
+  --blue-500: #3A5BF0;
+  --blue-400: #5E7BF5;
+  --blue-300: #8EA3F7;
+  --blue-100: #DCE3FC;
+  --ice: #EEF2FE;
+
+  /* surfaces */
+  --canvas: #F4F6FC;
   --surface: #ffffff;
-  --surface-2: #f6f5f2;
-  --line: #eceae6;
-  --ink: #1c1b19;
-  --ink-2: #5c5952;
-  --ink-3: #8e8b84;
-  --accent: #1c1b19;
-  --ink-hover: #322f2b;
-  --canvas-blur: rgba(251, 250, 248, 0.85);
-  --surface-blur: rgba(255, 255, 255, 0.95);
+  --surface-2: #F3F5FD;
+  --line: #E2E8F7;
+  --line-strong: #CBD5F0;
 
-  --hot: #e5484d;
-  --warm: #f5a524;
-  --low: #8e8e8e;
-  --escalate: #7c3aed;
-  --ok: #30a46c;
+  /* ink */
+  --ink: #0A1232;
+  --ink-2: #4A5681;
+  --ink-3: #8691B5;
 
-  --radius: 10px;
+  --accent: var(--blue-600);
+  --ink-hover: #1B2C73;
+  --canvas-blur: rgba(244, 246, 252, 0.82);
+  --surface-blur: rgba(255, 255, 255, 0.96);
+
+  /* grades — still semantic, retuned to sit beside the blue */
+  --hot: #E0394F;
+  --warm: #D98324;
+  --low: #8691B5;
+  --escalate: #7C4DF0;
+  --ok: #10876A;
+
+  --radius: 12px;
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Inter, Roboto, sans-serif;
 }
 
@@ -37,6 +59,7 @@ html, body {
   color: var(--ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 @layer components {
@@ -47,35 +70,46 @@ html, body {
     @apply inline-flex items-center gap-1.5 rounded-chip border px-2 py-0.5 text-[11px] font-medium leading-5 whitespace-nowrap;
   }
   .label {
-    @apply text-[11px] uppercase tracking-wider text-ink-3 font-medium;
+    @apply text-[10px] uppercase tracking-[0.09em] text-ink-3 font-semibold;
   }
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-card border border-line bg-surface px-3 py-1.5 text-sm font-medium
-           text-ink transition-colors hover:bg-surface-2 disabled:opacity-40 disabled:pointer-events-none;
+           text-ink transition-all hover:bg-surface-2 hover:border-line-strong disabled:opacity-40 disabled:pointer-events-none;
   }
   .btn-primary {
-    @apply bg-ink text-white border-ink hover:bg-[var(--ink-hover)];
+    @apply text-white border-transparent hover:brightness-110;
+    background: linear-gradient(140deg, var(--blue-600) 0%, var(--navy-700) 100%);
+    box-shadow: 0 1px 2px rgba(10, 18, 50, 0.16);
   }
   .input {
-    @apply w-full rounded-card border border-line bg-surface px-3 py-2 text-sm outline-none
-           placeholder:text-ink-3 focus:border-ink-3;
+    @apply w-full rounded-card border border-line bg-surface px-3 py-2 text-sm outline-none transition-colors
+           placeholder:text-ink-3 focus:border-[var(--blue-400)];
   }
-  .kv {
-    @apply flex flex-col gap-0.5;
+  .kv { @apply flex flex-col gap-0.5; }
+
+  /* The dark band the dashboard leads with. */
+  .hero {
+    background:
+      radial-gradient(120% 140% at 88% 0%, rgba(58, 91, 240, 0.42) 0%, rgba(58, 91, 240, 0) 58%),
+      linear-gradient(145deg, var(--navy-900) 0%, var(--navy-950) 55%, #04091B 100%);
+    color: #fff;
+    border-radius: 16px;
   }
+  .hero-divider { border-color: rgba(142, 163, 247, 0.18); }
 }
 
 /* Grade chips always carry a text label as well as colour. */
 .grade-HOT       { color: #fff; background: var(--hot);      border-color: var(--hot); }
-.grade-WARM      { color: #43300a; background: var(--warm);  border-color: var(--warm); }
+.grade-WARM      { color: #3A2102; background: #F7C87A;      border-color: #EDB355; }
 .grade-LOW       { color: #fff; background: var(--low);      border-color: var(--low); }
 .grade-ESCALATE  { color: #fff; background: var(--escalate); border-color: var(--escalate); }
 .grade-NOT_ENQUIRY { color: var(--ink-2); background: var(--surface-2); border-color: var(--line); }
 
-.fit-fits    { color: #14532d; background: #e7f6ee; border-color: #c7ead8; }
-.fit-close   { color: #6b4300; background: #fdf3e0; border-color: #f6e2bd; }
-.fit-below   { color: #7f1d1d; background: #fdecec; border-color: #f7d3d3; }
+.fit-fits    { color: #0A5C47; background: #DCF5EC; border-color: #B6E8D7; }
+.fit-close   { color: #6B4300; background: #FCF0DA; border-color: #F2DCAF; }
+.fit-below   { color: #8A1026; background: #FDE7EB; border-color: #F7C9D1; }
 .fit-unknown { color: var(--ink-2); background: var(--surface-2); border-color: var(--line); }
 
-.scrollbar-thin::-webkit-scrollbar { height: 8px; width: 8px; }
-.scrollbar-thin::-webkit-scrollbar-thumb { background: #e2dfd9; border-radius: 99px; }
+.scrollbar-thin::-webkit-scrollbar { height: 9px; width: 9px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 99px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }

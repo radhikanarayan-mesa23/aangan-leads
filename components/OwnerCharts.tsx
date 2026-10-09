@@ -25,14 +25,16 @@ const GRADE_FILL: Record<string, string> = {
 };
 
 const axis = { stroke: 'var(--ink-3)', fontSize: 11, tickLine: false, axisLine: false } as const;
+const BLUE = 'var(--blue-500)';
+const NAVY = 'var(--navy-700)';
 const grid = <CartesianGrid stroke="var(--line)" vertical={false} />;
 const tip = {
   contentStyle: {
     background: 'var(--surface)',
-    border: '1px solid var(--line)',
-    borderRadius: 10,
+    border: '1px solid var(--line-strong)',
+    borderRadius: 12,
     fontSize: 12,
-    boxShadow: '0 8px 28px rgba(16,15,14,0.10)',
+    boxShadow: '0 12px 32px rgba(10,18,50,0.12)',
   },
 } as const;
 
@@ -61,7 +63,7 @@ export function LocalityChart({ data }: { data: { name: string; total: number; H
         <XAxis type="number" {...axis} allowDecimals={false} />
         <YAxis type="category" dataKey="name" {...axis} width={96} />
         <Tooltip {...tip} />
-        <Bar dataKey="total" name="All leads" fill="var(--surface-2)" stroke="var(--line)" radius={[0, 5, 5, 0]} barSize={14} />
+        <Bar dataKey="total" name="All leads" fill="var(--blue-100)" radius={[0, 5, 5, 0]} barSize={14} />
         <Bar dataKey="HOT" name="Hot" fill="var(--hot)" radius={[0, 5, 5, 0]} barSize={14} />
       </BarChart>
     </ResponsiveContainer>
@@ -76,7 +78,7 @@ export function SourceChart({ data }: { data: { name: string; value: number }[] 
         <XAxis type="number" {...axis} allowDecimals={false} />
         <YAxis type="category" dataKey="name" {...axis} width={88} />
         <Tooltip {...tip} />
-        <Bar dataKey="value" name="Leads" radius={[0, 5, 5, 0]} barSize={14} fill="var(--ink)" />
+        <Bar dataKey="value" name="Leads" radius={[0, 5, 5, 0]} barSize={14} fill={BLUE} />
       </BarChart>
     </ResponsiveContainer>
   );
@@ -96,7 +98,7 @@ export function FunnelChart({ data }: { data: { stage: string; count: number; dr
             </span>
           </div>
           <div className="h-2 rounded-chip bg-surface-2 overflow-hidden">
-            <div className="h-full rounded-chip bg-ink transition-all" style={{ width: `${(d.count / max) * 100}%` }} />
+            <div className="h-full rounded-chip transition-all" style={{ width: `${(d.count / max) * 100}%`, background: `linear-gradient(90deg, ${NAVY}, ${BLUE})` }} />
           </div>
         </li>
       ))}
@@ -114,7 +116,7 @@ export function CostVsRevenue({ data }: { data: { month: string; cost: number; r
         <Tooltip {...tip} formatter={(v: any) => inr(Number(v))} />
         <Legend iconType="circle" wrapperStyle={{ fontSize: 11 }} />
         <Bar dataKey="revenue" name="Revenue won" fill="var(--ok)" radius={[5, 5, 0, 0]} barSize={26} />
-        <Line dataKey="cost" name="AI cost" stroke="var(--ink)" strokeWidth={2} dot={{ r: 2.5 }} />
+        <Line dataKey="cost" name="AI cost" stroke={NAVY} strokeWidth={2.5} dot={{ r: 3, fill: NAVY }} />
       </ComposedChart>
     </ResponsiveContainer>
   );
@@ -150,7 +152,7 @@ export function Heatmap({ data }: { data: { day: number; hour: number; count: nu
                     title={`${DAY[d]} ${h}:00 — ${c} call${c === 1 ? '' : 's'}`}
                     className="size-5 rounded-[3px]"
                     style={{
-                      background: c ? `color-mix(in srgb, var(--ink) ${12 + (c / max) * 78}%, var(--surface))` : 'var(--surface-2)',
+                      background: c ? `color-mix(in srgb, var(--blue-500) ${18 + (c / max) * 76}%, var(--ice))` : 'var(--surface-2)',
                       outline: office ? '1px solid var(--line)' : 'none',
                     }}
                   />

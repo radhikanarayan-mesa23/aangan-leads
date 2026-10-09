@@ -20,10 +20,17 @@ export function Chrome({
 
   return (
     <div className="min-h-dvh flex flex-col">
-      <header className="sticky top-0 z-30 bg-[var(--canvas-blur)] backdrop-blur border-b border-line">
+      <header className="sticky top-0 z-30 bg-[var(--canvas-blur)] backdrop-blur-xl border-b border-line">
         <div className="mx-auto max-w-[1600px] px-4 sm:px-6 h-14 flex items-center gap-4">
-          <Link href="/" className="font-semibold tracking-tight shrink-0">
-            Aangan<span className="text-ink-3"> Leads</span>
+          <Link href="/" className="flex items-center gap-2 shrink-0 group">
+            <span
+              className="grid place-items-center size-7 rounded-[9px] text-white text-[12px] font-bold tracking-tight"
+              style={{ background: 'linear-gradient(140deg, var(--blue-500), var(--navy-800))' }}
+              aria-hidden
+            >
+              A
+            </span>
+            <span className="font-semibold tracking-tight">Aangan<span className="text-ink-3"> Leads</span></span>
           </Link>
           <nav className="flex items-center gap-1 overflow-x-auto scrollbar-thin">
             {tabs.map((t) => (
@@ -32,7 +39,7 @@ export function Chrome({
                 href={t.href}
                 className={cn(
                   'px-2.5 py-1.5 rounded-card text-sm whitespace-nowrap transition-colors',
-                  active === t.key ? 'bg-surface-2 text-ink font-medium' : 'text-ink-2 hover:bg-surface-2'
+                  active === t.key ? 'bg-navy text-white font-medium shadow-card' : 'text-ink-2 hover:bg-surface-2'
                 )}
               >
                 {t.label}
