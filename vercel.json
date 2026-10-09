@@ -1,10 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
-    {
-      "path": "/api/cron",
-      "comment": "15:30 UTC = 21:00 IST — Nikhil's daily brief. Hobby plans allow one run a day; for the 10-minute sweep (queued pushes, hot-lead nudges, overdue callbacks, HubSpot retries) point cron-job.org at /api/cron?secret=$CRON_SECRET as well.",
-      "schedule": "30 15 * * *"
-    }
-  ]
+  "crons": [{ "path": "/api/cron", "schedule": "30 15 * * *" }]
 }
