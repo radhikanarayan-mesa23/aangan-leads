@@ -53,32 +53,58 @@ export async function stageIds(): Promise<Record<string, string>> {
   return map;
 }
 
+/**
+ * Find or create the caller as a HubSpot contact.
+ *
+ * Email is optional in the rubric — plenty of callers never give one — and
+ * HubSpot rejects a synthetic placeholder outright (`INVALID_EMAIL` on a
+ * `.invalid` address). So we key on the email when we have one and on the phone
+ * number when we do not, and never invent an address.
+ */
 export async function upsertContact(lead: {
   caller_name?: string | null;
   caller_email?: string | null;
   caller_number?: string | null;
   ticket_no: string;
 }): Promise<string> {
-  const email = lead.caller_email || `${lead.ticket_no.toLowerCase()}@aangan.invalid`;
-  const [firstname, ...rest] = (lead.caller_name ?? 'Aangan caller').split(' ');
-  try {
-    const found = await hs('/crm/v3/objects/contacts/search', {
-      method: 'POST',
-      body: JSON.stringify({
-        filterGroups: [{ filters: [{ propertyName: 'email', operator: 'EQ', value: email }] }],
-        properties: ['email'],
-        limit: 1,
-      }),
-    });
-    if (found.results?.[0]?.id) return String(found.results[0].id);
-  } catch {
-    /* fall through to create */
+  const email = lead.caller_email?.trim() || null;
+  const phone = lead.caller_number?.trim() || null;
+  const [firstname, ...rest] = (lead.caller_name?.trim() || 'Aangan caller').split(' ');
+
+  // Look for an existing contact on whichever identifier we actually have.
+  const searchBy = email ? { propertyName: 'email', value: email } : phone ? { propertyName: 'phone', value: phone } : null;
+  if (searchBy) {
+    try {
+      const found = await hs('/crm/v3/objects/contacts/search', {
+        method: 'POST',
+        body: JSON.stringify({
+          filterGroups: [{ filters: [{ ...searchBy, operator: 'EQ' }] }],
+          properties: ['email', 'phone'],
+          limit: 1,
+        }),
+      });
+      if (found.results?.[0]?.id) return String(found.results[0].id);
+    } catch {
+      // A failed search should not stop us creating the contact.
+    }
   }
-  const created = await hs('/crm/v3/objects/contacts', {
-    method: 'POST',
-    body: JSON.stringify({ properties: { email, firstname, lastname: rest.join(' ') || '—', phone: lead.caller_number ?? '' } }),
-  });
-  return String(created.id);
+
+  const properties: Record<string, string> = {
+    firstname,
+    lastname: rest.join(' ') || '—',
+  };
+  if (email) properties.email = email;
+  if (phone) properties.phone = phone;
+
+  try {
+    const created = await hs('/crm/v3/objects/contacts', { method: 'POST', body: JSON.stringify({ properties }) });
+    return String(created.id);
+  } catch (e) {
+    // A duplicate email raises 409 with the existing id in the message.
+    const existing = String(e).match(/Existing ID:\s*(\d+)/);
+    if (existing) return existing[1];
+    throw e;
+  }
 }
 
 /**

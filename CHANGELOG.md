@@ -97,3 +97,9 @@ HubSpot moved private apps under *Development → Legacy Apps* and disables crea
 - **New:** a stated budget ≥ ₹8,00,000 passes C3 on its own. The threshold is parsed out of `rubric.md`, not hardcoded.
 - `budget_fit` still records the arithmetic, so the board shows the real gap; leads that pass on the floor carry flag `BUDGET_FLOOR` and say so in the grade reason.
 - One seeded lead moved: AAN-0004 Warm → Hot. 14/14 checks, 38/38 DB checks.
+
+## phase-6.3 — HubSpot live, and a bug that would have hit most leads
+- HubSpot connected: dedicated **Aangan Leads** pipeline (id `2613566173`) with all 8 stages, plus the custom property `ai_call_cost_inr`.
+- **Fixed — we were inventing email addresses.** `upsertContact` fell back to `<ticket>@aangan.invalid`, which HubSpot rejects outright (`INVALID_EMAIL`). Email is optional in the rubric, so this would have broken the CRM sync for every caller who did not give one. Contacts are now keyed on the email when there is one and the **phone number** when there is not, and no address is ever fabricated. A 409 duplicate now recovers the existing id instead of failing.
+- The same fallback existed in the Cal.com booking. The attendee email now falls back to `BOOKING_FALLBACK_EMAIL` — a real studio inbox — because an invite to a synthetic address simply bounces.
+- Verified live against the real portal: contact + deal created for a lead **with** an email and one **without**, and a second stage move patches the same deal rather than creating a duplicate.

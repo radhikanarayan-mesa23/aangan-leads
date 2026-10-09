@@ -34,7 +34,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 | `GEMINI_API_KEY` | ❌ the credential supplied is an OAuth token, not an API key — Google returns 401. Needs an AI Studio key (`AIza…`) |
 | `TELEGRAM_BOT_TOKEN`, chat ids | missing — pushes are skipped, never crash |
 | `CALCOM_API_KEY`, `CALCOM_EVENT_TYPE_ID` | missing — booking falls back to our own DB, which still prevents double booking |
-| `HUBSPOT_PRIVATE_APP_TOKEN` | missing. **Create it before 26 Oct 2026** — HubSpot disables new legacy private apps then. Accepts a Service Key too — sync is a no-op. `HUBSPOT_PIPELINE_ID` (and `HUBSPOT_STAGE_MAP` on a free portal) are printed by `npm run hubspot:setup` |
+| `HUBSPOT_PRIVATE_APP_TOKEN`, `HUBSPOT_PIPELINE_ID` | ✅ set. Dedicated **Aangan Leads** pipeline `2613566173`, 8 stages, `ai_call_cost_inr` created. Deal creation and stage sync verified against the live portal |
 | `VAANI_API_KEY` | ✅ set |
 | `VAANI_WEBHOOK_SECRET`, `VAANI_TOOL_SECRET`, `CALCOM_WEBHOOK_SECRET` | ✅ generated and set in Vercel — paste the same values into Vaani and Cal.com |
 | `SESSION_SECRET`, `CRON_SECRET` | defaulted in development, **must be set in production** |

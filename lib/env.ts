@@ -13,6 +13,13 @@ export const env = {
   CALCOM_API_KEY: process.env.CALCOM_API_KEY ?? '',
   CALCOM_EVENT_TYPE_ID: process.env.CALCOM_EVENT_TYPE_ID ?? '',
   CALCOM_WEBHOOK_SECRET: process.env.CALCOM_WEBHOOK_SECRET ?? '',
+  /**
+   * Cal.com requires an attendee email and a caller may not give one. This is
+   * the studio address the invite goes to instead — a real, monitored inbox, so
+   * a designer still sees the booking. Never a synthetic address: HubSpot
+   * rejects those outright and a calendar invite to one simply bounces.
+   */
+  BOOKING_FALLBACK_EMAIL: process.env.BOOKING_FALLBACK_EMAIL ?? '',
 
   GEMINI_API_KEY: process.env.GEMINI_API_KEY ?? '',
   GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-2.5-flash',

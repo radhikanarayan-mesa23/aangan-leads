@@ -110,13 +110,16 @@ export async function calcomBook(opts: {
         eventTypeId: Number(env.CALCOM_EVENT_TYPE_ID),
         attendee: {
           name: opts.name || 'Aangan caller',
-          email: opts.email || `${opts.ticketNo.toLowerCase()}@aangan.invalid`,
+          email: opts.email || env.BOOKING_FALLBACK_EMAIL || 'studio@aanganstudio.in',
           timeZone: 'Asia/Kolkata',
           language: 'en',
           ...(opts.phone ? { phoneNumber: opts.phone } : {}),
         },
         // Hard rule 1: nothing price-related ever reaches a caller-facing invite.
         metadata: { ticket_no: opts.ticketNo },
+        // When the caller gave no email the invite goes to the studio instead,
+        // so note whose consultation it actually is.
+        ...(opts.email ? {} : { guests: [] }),
         bookingFieldsResponses: {
           title: `Consultation — ${opts.ticketNo}`,
           notes: opts.notes ?? `Aangan enquiry ${opts.ticketNo}`,
