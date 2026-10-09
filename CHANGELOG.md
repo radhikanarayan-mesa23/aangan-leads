@@ -162,3 +162,16 @@ The real platform is `api.vaanivoice.ai`, authenticated with `X-API-Key: vaani_�
 - Applied to agent `040c5b84…` ("Lead Qualification"): 12,654-char system prompt, the verbatim opening line, and the price-deflection FAQ. Verified by reading the agent back.
 - **Two API quirks found:** `know_how.guardrails` takes an object, not an array (422 on an array), and `rag_knowledge_base_dict` expects uploaded files rather than raw text — what we sent did not persist. So rather than let the agent depend on knowledge that may not be there, scope, service area, price policy and booking rules are appended into the prompt itself, which we can prove persisted.
 - Their webhook contract is also different from VaaniVoice's: plain JSON with an `event` field, events `call_started` … `call_ended` … **`call_postprocessing`** (the one that carries transcript, summary and entities), registered at Settings → Webhooks.
+
+## phase-12 — the receiver now matches Vaani AI's real deliveries
+Registered the webhook in their dashboard, hit **Test**, and captured the actual payload. It is nothing like the other vendor's, and my receiver did not handle it — their test created a junk `NOT_ENQUIRY` lead, which is exactly the bug this found.
+
+Their shape: `{ event, timestamp, events: [ … ] }` where **one delivery carries several events**, each `{ event, call_id, timestamp, data }`.
+
+- `readDelivery()` picks `call_postprocessing` (transcript, summary, entities, recording) over `call_ended` (timing only).
+- `webhook_test` is acknowledged and **never stored** — that was the junk lead.
+- `call_ended` arriving without a transcript returns 200 and waits for `call_postprocessing`, rather than grading an empty call.
+- Caller name comes from `data.entities.customer_name`; the id falls back to `room_name`.
+- **Duration unit trap:** `call_ended` reports seconds, `call_postprocessing` milliseconds. Converted, with a magnitude check so a provider change cannot silently multiply every call's cost by a thousand.
+- Their dashboard sends no signature header, so the shared secret rides in the endpoint URL query — their own Test button confirms it: *"Webhook test successful."*
+- `verify:db` is **46 checks**, now including their exact captured delivery.

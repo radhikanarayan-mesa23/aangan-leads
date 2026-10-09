@@ -44,7 +44,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 
 - `lib/db.ts` — Neon, decided 2026-10-08. One Postgres URL; nothing above it knows the host.
 - `lib/auth.ts` — our own magic link rather than Supabase Auth. With Neon there is no RLS, so hard rule 5 rests on `middleware.ts` and `requireOwner()` alone; `migrations/002_rls_supabase.sql` is parked.
-- `lib/vaani.ts` — written against VaaniVoice's published OpenAPI spec: envelope unwrapping, `sha256=` HMAC over raw bytes, `evt_` de-duplication. See `docs/VAANI-SETUP.md`.
+- `lib/vaani.ts` — written against **Vaani AI**'s real delivery, captured from their dashboard Test button. Multi-event deliveries, `call_postprocessing` preferred, ms→s conversion. Secret rides in the URL query; they send no signature header.
 - `lib/calcom.ts` — written from Cal.com's published v2 reference; `POST /v2/bookings` and `GET /v2/slots` are unverified against a live account. The slots parser accepts both documented shapes.
 - `lib/storage.ts` — on Neon, recordings stream through the auth-gated proxy. We keep no copy, so an expiring Vaani URL would lose the audio. TODO: Vercel Blob or S3.
 - ~~`rubric.md` §14 — six questions for Nikhil~~ — all confirmed 2026-10-09.

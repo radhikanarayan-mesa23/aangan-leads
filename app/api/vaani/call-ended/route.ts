@@ -1,7 +1,7 @@
 import { NextResponse, after, type NextRequest } from 'next/server';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { env } from '@/lib/env';
-import { normalizeVaniPayload, readEnvelope } from '@/lib/vaani';
+import { normalizeVaniPayload, readDelivery } from '@/lib/vaani';
 import { processLead, upsertCall } from '@/lib/pipeline';
 import { logEvent } from '@/lib/leads';
 import { one, sql } from '@/lib/db';
@@ -33,32 +33,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid json' }, { status: 400 });
   }
 
-  const envelope = readEnvelope(body);
-  const eventType = req.headers.get('x-vaanivoice-event') ?? envelope.type;
+  const delivery = readDelivery(body);
 
-  // The dashboard "Test" button. Acknowledge so the subscription stays healthy.
-  if (eventType === 'webhook.ping') {
-    return NextResponse.json({ ok: true, pong: true });
+  // The dashboard Test button. Acknowledge it, but never store a fake lead.
+  if (delivery.isTest) {
+    return NextResponse.json({ ok: true, test: true, events: delivery.events.map((e) => e.event) });
   }
 
-  // Events that are not a finished phone call. Acknowledged, not processed.
-  if (eventType && !['call.completed', 'call.failed', 'lead.created'].includes(eventType)) {
+  const eventType = delivery.primary?.event ?? '';
+
+  // One delivery can carry several events. Only a finished call is worth acting
+  // on; everything else is acknowledged so the subscription stays healthy.
+  const actionable = ['call_postprocessing', 'call_ended', 'call_failed'];
+  if (eventType && !actionable.includes(eventType)) {
     return NextResponse.json({ ok: true, ignored: eventType });
   }
 
-  // Retries reuse the event id, so a replay must not redo the work.
-  if (envelope.event_id) {
-    const seen = await one<{ id: string }>(
-      "select id from leads where raw_payload->>'__event_id' = $1",
-      [envelope.event_id]
-    ).catch(() => null);
-    if (seen) return NextResponse.json({ ok: true, replayed: true });
-  }
-
   const call = normalizeVaniPayload(body);
-  if (envelope.event_id) {
-    (call.raw as any) = { ...(call.raw as any), __event_id: envelope.event_id };
-  }
 
   let lead;
   try {
@@ -76,9 +67,15 @@ export async function POST(req: NextRequest) {
 
   // A call that failed on their side has no transcript worth grading, but the
   // caller still rang: keep the row so nothing is silently dropped.
-  if (eventType === 'call.failed') {
+  if (eventType === 'call_failed') {
     await sql("update leads set ended_reason = coalesce(ended_reason, 'failed') where id = $1", [lead.id]).catch(() => undefined);
     return NextResponse.json({ ok: true, ticket_no: lead.ticket_no, graded: false });
+  }
+
+  // call_ended carries only timing. Wait for call_postprocessing, which brings
+  // the transcript — grading without it would produce a meaningless verdict.
+  if (eventType === 'call_ended' && (call.transcript?.length ?? 0) === 0) {
+    return NextResponse.json({ ok: true, ticket_no: lead.ticket_no, awaiting: 'call_postprocessing' });
   }
 
   after(async () => {

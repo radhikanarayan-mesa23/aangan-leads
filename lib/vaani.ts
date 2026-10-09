@@ -13,43 +13,6 @@ import type { TranscriptTurn } from './schema';
 // masked, so everything below is a defensive parse.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Event types the spec says a subscription may carry. */
-export type VaaniEvent =
-  | 'call.completed'
-  | 'call.failed'
-  | 'meeting.ended'
-  | 'lead.created'
-  | 'usage.charged'
-  | 'low_balance.warned'
-  | 'webhook.ping';
-
-export type VaaniEnvelope = {
-  event_id: string | null;
-  type: VaaniEvent | string;
-  created: number | null;
-  data: any;
-  /** True when the body was NOT an envelope — a bare payload from a test or another vendor. */
-  bare: boolean;
-};
-
-/**
- * Unwraps the envelope. Falls back to treating the whole body as the payload,
- * so `scripts/replay.ts` and any non-Vaani source still work.
- */
-export function readEnvelope(raw: any): VaaniEnvelope {
-  const looksLikeEnvelope = raw && typeof raw === 'object' && typeof raw.type === 'string' && 'data' in raw;
-  if (!looksLikeEnvelope) {
-    return { event_id: null, type: 'call.completed', created: null, data: raw, bare: true };
-  }
-  return {
-    event_id: typeof raw.id === 'string' ? raw.id : null,
-    type: raw.type,
-    created: Number.isFinite(raw.created) ? Number(raw.created) : null,
-    data: raw.data ?? {},
-    bare: false,
-  };
-}
-
 export type NormalisedCall = {
   vani_call_id: string;
   caller_number: string | null;
@@ -60,7 +23,7 @@ export type NormalisedCall = {
   ended_reason: string | null;
   recording_url: string | null;
   transcript: TranscriptTurn[];
-  /** Slots the agent booked live, or preferences it collected for the fallback path. */
+  /** Slots the agent booked live, or preferences collected for the fallback path. */
   booked_at: string | null;
   calcom_booking_uid: string | null;
   preferred_slots: string[];
@@ -69,20 +32,105 @@ export type NormalisedCall = {
   raw: unknown;
 };
 
+/** Events Vaani AI fires. `webhook_test` comes from the dashboard Test button. */
+export type VaaniEvent =
+  | 'call_started'
+  | 'call_ringing'
+  | 'user_picked_up_at'
+  | 'call_rejected'
+  | 'call_no_answer'
+  | 'call_failed'
+  | 'human_transfer_initiated'
+  | 'human_transfer_successful'
+  | 'human_transfer_failed'
+  | 'call_ended'
+  | 'call_postprocessing'
+  | 'webhook_test';
+
+export type VaaniDelivery = {
+  /** The dashboard Test button — acknowledge it, never store it as a lead. */
+  isTest: boolean;
+  /** Every event in this delivery; one POST can carry several. */
+  events: { event: string; call_id?: string; timestamp?: string; data: any }[];
+  /**
+   * The event worth acting on. `call_postprocessing` carries the transcript,
+   * summary and recording, so it wins over `call_ended`, which is only timing.
+   */
+  primary: { event: string; data: any } | null;
+};
+
+/**
+ * A delivery looks like:
+ *   { event, timestamp, events: [ { event: "call_postprocessing", data: {…} },
+ *                                 { event: "call_ended", data: {…} } ] }
+ * Older/bare shapes are still accepted so the replay script keeps working.
+ */
+export function readDelivery(raw: any): VaaniDelivery {
+  const isTest = raw?.event === 'webhook_test';
+  const list: any[] = Array.isArray(raw?.events) ? raw.events : [];
+
+  const events = list.map((e) => ({
+    event: String(e?.event ?? ''),
+    call_id: e?.call_id ?? e?.data?.call_id,
+    timestamp: e?.timestamp,
+    data: e?.data ?? {},
+  }));
+
+  if (events.length === 0) {
+    // A bare body — the replay script, or a single-event POST.
+    const data = raw?.data ?? raw?.call ?? raw ?? {};
+    return { isTest, events: [{ event: String(raw?.event ?? 'call_postprocessing'), data }], primary: { event: String(raw?.event ?? 'call_postprocessing'), data } };
+  }
+
+  const primary =
+    events.find((e) => e.event === 'call_postprocessing') ??
+    events.find((e) => e.event === 'call_ended') ??
+    events[0];
+
+  return { isTest, events, primary };
+}
+
+/** Kept for callers that still speak the old name. */
+export const readEnvelope = (raw: any) => {
+  const d = readDelivery(raw);
+  return { event_id: null as string | null, type: d.primary?.event ?? '', created: null, data: d.primary?.data ?? {}, bare: !Array.isArray(raw?.events) };
+};
+
+/**
+ * `call_ended` reports seconds, `call_postprocessing` reports milliseconds.
+ * Anything implausibly large for a five-minute call is treated as milliseconds
+ * whichever event it came from, so a provider change cannot silently inflate
+ * every call's cost.
+ */
+function durationSeconds(value: unknown, event: string): number | null {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  const looksLikeMs = n > 3600 || event === 'call_postprocessing';
+  return Math.round(looksLikeMs && n > 3600 ? n / 1000 : n);
+}
+
 export function normalizeVaniPayload(raw: any): NormalisedCall {
-  // Accept an envelope, a bare body, or a {call:…} wrapper.
-  const unwrapped = readEnvelope(raw).data ?? raw ?? {};
-  const call = unwrapped?.call ?? unwrapped ?? {};
+  const delivery = readDelivery(raw);
+  const primary = delivery.primary;
+  const data = primary?.data ?? {};
+  // Timing may arrive on a sibling event rather than the primary one.
+  const ended = delivery.events.find((e) => e.event === 'call_ended')?.data ?? {};
+  const call = data?.call ?? data ?? {};
   const meta = call?.metadata ?? call?.custom_data ?? raw?.metadata ?? {};
 
   return {
-    vani_call_id: str(call.call_id ?? call.id ?? call.callId ?? raw?.call_id ?? raw?.id) ?? `unknown-${Date.now()}`,
-    caller_number: str(call.from ?? call.from_number ?? call.caller ?? call.customer_number ?? raw?.from),
-    caller_name: str(meta.caller_name ?? call.caller_name ?? call.customer_name),
+    vani_call_id:
+      str(call.call_id ?? call.room_name ?? primary?.data?.call_id ?? call.id ?? call.callId ?? raw?.call_id) ??
+      `unknown-${Date.now()}`,
+    caller_number: str(call.from ?? call.from_number ?? call.phone_number ?? call.caller ?? call.customer_number),
+    caller_name: str(meta.caller_name ?? call.caller_name ?? call.entities?.customer_name ?? call.customer_name),
     caller_email: str(meta.caller_email ?? call.caller_email),
     started_at: iso(call.started_at ?? call.start_time ?? call.startedAt ?? raw?.started_at),
-    duration_s: int(call.duration ?? call.duration_seconds ?? call.duration_s ?? raw?.duration),
-    ended_reason: str(call.ended_reason ?? call.end_reason ?? call.status ?? call.disconnect_reason),
+    duration_s:
+      durationSeconds(call.call_duration, primary?.event ?? '') ??
+      durationSeconds(ended.call_duration, 'call_ended') ??
+      int(call.duration ?? call.duration_seconds ?? call.duration_s),
+    ended_reason: str(call.end_reason ?? ended.end_reason ?? call.ended_reason ?? call.status),
     recording_url: str(call.recording_url ?? call.recordingUrl ?? call.recording?.url ?? raw?.recording_url),
     transcript: normalizeTranscript(call.transcript ?? call.messages ?? raw?.transcript),
     booked_at: iso(meta.booked_at ?? call.booked_at),

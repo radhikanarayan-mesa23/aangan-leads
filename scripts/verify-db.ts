@@ -7,7 +7,7 @@ import { seedAll } from './seed';
 import { getLead, listEvents, listLeads, listUsers, takenSlots, logEvent } from '../lib/leads';
 import { byLocality, bySource, costVsRevenue, funnel, health, heatmap, insights, kpis, leadsOverTime, loadRows, loadStageReach, team } from '../lib/analytics';
 import { upsertCall } from '../lib/pipeline';
-import { normalizeVaniPayload, readEnvelope } from '../lib/vaani';
+import { normalizeVaniPayload, readDelivery } from '../lib/vaani';
 import { openSlotsFromDb } from '../lib/calcom';
 import { SEED_CALLS } from '../seed/calls';
 
@@ -237,38 +237,41 @@ async function main() {
   );
   ok('the escalation keeps its "right away" promise', !!escalated?.callback_due_at);
 
-  // ── Vaani webhook: the real envelope, signed the way their spec says ──────
-  const { createHmac } = await import('node:crypto');
-  const secret = 'vv_whk_test_secret';
-  const envelope = {
-    id: 'evt_test_0001',
-    type: 'call.completed',
-    created: Math.floor(Date.now() / 1000),
-    data: {
-      call: {
-        call_id: 'vaani-envelope-test',
-        from: '+9198******34',
-        duration: 212,
-        ended_reason: 'completed',
-        transcript: 'Agent: Namaste, thank you for calling Aangan Studio.\nCaller: I have a 3BHK in Baner, 1100 square feet, full home.',
-        metadata: { caller_name: 'Envelope Test' },
+  // ── Vaani AI webhook: the exact delivery shape captured from their dashboard ──
+  const realDelivery = {
+    event: 'call_postprocessing',
+    timestamp: '2026-10-09T11:50:16.226573+00:00',
+    events: [
+      {
+        event: 'call_postprocessing',
+        call_id: 'room_abc123',
+        timestamp: '2026-10-09T11:50:16.226542+00:00',
+        data: {
+          call_id: 'room_abc123',
+          room_name: 'room_abc123',
+          end_reason: 'completed',
+          call_duration: 212_000, // milliseconds on this event
+          transcript: 'Agent: Namaste, thank you for calling Aangan Studio.\nUser: I have a 3BHK in Baner, eleven hundred square feet.',
+          summary: 'Caller has a 3BHK in Baner.',
+          entities: { customer_name: 'Priya Kulkarni', intent: 'inquiry' },
+          recording_url: 'https://example.com/r.mp3',
+        },
       },
-    },
+      { event: 'call_ended', timestamp: '…', data: { call_id: 'room_abc123', end_reason: 'completed', call_duration: 212 } },
+    ],
   };
-  const rawBody = JSON.stringify(envelope);
-  const sig = 'sha256=' + createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex');
-  ok('signature is the hex HMAC of the raw bytes', /^sha256=[0-9a-f]{64}$/.test(sig));
 
-  const unwrapped = normalizeVaniPayload(JSON.parse(rawBody));
-  ok('envelope unwraps to the call', unwrapped.vani_call_id === 'vaani-envelope-test', `id=${unwrapped.vani_call_id}`);
-  ok('transcript parses out of the envelope', unwrapped.transcript.length === 2, `${unwrapped.transcript.length} turns`);
-  ok('caller name read from metadata', unwrapped.caller_name === 'Envelope Test');
-  ok('masked number kept as given', unwrapped.caller_number === '+9198******34', String(unwrapped.caller_number));
+  const d = readDelivery(realDelivery);
+  ok('delivery carrying two events picks post-processing', d.primary?.event === 'call_postprocessing', d.events.map((e) => e.event).join(' + '));
+  ok('dashboard test is recognised, not stored', readDelivery({ event: 'webhook_test', events: [] }).isTest);
 
-  const env2 = readEnvelope(JSON.parse(rawBody));
-  ok('event id captured for de-duplication', env2.event_id === 'evt_test_0001' && !env2.bare);
-  const bare = readEnvelope({ call: { call_id: 'x' } });
-  ok('a bare body still works (replay script, other vendors)', bare.bare === true);
+  const v = normalizeVaniPayload(realDelivery);
+  ok('call id read from the nested event', v.vani_call_id === 'room_abc123', v.vani_call_id);
+  ok('transcript parses Agent/User turns', v.transcript.length === 2 && v.transcript[0].speaker === 'agent' && v.transcript[1].speaker === 'caller', `${v.transcript.length} turns`);
+  ok('milliseconds converted to seconds', v.duration_s === 212, `${v.duration_s}s`);
+  ok('caller name read from entities', v.caller_name === 'Priya Kulkarni');
+  ok('recording url captured', v.recording_url === 'https://example.com/r.mp3');
+  ok('a bare body still works (replay script)', normalizeVaniPayload({ call: { call_id: 'bare-1', duration: 30 } }).vani_call_id === 'bare-1');
 
   console.log(checks.join('\n'));
   console.log(`\n${checks.length - failures}/${checks.length} checks passed`);
