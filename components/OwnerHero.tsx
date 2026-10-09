@@ -59,15 +59,20 @@ export function OwnerHero({
                   interval={0}
                 />
                 <Tooltip
-                  cursor={{ fill: 'rgba(142,163,247,0.08)' }}
+                  // A dark tooltip on a dark card was unreadable — this one is a
+                  // light card with ink text, the same as the tooltips below.
+                  cursor={{ fill: 'rgba(255,255,255,0.10)' }}
                   contentStyle={{
-                    background: 'var(--navy-800)',
-                    border: '1px solid rgba(142,163,247,0.25)',
+                    background: '#fff',
+                    border: '1px solid var(--line)',
                     borderRadius: 10,
                     fontSize: 12,
-                    color: '#fff',
+                    color: 'var(--ink)',
+                    boxShadow: '0 12px 28px rgba(5,11,34,0.45)',
+                    padding: '8px 10px',
                   }}
-                  labelStyle={{ color: 'var(--blue-300)' }}
+                  labelStyle={{ color: 'var(--ink-2)', fontWeight: 600, marginBottom: 2 }}
+                  itemStyle={{ color: 'var(--ink)' }}
                   formatter={(v: any, n: any) => [v, n === 'HOT' ? 'Hot' : 'All leads']}
                 />
                 <Bar dataKey="total" radius={[5, 5, 0, 0]} label={{ position: 'top', fill: '#fff', fontSize: 12 }}>

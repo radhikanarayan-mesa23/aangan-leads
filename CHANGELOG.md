@@ -196,3 +196,6 @@ Each KPI tile now carries a 3px accent rule and a faint diagonal wash from the p
 - **Cost tiles** — deep navy, visually quiet; they are overheads, not wins.
 
 The accent sits on the rule, never on the figure, so the number stays the most legible thing on the card and grade chips keep their text labels.
+
+## phase-13.3 — readable tooltip on the hero chart
+The locality tooltip was a navy card on a navy hero, so the figure under the cursor was barely legible. It is now a white card with ink text and a drop shadow — matching the tooltips on the charts below — and the hover cursor is a light wash rather than a dark one.
