@@ -79,18 +79,40 @@ export default async function OwnerPage() {
 
       {/* KPI row */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Kpi label="Leads in" value={k.month.count} sub={`${k.week.count} this week`} delta={deltaLeads} />
+        <Kpi label="Leads in" value={k.month.count} sub={`${k.week.count} this week`} delta={deltaLeads} accent="var(--blue-500)" />
         <Kpi
           label="Hot / Warm / Low"
-          value={`${k.month.mix.HOT} / ${k.month.mix.WARM} / ${k.month.mix.LOW}`}
+          value={
+            <span className="tabular-nums">
+              <span style={{ color: 'var(--hot)' }}>{k.month.mix.HOT}</span>
+              <span className="text-ink-3 font-normal mx-1">/</span>
+              <span style={{ color: 'var(--warm)' }}>{k.month.mix.WARM}</span>
+              <span className="text-ink-3 font-normal mx-1">/</span>
+              <span style={{ color: 'var(--low)' }}>{k.month.mix.LOW}</span>
+            </span>
+          }
           sub={k.month.mix.ESCALATE ? `${k.month.mix.ESCALATE} escalated` : 'none escalated'}
+          accent="linear-gradient(90deg, var(--hot) 0%, var(--warm) 55%, var(--low) 100%)"
+          wash="linear-gradient(160deg, rgba(224,57,79,0.05) 0%, rgba(224,57,79,0) 58%)"
         />
-        <Kpi label="Answered in under 5 min" value={`${k.month.answered}%`} sub="picked up on the first ring; share that became a real conversation" />
-        <Kpi label="Total AI cost" value={inr(Math.round(k.month.cost))} sub={`${inr(Math.round(k.costPerLead))} per lead`} delta={deltaCost} invert />
-        <Kpi label="Cost per hot lead" value={inr(Math.round(k.costPerHot))} sub={`${k.month.hot} hot this month`} />
-        <Kpi label="Pipeline value" value={inr(k.pipeline)} sub="internal estimate midpoints, open leads" internal />
-        <Kpi label="Forecast" value={inr(k.forecast)} sub={`pipeline × ${Math.round(k.conversionRate * 100)}% close rate`} internal />
-        <Kpi label="Converted" value={`${k.convertedCount} · ${inr(k.revenue)}`} sub={`${Math.round(k.conversionRate * 100)}% of closed leads`} />
+        <Kpi
+          label="Answered in under 5 min"
+          value={`${k.month.answered}%`}
+          sub="picked up on the first ring; share that became a real conversation"
+          accent={k.month.answered >= 95 ? 'var(--ok)' : 'var(--warm)'}
+          wash="linear-gradient(160deg, rgba(16,135,106,0.055) 0%, rgba(16,135,106,0) 58%)"
+        />
+        <Kpi label="Total AI cost" value={inr(Math.round(k.month.cost))} sub={`${inr(Math.round(k.costPerLead))} per lead`} delta={deltaCost} invert accent="var(--navy-700)" />
+        <Kpi label="Cost per hot lead" value={inr(Math.round(k.costPerHot))} sub={`${k.month.hot} hot this month`} accent="var(--navy-700)" />
+        <Kpi label="Pipeline value" value={inr(k.pipeline)} sub="internal estimate midpoints, open leads" internal accent="var(--blue-400)" />
+        <Kpi label="Forecast" value={inr(k.forecast)} sub={`pipeline × ${Math.round(k.conversionRate * 100)}% close rate`} internal accent="var(--blue-300)" />
+        <Kpi
+          label="Converted"
+          value={`${k.convertedCount} · ${inr(k.revenue)}`}
+          sub={`${Math.round(k.conversionRate * 100)}% of closed leads`}
+          accent="var(--ok)"
+          wash="linear-gradient(160deg, rgba(16,135,106,0.07) 0%, rgba(16,135,106,0) 58%)"
+        />
       </section>
 
       {/* health strip */}
@@ -180,6 +202,8 @@ function Kpi({
   delta,
   invert,
   internal,
+  accent,
+  wash,
 }: {
   label: string;
   value: React.ReactNode;
@@ -187,10 +211,16 @@ function Kpi({
   delta?: number | null;
   invert?: boolean;
   internal?: boolean;
+  /** Colour of the rule along the top — carries the palette, not the number. */
+  accent?: string;
+  wash?: string;
 }) {
   const good = delta == null ? null : invert ? delta <= 0 : delta >= 0;
   return (
-    <div className="card p-4">
+    <div
+      className="kpi p-4"
+      style={{ ...(accent ? { ['--kpi-accent' as string]: accent } : {}), ...(wash ? { ['--kpi-wash' as string]: wash } : {}) } as React.CSSProperties}
+    >
       <div className="flex items-center justify-between gap-2">
         <p className="label">{label}</p>
         {internal && <span className="text-[10px] text-ink-3 border border-dashed border-line rounded-chip px-1.5">internal</span>}

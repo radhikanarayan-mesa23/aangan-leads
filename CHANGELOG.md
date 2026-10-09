@@ -185,3 +185,14 @@ Seats stagger in, lift on hover, and the arrow nudges — the same motion langua
 - **Seats are frosted glass at rest and solid white under the cursor** — the card lifts, the avatar fills with the blue gradient, the sub-line darkens and "Enter" turns blue, all on one 0.3s curve. The owner no longer sits permanently white; all three behave the same, so the page reads as a choice rather than a default.
 - **"Welcome to Aangan" arrives a word at a time**, each one rising out of a blur 110ms after the last.
 - Both respect `prefers-reduced-motion` — the words appear instantly and the cards stop lifting.
+
+## phase-13.2 — colour in "The numbers"
+Each KPI tile now carries a 3px accent rule and a faint diagonal wash from the palette, plus a lift on hover. The colour is assigned by meaning rather than decoration:
+
+- **Hot / Warm / Low** — the figures use the grade colours themselves, and the rule is a gradient across all three. The one tile where colour is information.
+- **Answered in under 5 min** — green at or above target, amber below. It changes with the number.
+- **Converted** — green, the only revenue tile.
+- **Pipeline / Forecast** — the lighter blues, grouping the two internal-estimate tiles.
+- **Cost tiles** — deep navy, visually quiet; they are overheads, not wins.
+
+The accent sits on the rule, never on the figure, so the number stays the most legible thing on the card and grade chips keep their text labels.

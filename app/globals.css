@@ -87,6 +87,35 @@ html, body {
   }
   .kv { @apply flex flex-col gap-0.5; }
 
+  /* A KPI tile. The accent rule along the top carries the palette without
+     colouring the number itself, so the figure stays the most legible thing
+     on the card. */
+  .kpi {
+    @apply relative bg-surface border border-line rounded-card overflow-hidden;
+    transition: box-shadow 0.22s ease, transform 0.22s ease, border-color 0.22s ease;
+  }
+  .kpi::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: var(--kpi-accent, var(--blue-500));
+    opacity: 0.9;
+  }
+  .kpi::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--kpi-wash, linear-gradient(160deg, rgba(58, 91, 240, 0.055) 0%, rgba(58, 91, 240, 0) 58%));
+  }
+  .kpi:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    box-shadow: 0 12px 26px -16px rgba(10, 18, 50, 0.3);
+  }
+  .kpi > * { position: relative; z-index: 1; }
+
   /* The dark band the dashboard leads with. */
   .hero {
     background:
