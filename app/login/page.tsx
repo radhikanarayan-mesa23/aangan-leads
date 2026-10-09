@@ -6,28 +6,21 @@ import { listUsers } from '@/lib/leads';
 import { randomUUID } from 'node:crypto';
 import { env } from '@/lib/env';
 import { SetupNeeded } from '@/components/SetupNeeded';
+import { cn, initials } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
 /** Demo mode is the only thing that lets anyone sign in without an inbox. */
 const demoMode = () => process.env.NODE_ENV !== 'production' || env.DEMO_MAGIC_LINK;
 
-/**
- * Magic link, our own: a one-time token row exchanged for a signed session
- * cookie. There is no email provider yet, so in demo mode the link is shown on
- * screen instead — and anyone with the URL can step into either role.
- */
 async function requestLink(formData: FormData) {
   'use server';
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const user = await findUser(email);
   if (!user) {
-    // Same response either way outside demo mode, so the form cannot be used
-    // to discover who is on the team.
     if (!env.DEMO_MAGIC_LINK) redirect('/login?sent=1');
     redirect(`/login?error=${encodeURIComponent('That email is not on the team list.')}`);
   }
-
   const token = randomUUID().replace(/-/g, '');
   await sql("insert into magic_tokens (token, email, expires_at) values ($1,$2, now() + interval '20 minutes')", [token, user.email]);
   redirect(`/login?sent=1&link=${encodeURIComponent(`${env.APP_URL}/api/auth/login?token=${token}`)}`);
@@ -57,56 +50,110 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       return <SetupNeeded detail="The database is set but the team table could not be read." />;
     }
   }
-  const owner = team.find((u) => u.role === 'owner');
-  const designers = team.filter((u) => u.role === 'designer');
+  // Owner first, then designers — the order the cards read in.
+  const seats = [...team].sort((a, b) => (a.role === 'owner' ? -1 : b.role === 'owner' ? 1 : 0));
 
   return (
-    <main className="min-h-dvh grid place-items-center px-5 py-10">
-      <div className="w-full max-w-md">
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight">Aangan Leads</h1>
-          <p className="text-sm text-ink-2 mt-1">
-            Every phone enquiry to Aangan Studio answered, graded, and on a designer’s board — at 11pm on a Sunday as
-            reliably as 11am on a Tuesday.
-          </p>
-        </div>
+    <main className="min-h-dvh grid place-items-center px-4 py-8 sm:px-6">
+      <div className="w-full max-w-3xl">
+        <section className="hero-vivid relative overflow-hidden px-6 py-8 sm:px-10 sm:py-11 shadow-pop animate-fade-up">
+          {/* a soft light bloom, like a lamp in a finished room */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-28 right-[-12%] size-[28rem] rounded-full blur-3xl opacity-55"
+            style={{ background: 'radial-gradient(circle, var(--blue-500) 0%, transparent 64%)' }}
+          />
 
-        {demo && (
-          <section className="card p-5 shadow-card">
-            <p className="label mb-1">Have a look around</p>
-            <p className="text-sm text-ink-2 mb-4">
-              Pick a seat. The board holds 14 example calls — nothing here is a real caller.
-            </p>
-
-            <div className="space-y-2">
-              {owner && (
-                <form action={signInAs}>
-                  <input type="hidden" name="email" value={owner.email} />
-                  <button className="btn btn-primary w-full justify-between" type="submit">
-                    <span>Enter as {owner.name}</span>
-                    <span className="text-xs opacity-70">owner · sees everything</span>
-                  </button>
-                </form>
-              )}
-              {designers.map((d) => (
-                <form action={signInAs} key={d.email}>
-                  <input type="hidden" name="email" value={d.email} />
-                  <button className="btn w-full justify-between" type="submit">
-                    <span>Enter as {d.name}</span>
-                    <span className="text-xs text-ink-3">designer · board only</span>
-                  </button>
-                </form>
-              ))}
+          <div className="relative">
+            <div className="flex items-center gap-2">
+              <span
+                className="grid place-items-center size-7 rounded-[9px] text-[13px] font-bold"
+                style={{ background: 'rgba(255,255,255,0.22)', color: '#fff' }}
+                aria-hidden
+              >
+                A
+              </span>
+              <span className="text-sm font-semibold tracking-tight text-white">
+                Aangan<span className="opacity-60"> Leads</span>
+              </span>
             </div>
 
-            <p className="text-xs text-ink-3 mt-4 leading-relaxed">
-              A designer who opens the owner dashboard is sent back to the board — try it.
-            </p>
-          </section>
-        )}
+            <span
+              className="mt-8 inline-flex items-center gap-2 rounded-chip px-3 py-1.5 text-[12px] font-medium text-white"
+              style={{ background: 'rgba(142,163,247,0.18)', backdropFilter: 'blur(6px)' }}
+            >
+              Open late, like good ideas 🌙
+            </span>
 
+            <h1 className="mt-4 text-[34px] sm:text-[44px] font-semibold tracking-[-0.03em] leading-[1.08] text-white">
+              Welcome to Aangan
+            </h1>
+            <p className="mt-3 max-w-lg text-[15px] leading-relaxed" style={{ color: 'rgba(222,231,255,0.78)' }}>
+              Every beautiful room starts with a conversation — so we make sure not one of them rings out.
+              Pick a seat and see where today&rsquo;s calls landed.
+            </p>
+
+            {/* the three seats */}
+            {demo && (
+              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                {seats.map((u, i) => {
+                  const owner = u.role === 'owner';
+                  return (
+                    <form action={signInAs} key={u.email} className="contents">
+                      <input type="hidden" name="email" value={u.email} />
+                      <button
+                        type="submit"
+                        style={{ animationDelay: `${120 + i * 70}ms` }}
+                        className={cn(
+                          'lead-card group relative text-left rounded-card p-4 min-h-[146px] flex flex-col transition-all',
+                          owner
+                            ? 'bg-white text-ink shadow-pop'
+                            : 'text-white border border-white/15 bg-white/[0.07] backdrop-blur-sm hover:border-white/35 hover:bg-white/[0.13]'
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            'grid place-items-center size-7 rounded-full text-[11px] font-semibold',
+                            owner ? 'text-white' : 'text-white/90'
+                          )}
+                          style={{
+                            background: owner ? 'linear-gradient(140deg, var(--blue-500), var(--navy-700))' : 'rgba(255,255,255,0.18)',
+                          }}
+                          aria-hidden
+                        >
+                          {initials(u.name)}
+                        </span>
+
+                        <span className="mt-auto block text-[15px] font-semibold leading-tight">{u.name}</span>
+                        <span className={cn('mt-1 block text-[12px]', owner ? 'text-ink-2' : 'text-white/75')}>
+                          {owner ? 'Owner · sees the whole business' : 'Designer · works the board'}
+                        </span>
+                        <span
+                          className={cn(
+                            'mt-2 inline-flex items-center gap-1 text-[12px] font-medium transition-transform group-hover:translate-x-0.5',
+                            owner ? 'text-[var(--blue-600)]' : 'text-white/85'
+                          )}
+                        >
+                          Enter →
+                        </span>
+                      </button>
+                    </form>
+                  );
+                })}
+              </div>
+            )}
+
+            {demo && (
+              <p className="mt-5 text-[12px]" style={{ color: 'rgba(222,231,255,0.55)' }}>
+                Fourteen example calls, no real callers. A designer who opens the owner dashboard gets sent back to the board — do try it.
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* the real way in, once sign-in links are emailed */}
         <details className="mt-4 group">
-          <summary className="text-xs text-ink-3 cursor-pointer select-none hover:text-ink-2">
+          <summary className="text-xs text-ink-3 cursor-pointer select-none hover:text-ink-2 px-1">
             Sign in with a work email instead
           </summary>
           <form action={requestLink} className="card p-5 space-y-3 shadow-card mt-2">
@@ -127,13 +174,6 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
               ))}
           </form>
         </details>
-
-        {demo && (
-          <p className="text-[11px] text-ink-3 mt-5 leading-relaxed">
-            Demo mode. Open sign-in is switched off — and real sign-in links start being emailed — the moment a real
-            caller is in the system.
-          </p>
-        )}
       </div>
     </main>
   );

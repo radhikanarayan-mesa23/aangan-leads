@@ -175,3 +175,8 @@ Their shape: `{ event, timestamp, events: [ … ] }` where **one delivery carrie
 - **Duration unit trap:** `call_ended` reports seconds, `call_postprocessing` milliseconds. Converted, with a magnitude check so a provider change cannot silently multiply every call's cost by a thousand.
 - Their dashboard sends no signature header, so the shared secret rides in the endpoint URL query — their own Test button confirms it: *"Webhook test successful."*
 - `verify:db` is **46 checks**, now including their exact captured delivery.
+
+## phase-13 — the welcome card
+The sign-in page is now one gradient card rather than a stack of plain buttons: brand mark, a pill, **"Welcome to Aangan"**, a line about why the product exists, and the three seats as cards inside it — owner in solid white, designers in translucent glass. Layout follows the supplied reference; colour stays on the badge palette (`.hero-vivid` is the same navy ground and royal-blue bloom as the dashboard hero, not a brighter blue).
+
+Seats stagger in, lift on hover, and the arrow nudges — the same motion language as the board. The work-email form is still there behind a disclosure for when sign-in links are actually emailed.

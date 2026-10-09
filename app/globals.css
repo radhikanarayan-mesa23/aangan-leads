@@ -96,6 +96,16 @@ html, body {
     border-radius: 16px;
   }
   .hero-divider { border-color: rgba(142, 163, 247, 0.18); }
+
+  /* The welcome card. Same badge palette as the dashboard hero, with a little
+     more lift in the bloom — navy ground, royal blue, nothing brighter. */
+  .hero-vivid {
+    background:
+      radial-gradient(85% 80% at 76% 6%, rgba(58, 91, 240, 0.60) 0%, rgba(58, 91, 240, 0) 58%),
+      linear-gradient(140deg, var(--navy-800) 0%, var(--navy-900) 46%, var(--navy-950) 100%);
+    color: #fff;
+    border-radius: 18px;
+  }
 }
 
 /* Grade chips always carry a text label as well as colour. */
