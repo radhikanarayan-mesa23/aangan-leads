@@ -151,3 +151,14 @@ Read VaaniVoice's OpenAPI spec properly instead of guessing, and found the webho
 - **Cal.com webhook registered via the API** (`POST /v2/webhooks`, id `8c3d3ce1…`) for `BOOKING_CREATED` and `BOOKING_CANCELLED`. I had written this up as a dashboard task without checking whether the API could do it — it can, and I had the key.
 - Demo deals and contacts removed from HubSpot; the **Aangan Leads** pipeline and the `ai_call_cost_inr` property stay. Board rows cleared of their HubSpot ids, so the first real stage move creates a clean deal.
 - Telegram live: owner chat `8939412037`. The designer id points at the same chat **temporarily**, until a designers' group exists.
+
+## phase-11 — the Vaani agent is configured from this repo
+
+**I had analysed the wrong vendor.** `vaanilabs.in` / VaaniVoice is a different company from the Vaani AI product in Radhika's dashboard. Everything I said about "no telephony, no agent API" was about that other product and was wrong here.
+
+The real platform is `api.vaanivoice.ai`, authenticated with `X-API-Key: vaani_…` — **the key supplied works**. It has full agent CRUD: persona, training, experience, analysis, deployment.
+
+- **`npm run vaani:setup`** pushes `vaani_agent_prompt.md` and the rubric's non-negotiable sections into the live agent. Dry-run by default, `--apply` to write. The prompt now lives in the repo and is deployed from it, instead of being pasted into a dashboard where it quietly drifts.
+- Applied to agent `040c5b84…` ("Lead Qualification"): 12,654-char system prompt, the verbatim opening line, and the price-deflection FAQ. Verified by reading the agent back.
+- **Two API quirks found:** `know_how.guardrails` takes an object, not an array (422 on an array), and `rag_knowledge_base_dict` expects uploaded files rather than raw text — what we sent did not persist. So rather than let the agent depend on knowledge that may not be there, scope, service area, price policy and booking rules are appended into the prompt itself, which we can prove persisted.
+- Their webhook contract is also different from VaaniVoice's: plain JSON with an `event` field, events `call_started` … `call_ended` … **`call_postprocessing`** (the one that carries transcript, summary and entities), registered at Settings → Webhooks.
