@@ -88,3 +88,6 @@ Going public exposed a hole: every webhook treated a missing shared secret as "a
 - Creating an extra deal pipeline needs Sales Hub Professional. `scripts/hubspot-setup.ts` now catches the 403, falls back to the portal's existing pipeline, maps our eight columns onto its stages by position, and prints a `HUBSPOT_STAGE_MAP` with the mapping shown for checking. *Closed won* and *Closed lost* are matched by name, not position.
 - `lib/hubspot.ts` resolves a stage through `resolveStageId()`: the explicit map wins, then a label match. It returns null rather than guessing, and `updateDealStage` now throws a readable error instead of silently filing a deal under no stage.
 - `docs/KEYS.md` has the step-by-step for creating the private app and the exact six scopes.
+
+## phase-6.1 — corrected HubSpot instructions
+HubSpot moved private apps under *Development → Legacy Apps* and disables creation for existing accounts on **26 October 2026**. `docs/KEYS.md` now reflects that, names Service Keys as the successor, and notes that `HUBSPOT_PRIVATE_APP_TOKEN` accepts either credential.

@@ -102,3 +102,26 @@ Hard rule 9 (private recordings) is met by the auth-gated proxy at `/api/leads/:
 **Why this is better than the first Cal.com build.** `scripts/verify-db.ts` now applies the whole migration chain in order rather than just the initial schema, so migrations are tested as a sequence.
 
 **Open risk.** Two GitHub issues report `POST /v2/bookings` rejecting a `title` field the docs do not list as required, and `/v2/slots` returning times `/v2/bookings` then refuses. `title` is sent in `bookingFieldsResponses` defensively. Neither is confirmed against a live account — the first real booking is the test.
+
+---
+
+## 2026-10-09 — HubSpot credential: legacy private app now, Service Key later
+
+**Decision.** Authenticate with a legacy private app token.
+
+**Why, given it is being retired.** HubSpot has moved private apps under
+*Development → Legacy Apps* and disables creation for existing accounts on
+**26 October 2026** — seventeen days out. Tokens already issued are explicitly
+not revoked. The legacy private app is documented, stable, and what
+`lib/hubspot.ts` is written against, so it is the fastest safe route today.
+
+**The successor** is Service Keys (*Settings → Integrations → Service Keys*),
+currently public beta. It is a bearer token against the same CRM endpoints, so
+`HUBSPOT_PRIVATE_APP_TOKEN` takes either and no code should need to change.
+
+**Follow-up owed.** Migrate to a Service Key once it leaves beta, and re-run
+`npm run hubspot:setup` to confirm nothing shifted.
+
+**Rejected.** Going straight to Service Keys now. It is beta, the auth shape is
+unverified against this codebase, and the fallback path would be closed by the
+time we found out.

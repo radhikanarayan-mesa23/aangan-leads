@@ -121,12 +121,18 @@ lives in our own database, which still prevents double booking.
 
 ### Getting the token
 
-1. Sign in to HubSpot as a **Super Admin** (only a Super Admin can create a private app).
-2. Top-right **⚙ Settings**.
-3. Left sidebar → **Integrations → Private apps**.
-4. **Create a private app**.
-5. **Basic info** tab → name it `Aangan Leads`.
-6. **Scopes** tab → search for and tick exactly these six:
+> **HubSpot moved this.** Private apps now sit under **Development → Legacy
+> Apps**, and HubSpot is retiring them: for existing accounts the option to
+> create a new one disappears on **26 October 2026**. Tokens already created
+> keep working — they are not being revoked. So make one now.
+
+1. Sign in as a **Super Admin** (only a Super Admin can create one).
+2. **Development → Legacy Apps** → *Go to Legacy Apps*.
+   If there is no create button there, try **⚙ Settings → Integrations →
+   Private Apps**; HubSpot is mid-migration and the entry point differs by
+   account.
+3. **Create a private app**, name it `Aangan Leads`.
+4. **Scopes** tab → tick exactly these six:
 
    | Scope | Why |
    |---|---|
@@ -137,19 +143,24 @@ lives in our own database, which still prevents double booking.
    | `crm.schemas.deals.read` | look up the pipeline's stage ids |
    | `crm.schemas.deals.write` | create the pipeline and the `ai_call_cost_inr` property |
 
-7. **Create app** → **Continue creating**.
-8. Copy the **access token** (`pat-na1-…` or `pat-eu1-…`). It is shown once —
-   after that you have to rotate it.
+5. **Create app** → **Continue creating**.
+6. Copy the access token (`pat-na1-…` / `pat-eu1-…`). **Shown once** — after
+   that it has to be rotated.
 
-Send me that token. Then I run:
+**The successor: Service Keys.** HubSpot's replacement lives at
+**⚙ Settings → Integrations → Service Keys** (public beta). It is also a bearer
+token against the same CRM endpoints, so `lib/hubspot.ts` should take it
+unchanged — `HUBSPOT_PRIVATE_APP_TOKEN` accepts either. Worth migrating to once
+it leaves beta; not worth blocking on today.
+
+Send me the token. Then I run:
 
 ```bash
 npm run hubspot:setup
 ```
 
 which creates the pipeline and the custom property `ai_call_cost_inr`, and
-prints `HUBSPOT_PIPELINE_ID` for me to set. You do not need to find that id
-yourself.
+prints `HUBSPOT_PIPELINE_ID`. You do not need to find that id yourself.
 
 ### ⚠️ One thing to check first: your HubSpot tier
 

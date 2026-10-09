@@ -21,6 +21,11 @@ export const env = {
   TELEGRAM_DESIGNER_CHAT_ID: process.env.TELEGRAM_DESIGNER_CHAT_ID ?? '',
   TELEGRAM_OWNER_CHAT_ID: process.env.TELEGRAM_OWNER_CHAT_ID ?? '',
 
+  /**
+   * A legacy private app token (`pat-…`) or a Service Key — HubSpot's
+   * replacement for them. Both are bearer tokens against the same CRM
+   * endpoints, so either works here.
+   */
   HUBSPOT_PRIVATE_APP_TOKEN: process.env.HUBSPOT_PRIVATE_APP_TOKEN ?? '',
   HUBSPOT_PIPELINE_ID: process.env.HUBSPOT_PIPELINE_ID ?? '',
   /**
