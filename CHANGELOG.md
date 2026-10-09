@@ -180,3 +180,8 @@ Their shape: `{ event, timestamp, events: [ … ] }` where **one delivery carrie
 The sign-in page is now one gradient card rather than a stack of plain buttons: brand mark, a pill, **"Welcome to Aangan"**, a line about why the product exists, and the three seats as cards inside it — owner in solid white, designers in translucent glass. Layout follows the supplied reference; colour stays on the badge palette (`.hero-vivid` is the same navy ground and royal-blue bloom as the dashboard hero, not a brighter blue).
 
 Seats stagger in, lift on hover, and the arrow nudges — the same motion language as the board. The work-email form is still there behind a disclosure for when sign-in links are actually emailed.
+
+## phase-13.1 — motion on the welcome card
+- **Seats are frosted glass at rest and solid white under the cursor** — the card lifts, the avatar fills with the blue gradient, the sub-line darkens and "Enter" turns blue, all on one 0.3s curve. The owner no longer sits permanently white; all three behave the same, so the page reads as a choice rather than a default.
+- **"Welcome to Aangan" arrives a word at a time**, each one rising out of a blur 110ms after the last.
+- Both respect `prefers-reduced-motion` — the words appear instantly and the cards stop lifting.

@@ -86,7 +86,12 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             </span>
 
             <h1 className="mt-4 text-[34px] sm:text-[44px] font-semibold tracking-[-0.03em] leading-[1.08] text-white">
-              Welcome to Aangan
+              {['Welcome', 'to', 'Aangan'].map((w, i) => (
+                <span key={w} className="word" style={{ animationDelay: `${120 + i * 110}ms` }}>
+                  {w}
+                  {i < 2 ? '\u00A0' : ''}
+                </span>
+              ))}
             </h1>
             <p className="mt-3 max-w-lg text-[15px] leading-relaxed" style={{ color: 'rgba(222,231,255,0.78)' }}>
               Every beautiful room starts with a conversation — so we make sure not one of them rings out.
@@ -104,36 +109,17 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
                       <button
                         type="submit"
                         style={{ animationDelay: `${120 + i * 70}ms` }}
-                        className={cn(
-                          'lead-card group relative text-left rounded-card p-4 min-h-[146px] flex flex-col transition-all',
-                          owner
-                            ? 'bg-white text-ink shadow-pop'
-                            : 'text-white border border-white/15 bg-white/[0.07] backdrop-blur-sm hover:border-white/35 hover:bg-white/[0.13]'
-                        )}
+                        className="seat lead-card group relative text-left rounded-card p-4 min-h-[146px] flex flex-col"
                       >
-                        <span
-                          className={cn(
-                            'grid place-items-center size-7 rounded-full text-[11px] font-semibold',
-                            owner ? 'text-white' : 'text-white/90'
-                          )}
-                          style={{
-                            background: owner ? 'linear-gradient(140deg, var(--blue-500), var(--navy-700))' : 'rgba(255,255,255,0.18)',
-                          }}
-                          aria-hidden
-                        >
+                        <span className="seat-avatar grid place-items-center size-7 rounded-full text-[11px] font-semibold" aria-hidden>
                           {initials(u.name)}
                         </span>
 
                         <span className="mt-auto block text-[15px] font-semibold leading-tight">{u.name}</span>
-                        <span className={cn('mt-1 block text-[12px]', owner ? 'text-ink-2' : 'text-white/75')}>
+                        <span className="seat-sub mt-1 block text-[12px]">
                           {owner ? 'Owner · sees the whole business' : 'Designer · works the board'}
                         </span>
-                        <span
-                          className={cn(
-                            'mt-2 inline-flex items-center gap-1 text-[12px] font-medium transition-transform group-hover:translate-x-0.5',
-                            owner ? 'text-[var(--blue-600)]' : 'text-white/85'
-                          )}
-                        >
+                        <span className="seat-cta mt-2 inline-flex items-center gap-1 text-[12px] font-medium">
                           Enter →
                         </span>
                       </button>

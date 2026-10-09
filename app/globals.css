@@ -164,12 +164,60 @@ html, body {
   border-color: var(--blue-400);
 }
 
+/* The heading arrives a word at a time, out of focus and settling. */
+@keyframes word-in {
+  from { opacity: 0; transform: translateY(16px); filter: blur(8px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+.word {
+  display: inline-block;
+  animation: word-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* A seat on the welcome card: frosted glass at rest, solid white under the
+   cursor — like a light coming on in the room it is offering you. */
+.seat {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  transition:
+    background 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease;
+}
+.seat:hover,
+.seat:focus-visible {
+  background: #fff;
+  border-color: #fff;
+  color: var(--ink);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 36px -16px rgba(5, 11, 34, 0.75);
+  outline: none;
+}
+.seat .seat-sub { color: rgba(255, 255, 255, 0.72); transition: color 0.3s ease; }
+.seat:hover .seat-sub, .seat:focus-visible .seat-sub { color: var(--ink-2); }
+
+.seat .seat-cta { color: rgba(255, 255, 255, 0.88); transition: color 0.3s ease, transform 0.3s ease; }
+.seat:hover .seat-cta, .seat:focus-visible .seat-cta { color: var(--blue-600); transform: translateX(3px); }
+
+.seat .seat-avatar {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  transition: background 0.3s ease;
+}
+.seat:hover .seat-avatar, .seat:focus-visible .seat-avatar {
+  background: linear-gradient(140deg, var(--blue-500), var(--navy-700));
+}
+
 .animate-fade-up { animation: fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .animate-panel-in { animation: panel-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .lead-card, .just-moved, .animate-fade-up, .animate-panel-in { animation: none !important; }
-  .lead-card:hover { transform: none; }
+  .lead-card, .just-moved, .animate-fade-up, .animate-panel-in, .word { animation: none !important; }
+  .lead-card:hover, .seat:hover { transform: none; }
   * { transition-duration: 0.01ms !important; }
 }
 
