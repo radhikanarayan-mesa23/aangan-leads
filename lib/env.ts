@@ -23,6 +23,13 @@ export const env = {
 
   HUBSPOT_PRIVATE_APP_TOKEN: process.env.HUBSPOT_PRIVATE_APP_TOKEN ?? '',
   HUBSPOT_PIPELINE_ID: process.env.HUBSPOT_PIPELINE_ID ?? '',
+  /**
+   * Optional JSON, {"<our stage>": "<hubspot stage id>"}. Needed when we cannot
+   * create our own pipeline — HubSpot only allows that from Sales Hub
+   * Professional up — so our stages are mapped onto an existing pipeline's.
+   * scripts/hubspot-setup.ts prints a ready-made value.
+   */
+  HUBSPOT_STAGE_MAP: process.env.HUBSPOT_STAGE_MAP ?? '',
 
   APP_URL: process.env.APP_URL || 'http://localhost:3000',
   CRON_SECRET: process.env.CRON_SECRET ?? '',

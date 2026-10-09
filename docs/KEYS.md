@@ -119,18 +119,54 @@ lives in our own database, which still prevents double booking.
 
 ## 6. HubSpot — CRM
 
-| Key | Where |
-|---|---|
-| `HUBSPOT_PRIVATE_APP_TOKEN` | HubSpot → Settings → Integrations → Private Apps → create one |
-| `HUBSPOT_PIPELINE_ID` | **Don't look for this** — give me the token and I run `npm run hubspot:setup`, which creates the pipeline and prints the id |
+### Getting the token
 
-Scopes the private app needs: `crm.objects.contacts.read/write`,
-`crm.objects.deals.read/write`, `crm.schemas.deals.read/write`.
+1. Sign in to HubSpot as a **Super Admin** (only a Super Admin can create a private app).
+2. Top-right **⚙ Settings**.
+3. Left sidebar → **Integrations → Private apps**.
+4. **Create a private app**.
+5. **Basic info** tab → name it `Aangan Leads`.
+6. **Scopes** tab → search for and tick exactly these six:
+
+   | Scope | Why |
+   |---|---|
+   | `crm.objects.contacts.read` | find an existing contact before creating a duplicate |
+   | `crm.objects.contacts.write` | create the caller as a contact |
+   | `crm.objects.deals.read` | read deals back |
+   | `crm.objects.deals.write` | create the deal and move its stage |
+   | `crm.schemas.deals.read` | look up the pipeline's stage ids |
+   | `crm.schemas.deals.write` | create the pipeline and the `ai_call_cost_inr` property |
+
+7. **Create app** → **Continue creating**.
+8. Copy the **access token** (`pat-na1-…` or `pat-eu1-…`). It is shown once —
+   after that you have to rotate it.
+
+Send me that token. Then I run:
+
+```bash
+npm run hubspot:setup
+```
+
+which creates the pipeline and the custom property `ai_call_cost_inr`, and
+prints `HUBSPOT_PIPELINE_ID` for me to set. You do not need to find that id
+yourself.
+
+### ⚠️ One thing to check first: your HubSpot tier
+
+Creating an **extra deal pipeline** requires **Sales Hub Professional or above**.
+Free and Starter portals have one fixed pipeline, so the setup will get a 403.
+
+That is handled, not fatal. The script falls back to the pipeline you already
+have, maps our eight board columns onto its stages by position, and prints a
+`HUBSPOT_STAGE_MAP` for me to set — with the mapping laid out so we can correct
+it by eye. *Closed won* and *Closed lost* are matched by name rather than
+position, because those two matter most.
+
+So: Professional and above gets a dedicated **Aangan Leads** pipeline;
+free or Starter reuses the existing one. Either works.
 
 **Unblocks:** a deal created the first time a designer moves a card out of New,
-and stage sync on every move after.
-
----
+and stage sync on every move after. Failures are retried by the cron.
 
 ## 7. Cron — after the database is live
 

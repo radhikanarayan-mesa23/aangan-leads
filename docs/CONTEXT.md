@@ -11,7 +11,7 @@ _Updated 2026-10-08._
 - **P4 Owner Dashboard** — `/owner` KPI row, health strip, code-computed insights, leads over time, funnel with drop-off, locality, source, cost vs revenue, hour × weekday heatmap, team table.
 - **Live call tools** — `POST /api/vaani/tools/slots` and `/book` (secret-checked, 30s cache, availability re-checked before booking).
 - **Cron** — `GET /api/cron`: queued pushes, hot-lead nudges, overdue callbacks, HubSpot retries, 9pm digest.
-- **HubSpot** — client, stage map, `scripts/hubspot-setup.ts`, deal created on the first move out of New, retried by cron.
+- **HubSpot** — client, stage resolution via `resolveStageId()`, `scripts/hubspot-setup.ts` (falls back to the portal's existing pipeline when it cannot create one — extra pipelines need Sales Hub Professional), deal created on the first move out of New, retried by cron.
 
 ## Fixed in the review pass (2026-10-08)
 
@@ -34,7 +34,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 | `GEMINI_API_KEY` | ❌ the credential supplied is an OAuth token, not an API key — Google returns 401. Needs an AI Studio key (`AIza…`) |
 | `TELEGRAM_BOT_TOKEN`, chat ids | missing — pushes are skipped, never crash |
 | `CALCOM_API_KEY`, `CALCOM_EVENT_TYPE_ID` | missing — booking falls back to our own DB, which still prevents double booking |
-| `HUBSPOT_*` | missing — sync is a no-op |
+| `HUBSPOT_PRIVATE_APP_TOKEN` | missing — sync is a no-op. `HUBSPOT_PIPELINE_ID` (and `HUBSPOT_STAGE_MAP` on a free portal) are printed by `npm run hubspot:setup` |
 | `VAANI_API_KEY` | ✅ set |
 | `VAANI_WEBHOOK_SECRET`, `VAANI_TOOL_SECRET`, `CALCOM_WEBHOOK_SECRET` | ✅ generated and set in Vercel — paste the same values into Vaani and Cal.com |
 | `SESSION_SECRET`, `CRON_SECRET` | defaulted in development, **must be set in production** |

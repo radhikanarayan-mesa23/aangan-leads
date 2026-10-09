@@ -83,3 +83,8 @@ Going public exposed a hole: every webhook treated a missing shared secret as "a
 - `migrations/003_calcom.sql` renames the booking columns on the live Neon database. Idempotent, and safe on a fresh install.
 - `verify:db` now applies the **whole migration chain** in order, not just `001` — 38 checks.
 - Generated `VAANI_WEBHOOK_SECRET`, `VAANI_TOOL_SECRET` and `CALCOM_WEBHOOK_SECRET`; set in Vercel and `.env`, so those endpoints no longer return 503 in production.
+
+## phase-6 — HubSpot setup survives a free portal
+- Creating an extra deal pipeline needs Sales Hub Professional. `scripts/hubspot-setup.ts` now catches the 403, falls back to the portal's existing pipeline, maps our eight columns onto its stages by position, and prints a `HUBSPOT_STAGE_MAP` with the mapping shown for checking. *Closed won* and *Closed lost* are matched by name, not position.
+- `lib/hubspot.ts` resolves a stage through `resolveStageId()`: the explicit map wins, then a label match. It returns null rather than guessing, and `updateDealStage` now throws a readable error instead of silently filing a deal under no stage.
+- `docs/KEYS.md` has the step-by-step for creating the private app and the exact six scopes.
