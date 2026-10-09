@@ -49,13 +49,30 @@ export function humanScope(scope?: string | null): string | null {
   )[scope] ?? scope;
 }
 
-export function digestMessage(rows: { grade: string; count: number }[], cost: number, hotInNew: number): string {
-  const line = rows.map((r) => `${r.grade}: ${r.count}`).join(' · ');
+/**
+ * The 9pm status for Nikhil. One short highlight — capped at 70 words in
+ * lib/brief.ts — then a line to download the detail. Deliberately not a report.
+ */
+export function digestMessage(opts: {
+  dateLabel: string;
+  highlight: string;
+  numbers: { label: string; value: string }[];
+  cronSecret: string;
+}): string {
+  const keep = new Set(['Calls today', 'Hot today', 'Booked in the call', 'Cost today']);
+  const line = opts.numbers
+    .filter((x) => keep.has(x.label))
+    .map((x) => `${escapeHtml(x.label)} <b>${escapeHtml(x.value)}</b>`)
+    .join(' · ');
+
+  const download = `${env.APP_URL}/api/owner/brief?t=${encodeURIComponent(opts.cronSecret)}`;
   return [
-    '🌙 <b>Aangan — today</b>',
-    line || 'No calls today.',
-    `Cost today: ₹${cost.toFixed(0)}`,
-    hotInNew ? `⚠️ ${hotInNew} hot lead(s) still sitting in New.` : '✅ No hot leads left untouched.',
-    `<a href="${env.APP_URL}/owner">Open the dashboard</a>`,
+    `🌙 <b>Aangan — ${escapeHtml(opts.dateLabel)}</b>`,
+    '',
+    escapeHtml(opts.highlight),
+    '',
+    line,
+    '',
+    `<a href="${download}">Download today's brief</a> · <a href="${env.APP_URL}/owner">Open the dashboard</a>`,
   ].join('\n');
 }

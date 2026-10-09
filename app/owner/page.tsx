@@ -7,6 +7,7 @@ import { InternalBadge } from '@/components/Chips';
 import { CostVsRevenue, FunnelChart, Heatmap, LeadsOverTime, LocalityChart, SourceChart } from '@/components/OwnerCharts';
 import { OwnerHero } from '@/components/OwnerHero';
 import { heroCopy } from '@/lib/hero-copy';
+import { buildDailyBrief } from '@/lib/brief';
 import { byLocality, bySource, costVsRevenue, funnel, health, heatmap, insights, kpis, leadsOverTime, loadRows, loadStageReach, team } from '@/lib/analytics';
 import { inr } from '@/lib/pricing';
 import { cn } from '@/lib/utils';
@@ -32,6 +33,7 @@ export default async function OwnerPage() {
   const awaitingCallback = rows.filter((r) => r.callback_due_at && !r.callback_done_at && !r.first_contact_at).length;
   const escalations = rows.filter((r) => r.grade === 'ESCALATE' && r.stage === 'New').length;
   const hero = heroCopy({ hotInNew, awaitingCallback, escalations, pricesSpoken: h.pricesSpoken });
+  const brief = await buildDailyBrief();
 
   const deltaLeads = pct(k.month.count, k.prevMonth.count);
   const deltaCost = pct(k.month.cost, k.prevMonth.cost);
@@ -48,6 +50,24 @@ export default async function OwnerPage() {
         ]}
         localities={byLocality(rows, 6).filter((l) => l.name !== 'Not stated')}
       />
+
+      {/* Today's status — the same 70-word highlight Nikhil gets at 9pm. */}
+      <section className="mt-4 card p-4 sm:p-5 animate-fade-up">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0 max-w-2xl">
+            <p className="label mb-1.5">Today · {brief.dateLabel}</p>
+            <p className="text-[15px] leading-relaxed">{brief.highlight}</p>
+          </div>
+          <div className="flex flex-col gap-2 shrink-0">
+            <a className="btn btn-primary" href="/api/owner/brief" download>
+              Download today’s brief
+            </a>
+            <a className="btn" href="/api/owner/brief?format=csv" download>
+              All leads (CSV)
+            </a>
+          </div>
+        </div>
+      </section>
 
       <div className="mt-6 mb-3 flex items-end justify-between gap-4 flex-wrap">
         <div>

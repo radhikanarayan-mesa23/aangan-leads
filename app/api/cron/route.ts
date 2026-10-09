@@ -4,6 +4,7 @@ import { env, has } from '@/lib/env';
 import { requireSecret } from '@/lib/webhook-auth';
 import { notifyLead } from '@/lib/pipeline';
 import { digestMessage, sendTelegram } from '@/lib/telegram';
+import { buildDailyBrief } from '@/lib/brief';
 import { escapeHtml } from '@/lib/utils';
 import { istParts } from '@/lib/time';
 import { syncHubspot } from '@/lib/hubspot-sync';
@@ -14,9 +15,12 @@ export const maxDuration = 60;
 
 // Triggered every 10 minutes from cron-job.org with CRON_SECRET.
 export async function GET(req: NextRequest) {
+  // Vercel Cron sends `Authorization: Bearer $CRON_SECRET`; cron-job.org sends
+  // the query parameter. Accept either.
+  const bearer = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ?? null;
   const auth = requireSecret(
     env.CRON_SECRET,
-    req.headers.get('x-cron-secret') ?? req.nextUrl.searchParams.get('secret'),
+    req.headers.get('x-cron-secret') ?? req.nextUrl.searchParams.get('secret') ?? bearer,
     'CRON_SECRET'
   );
   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
@@ -92,22 +96,17 @@ export async function GET(req: NextRequest) {
     );
     if (Number(already[0]?.c ?? 0) > 0) return { skipped: 'already sent' };
 
-    const rows = await sql<{ grade: string; count: string }>(
-      "select coalesce(grade,'UNGRADED') grade, count(*)::text from leads where created_at >= date_trunc('day', now() at time zone 'Asia/Kolkata') group by 1 order by 1"
-    );
-    const cost = await sql<{ sum: string | null }>(
-      "select coalesce(sum(cost_inr),0)::text sum from leads where created_at >= date_trunc('day', now() at time zone 'Asia/Kolkata')"
-    );
-    const hot = await sql<{ c: string }>("select count(*)::text c from leads where grade='HOT' and stage='New'");
+    const brief = await buildDailyBrief();
 
     if (has.telegram() && env.TELEGRAM_OWNER_CHAT_ID) {
       await sendTelegram(
         env.TELEGRAM_OWNER_CHAT_ID,
-        digestMessage(
-          rows.map((r) => ({ grade: r.grade, count: Number(r.count) })),
-          Number(cost[0]?.sum ?? 0),
-          Number(hot[0]?.c ?? 0)
-        )
+        digestMessage({
+          dateLabel: brief.dateLabel,
+          highlight: brief.highlight,
+          numbers: brief.numbers,
+          cronSecret: env.CRON_SECRET,
+        })
       );
       const any = await sql<{ id: string }>('select id from leads order by created_at desc limit 1');
       if (any[0]) await sql("insert into lead_events (lead_id, type, note) values ($1,'telegram','Daily digest sent.')", [any[0].id]);

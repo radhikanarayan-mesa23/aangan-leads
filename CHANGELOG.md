@@ -128,3 +128,10 @@ Gated on `DEMO_MAGIC_LINK`, so switching that off closes open sign-in **and** st
 - Charts recoloured to the blue ramp; the funnel bars and the heatmap now run on a navy→blue gradient. Grade chips stay semantic (hot red, warm amber, escalate purple) and still carry their word, so colour is never the only signal.
 - Nav is a navy pill with a gradient mark; primary buttons carry the badge's blue→navy gradient.
 - **Fixed on the way:** `heroCopy()` was exported from a `'use client'` module and called from the server page, which type-checked and built cleanly but crashed at runtime. Moved to `lib/hero-copy.ts`.
+
+## phase-9 — board motion, and Nikhil's daily brief
+- **Motion on the board.** Cards rise in with a staggered entrance (capped so a long column never crawls), lift on hover, tilt while dragged, and pulse once where they land so a drop is acknowledged. Drop targets tint blue. Column counts animate on change. All of it is disabled under `prefers-reduced-motion`.
+- **Daily brief for Nikhil.** `lib/brief.ts` builds a highlight **capped at 70 words** — the cap is enforced in code, sentences are added in priority order and trimmed from the bottom, so it can never grow into a report. It leads with what needs action: prices spoken, escalations, unclaimed hot leads, overdue callbacks.
+- The same highlight appears in three places and is built once: the 9pm Telegram message, the top of the dashboard, and the downloaded file — so they cannot drift.
+- **`GET /api/owner/brief`** downloads the detail as Markdown, or `?format=csv` for every lead. Owner-only, since it carries internal estimates (hard rule 1); the cron secret also opens it so the Telegram link works.
+- **`vercel.json` cron** runs the brief at 21:00 IST without any external service. The 10-minute sweep still wants cron-job.org. `/api/cron` now also accepts Vercel's `Authorization: Bearer` form.

@@ -40,6 +40,7 @@ export function Board({ leads, users, me, openLeadId }: Props) {
   const [dragging, setDragging] = useState<BoardLead | null>(null);
   const [pending, setPending] = useState<Record<string, Stage>>({});
   const [error, setError] = useState<string | null>(null);
+  const [justMoved, setJustMoved] = useState<string | null>(null);
 
   const localities = useMemo(
     () => [...new Set(leads.map((l) => l.locality).filter(Boolean) as string[])].sort(),
@@ -88,6 +89,7 @@ export function Board({ leads, users, me, openLeadId }: Props) {
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
       setError(body.error ?? 'That move did not stick.');
+      setJustMoved(null);
       setPending((p) => {
         const next = { ...p };
         delete next[lead.id];
@@ -95,6 +97,8 @@ export function Board({ leads, users, me, openLeadId }: Props) {
       });
       return;
     }
+    setJustMoved(lead.id);
+    window.setTimeout(() => setJustMoved((id) => (id === lead.id ? null : id)), 800);
     router.refresh();
   }
 
@@ -174,7 +178,7 @@ export function Board({ leads, users, me, openLeadId }: Props) {
       >
         <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-thin -mx-4 px-4 sm:-mx-6 sm:px-6">
           {STAGES.map((stage) => (
-            <Column key={stage} stage={stage} leads={byStage.get(stage) ?? []} onOpen={setOpenId} />
+            <Column key={stage} stage={stage} leads={byStage.get(stage) ?? []} onOpen={setOpenId} justMoved={justMoved} />
           ))}
         </div>
         <DragOverlay>{dragging ? <Card lead={dragging} dragging /> : null}</DragOverlay>
@@ -197,27 +201,32 @@ function Column({
   stage,
   leads,
   onOpen,
+  justMoved,
 }: {
   stage: Stage;
   leads: BoardLead[];
   onOpen: (id: string) => void;
+  justMoved?: string | null;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: stage });
   return (
     <div className="w-[270px] shrink-0 flex flex-col">
       <div className="flex items-baseline justify-between px-1 pb-2">
         <h2 className="text-sm font-medium">{stage}</h2>
-        <span className="text-xs text-ink-3 tabular-nums">{leads.length}</span>
+        <span
+          key={leads.length}
+          className="text-xs text-ink-3 tabular-nums animate-fade-up rounded-chip bg-surface-2 px-1.5 min-w-[22px] text-center"
+        >
+          {leads.length}
+        </span>
       </div>
       <div
         ref={setNodeRef}
-        className={cn(
-          'flex-1 min-h-[160px] rounded-card p-2 space-y-2 transition-colors border border-dashed',
-          isOver ? 'bg-surface-2 border-ink-3' : 'border-transparent'
-        )}
+        data-over={isOver}
+        className="column-drop flex-1 min-h-[160px] rounded-card p-2 space-y-2 border border-dashed border-transparent"
       >
-        {leads.map((l) => (
-          <Card key={l.id} lead={l} onOpen={onOpen} />
+        {leads.map((l, i) => (
+          <Card key={l.id} lead={l} onOpen={onOpen} index={i} justMoved={justMoved === l.id} />
         ))}
         {leads.length === 0 && <p className="text-xs text-ink-3 px-1 py-3">Nothing here.</p>}
       </div>
@@ -229,13 +238,20 @@ function Card({
   lead,
   onOpen,
   dragging,
+  index = 0,
+  justMoved,
 }: {
   lead: BoardLead;
   onOpen?: (id: string) => void;
   dragging?: boolean;
+  index?: number;
+  justMoved?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: lead.id });
-  const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined;
+  const style: React.CSSProperties = transform
+    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, animation: 'none' }
+    : // Stagger the entrance down the column, capped so a long column never crawls.
+      { animationDelay: `${Math.min(index, 7) * 45}ms` };
 
   // The whole card is both the drag handle and the open target. dnd-kit's
   // pointer sensor needs 6px of movement before it claims the gesture, so a
@@ -252,9 +268,10 @@ function Card({
         }
       }}
       className={cn(
-        'card p-3 shadow-card cursor-grab active:cursor-grabbing select-none text-left',
-        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink-3',
-        (isDragging || dragging) && 'opacity-90 shadow-pop rotate-[0.6deg]'
+        'lead-card card p-3 shadow-card cursor-grab active:cursor-grabbing select-none text-left',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--blue-400)]',
+        (isDragging || dragging) && 'opacity-95 shadow-pop rotate-[1.2deg] scale-[1.02]',
+        justMoved && 'just-moved'
       )}
       {...listeners}
       {...attributes}

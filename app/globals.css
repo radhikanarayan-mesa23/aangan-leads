@@ -110,6 +110,59 @@ html, body {
 .fit-below   { color: #8A1026; background: #FDE7EB; border-color: #F7C9D1; }
 .fit-unknown { color: var(--ink-2); background: var(--surface-2); border-color: var(--line); }
 
+/* ── Motion ────────────────────────────────────────────────────────────────
+   Small and purposeful: cards arrive, lift under the cursor, and settle when
+   dropped. Nothing loops, nothing bounces, and all of it stops dead for anyone
+   who has asked their system for less motion.
+   ──────────────────────────────────────────────────────────────────────── */
+@keyframes card-rise {
+  from { opacity: 0; transform: translateY(8px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes settle {
+  0%   { box-shadow: 0 0 0 0 rgba(58, 91, 240, 0.38); }
+  100% { box-shadow: 0 0 0 10px rgba(58, 91, 240, 0); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes panel-in {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.lead-card {
+  animation: card-rise 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+}
+.lead-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -10px rgba(10, 18, 50, 0.28);
+  border-color: var(--line-strong);
+}
+.lead-card:active { transform: translateY(0) scale(0.995); }
+
+/* Pulses once where a card lands, so a drop is visibly acknowledged. */
+.just-moved { animation: settle 0.7s ease-out 1; }
+
+.column-drop {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.column-drop[data-over='true'] {
+  background: color-mix(in srgb, var(--blue-500) 7%, var(--surface));
+  border-color: var(--blue-400);
+}
+
+.animate-fade-up { animation: fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-panel-in { animation: panel-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lead-card, .just-moved, .animate-fade-up, .animate-panel-in { animation: none !important; }
+  .lead-card:hover { transform: none; }
+  * { transition-duration: 0.01ms !important; }
+}
+
 .scrollbar-thin::-webkit-scrollbar { height: 9px; width: 9px; }
 .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 99px; }
 .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }

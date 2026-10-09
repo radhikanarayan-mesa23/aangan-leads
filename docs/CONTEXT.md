@@ -10,7 +10,8 @@ _Updated 2026-10-08._
 - **P3 Designer Board** — `/board` Kanban, 8 columns, dnd-kit drag (pointer + touch), filters (grade, mine, locality, date, designer), claim, card detail panel (contact, requirement grid, budget vs internal estimate, criteria, handoff note, off-script questions, recording, transcript, timeline, stage dropdown, notes), `/board/calendar` week view.
 - **P4 Owner Dashboard** — `/owner` KPI row, health strip, code-computed insights, leads over time, funnel with drop-off, locality, source, cost vs revenue, hour × weekday heatmap, team table.
 - **Live call tools** — `POST /api/vaani/tools/slots` and `/book` (secret-checked, 30s cache, availability re-checked before booking).
-- **Cron** — `GET /api/cron`: queued pushes, hot-lead nudges, overdue callbacks, HubSpot retries, 9pm digest.
+- **Cron** — `GET /api/cron`: queued pushes, hot-lead nudges, overdue callbacks, HubSpot retries, 9pm brief. Scheduled daily by `vercel.json`; the 10-minute sweep still needs cron-job.org.
+- **Daily brief** — `lib/brief.ts`, 70-word highlight + Markdown/CSV download at `/api/owner/brief`.
 - **HubSpot** — client, stage resolution via `resolveStageId()`, `scripts/hubspot-setup.ts` (falls back to the portal's existing pipeline when it cannot create one — extra pipelines need Sales Hub Professional), deal created on the first move out of New, retried by cron.
 
 ## Fixed in the review pass (2026-10-08)
