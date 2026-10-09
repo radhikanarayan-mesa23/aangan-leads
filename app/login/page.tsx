@@ -17,7 +17,12 @@ async function requestLink(formData: FormData) {
   'use server';
   const email = String(formData.get('email') ?? '').trim().toLowerCase();
   const user = await findUser(email);
-  if (!user) redirect(`/login?error=${encodeURIComponent('That email is not on the team list.')}`);
+  if (!user) {
+    // Same response either way when we are not showing the link, so the form
+    // cannot be used to discover who is on the team.
+    if (!env.DEMO_MAGIC_LINK) redirect('/login?sent=1');
+    redirect(`/login?error=${encodeURIComponent('That email is not on the team list.')}`);
+  }
 
   const token = randomUUID().replace(/-/g, '');
   await sql("insert into magic_tokens (token, email, expires_at) values ($1,$2, now() + interval '20 minutes')", [token, user.email]);
@@ -38,6 +43,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   if (!process.env.DATABASE_URL) return <SetupNeeded />;
   const devMode = process.env.NODE_ENV !== 'production';
+  const showLink = devMode || env.DEMO_MAGIC_LINK;
 
   return (
     <main className="min-h-dvh grid place-items-center px-5">
@@ -54,12 +60,20 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             {devMode ? 'Sign in' : 'Send me a link'}
           </button>
           {sp.error && <p className="text-sm text-[var(--hot)]">{sp.error}</p>}
-          {sp.sent && (
-            <div className="text-sm text-ink-2 space-y-2">
-              <p>Link created. In development it is shown here instead of emailed:</p>
-              <a className="underline break-all text-ink" href={sp.link}>{sp.link}</a>
-            </div>
-          )}
+          {sp.sent &&
+            (showLink ? (
+              <div className="text-sm text-ink-2 space-y-2">
+                <p>
+                  Link created. No email provider is wired up yet, so it is shown here —
+                  <b> demo mode</b>, and it must be switched off before real caller data lands.
+                </p>
+                <a className="underline break-all text-ink" href={sp.link}>{sp.link}</a>
+              </div>
+            ) : (
+              <p className="text-sm text-ink-2">
+                If that address is on the team, a sign-in link is on its way. It expires in 20 minutes.
+              </p>
+            ))}
         </form>
 
         <p className="text-xs text-ink-3 mt-4 leading-relaxed">

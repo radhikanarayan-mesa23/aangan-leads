@@ -72,3 +72,7 @@
 Going public exposed a hole: every webhook treated a missing shared secret as "allow", which is right on a laptop and wrong on a public URL. An unsigned POST to `/api/calendly/webhook` returned 200, and `/api/vaani/call-ended` would have accepted fabricated calls.
 
 `lib/webhook-auth.ts` now centralises the rule — **a missing secret is a 503 in production, never an open door** — and `/api/vaani/call-ended`, both live call tools, `/api/calendly/webhook` and `/api/cron` all use it. Local development is unchanged.
+
+## phase-5.2 — live on Neon
+- Neon pooled endpoint wired, schema applied, 14 leads seeded. All grades land as the rubric's worked examples promise, including the code override on AAN-0004.
+- **Fixed — the magic link was printed on the production login page.** With no email provider wired, anyone who knew a team address could have signed in. It is now behind `DEMO_MAGIC_LINK=1`, and with the flag off the form gives the same answer for any address so it cannot be used to discover who is on the team.

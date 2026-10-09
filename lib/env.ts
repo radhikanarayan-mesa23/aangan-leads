@@ -29,6 +29,14 @@ export const env = {
 
   APP_URL: process.env.APP_URL || 'http://localhost:3000',
   CRON_SECRET: process.env.CRON_SECRET ?? '',
+  /**
+   * Shows the magic link on screen instead of emailing it. There is no email
+   * provider wired yet, so this is the only way in — but it means anyone who
+   * knows a team address can sign in. Acceptable while the board holds nothing
+   * but fictional seed data; it MUST be off before a real caller is in there.
+   */
+  DEMO_MAGIC_LINK: process.env.DEMO_MAGIC_LINK === '1',
+
   SESSION_SECRET: process.env.SESSION_SECRET || 'dev-only-insecure-secret-change-me-32chars',
 
   COST_VAANI_INR_PER_MIN: num(process.env.COST_VAANI_INR_PER_MIN, 6),

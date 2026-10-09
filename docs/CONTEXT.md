@@ -21,20 +21,21 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 
 ## In progress / next step
 
-1. **Waiting on the Neon `DATABASE_URL`** — nothing has been run against a real database yet. First commands once it lands: `npm run db:migrate && npm run db:seed`.
-2. Waiting on `GEMINI_API_KEY` to run `npm run eval` against the live model.
-3. Waiting on the design file to re-token `app/globals.css`.
+1. **A real Gemini API key** — the one supplied is an OAuth credential and Google rejects it. Needed for grading live calls and for `npm run eval`.
+2. **`DEMO_MAGIC_LINK` must go off** before real caller data lands, which means wiring an email provider for sign-in links.
+3. Calendly, Telegram and HubSpot keys.
+4. Waiting on the design file to re-token `app/globals.css`.
 
 ## Env status
 
 | Key | Status |
 |---|---|
-| `DATABASE_URL` | **missing — blocks everything runtime.** Neon, pooled endpoint (`-pooler`) |
-| `GEMINI_API_KEY` | missing — leads store ungraded and fall back to WARM |
+| `DATABASE_URL` | ✅ set — Neon pooled endpoint, schema applied, 14 leads seeded |
+| `GEMINI_API_KEY` | ❌ the credential supplied is an OAuth token, not an API key — Google returns 401. Needs an AI Studio key (`AIza…`) |
 | `TELEGRAM_BOT_TOKEN`, chat ids | missing — pushes are skipped, never crash |
 | `CALENDLY_API_KEY`, `CALENDLY_EVENT_TYPE_URI` | missing — booking falls back to our own DB, which still prevents double booking. **Needs a paid Calendly plan.** |
 | `HUBSPOT_*` | missing — sync is a no-op |
-| `VAANI_*` | missing — the webhook and both tools return **503 in production** and only run open locally |
+| `VAANI_API_KEY` | ✅ set. The webhook/tool secrets are still unset, so those endpoints return **503 in production** |
 | `SESSION_SECRET`, `CRON_SECRET` | defaulted in development, **must be set in production** |
 
 ## Open `// ASSUME:` notes
