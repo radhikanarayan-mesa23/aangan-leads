@@ -21,7 +21,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 
 ## In progress / next step
 
-1. **A real Gemini API key** — the one supplied is an OAuth credential and Google rejects it. Needed for grading live calls and for `npm run eval`.
+1. **Vaani telephony** — the open question. Their public API has no phone leg and the supplied key does not authenticate against them.
 2. **`DEMO_MAGIC_LINK` must go off** before real caller data lands, which means wiring an email provider for sign-in links.
 3. Cal.com, Telegram and HubSpot keys.
 4. Waiting on the design file to re-token `app/globals.css`.
@@ -31,7 +31,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 | Key | Status |
 |---|---|
 | `DATABASE_URL` | ✅ set — Neon pooled endpoint, schema applied, 14 leads seeded |
-| `GEMINI_API_KEY` | ❌ the credential supplied is an OAuth token, not an API key — Google returns 401. Needs an AI Studio key (`AIza…`) |
+| `GEMINI_API_KEY`, `GEMINI_MODEL` | ✅ set, `gemini-3.8-flash`. Live grading verified; `npm run eval` 20/20, 0 false lows |
 | `TELEGRAM_BOT_TOKEN` | ✅ set (@aanganNNbot). **Chat ids still needed** — message the bot, then `npm run telegram:ids` |
 | `CALCOM_API_KEY`, `CALCOM_EVENT_TYPE_ID` | ✅ set. Event type `7409828`, 60 min, schedule `2476628` Mon–Sat 12–5pm IST. Booking and cancellation verified live |
 | `HUBSPOT_PRIVATE_APP_TOKEN`, `HUBSPOT_PIPELINE_ID` | ✅ set. Dedicated **Aangan Leads** pipeline `2613566173`, 8 stages, `ai_call_cost_inr` created. Deal creation and stage sync verified against the live portal |

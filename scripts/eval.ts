@@ -37,7 +37,10 @@ async function main() {
       const g = await gradeWithGemini({ transcript: c.transcript, durationS: null });
       const v = gradeLead(g.output);
       const ok = c.expect.includes(v.grade);
-      const falseLow = v.grade === 'LOW' && c.expect.some((e) => e === 'HOT' || e === 'WARM');
+      // A false LOW is a lead that came back LOW when LOW was never an
+      // acceptable answer. A case that explicitly allows WARM *or* LOW is not
+      // one — flagging those made the gate cry wolf.
+      const falseLow = v.grade === 'LOW' && !c.expect.includes('LOW');
       if (falseLow) falseLows++;
       if (g.output.price_mentioned) pricesSpoken++;
       if (!ok) mismatches++;

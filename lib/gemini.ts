@@ -60,7 +60,18 @@ export async function gradeWithGemini(opts: {
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: system }] },
         contents: [{ role: 'user', parts: [{ text: user }] }],
-        generationConfig: { temperature: 0, responseMimeType: 'application/json', maxOutputTokens: 4096 },
+        generationConfig: {
+          temperature: 0,
+          responseMimeType: 'application/json',
+          // Gemini 3.x reasons before answering, and that reasoning is billed
+          // against this budget. At 4096 the JSON was being cut off mid-object
+          // and failing validation, so give it room.
+          maxOutputTokens: 16384,
+          // On the retry, stop it reasoning entirely. The rubric is explicit and
+          // the code re-derives every number anyway, so a plain extraction is
+          // the more reliable second attempt.
+          ...(attempt === 2 ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
+        },
       }),
     });
 
@@ -72,8 +83,17 @@ export async function gradeWithGemini(opts: {
 
     const body = (await res.json()) as any;
     input_tokens += body?.usageMetadata?.promptTokenCount ?? 0;
-    output_tokens += body?.usageMetadata?.candidatesTokenCount ?? 0;
-    raw = body?.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join('') ?? '';
+    // Reasoning tokens are billed too, so count them or the cost per lead lies.
+    output_tokens += (body?.usageMetadata?.candidatesTokenCount ?? 0) + (body?.usageMetadata?.thoughtsTokenCount ?? 0);
+
+    const candidate = body?.candidates?.[0];
+    raw = candidate?.content?.parts?.map((p: any) => p.text ?? '').join('') ?? '';
+
+    if (!raw && candidate?.finishReason) {
+      lastErr = `Gemini returned no text (finishReason: ${candidate.finishReason})`;
+      if (attempt === 2) throw new Error(lastErr);
+      continue;
+    }
 
     const parsed = GeminiOutputSchema.safeParse(safeJson(raw));
     if (parsed.success) {

@@ -109,3 +109,10 @@ HubSpot moved private apps under *Development → Legacy Apps* and disables crea
 - **Fixed on the way:** I first created the event type with an `attendeeDefined` location, and Cal.com rejected every booking with *"requires attendee location as the location"*. A studio consultation has a fixed address, so the event type now carries `address: "Aangan Studio, Pune"` — **correct that to the real address.**
 - Verified against the live account: availability intersection (Cal.com reports 22 free in six days, our grid narrows it to 20, correctly excluding a slot a seeded lead already holds), a real booking, and a cancellation that frees the slot again.
 - `npm run telegram:ids` — finds the chat ids once someone has messaged the bot, and says exactly what to do when it finds none. Bot is **@aanganNNbot**.
+
+## phase-7 — grading is live, and the eval gate passes
+- **Gemini connected.** Two of the three keys supplied were valid; the first was dead. `AQ.Ab8RN6…` *is* a legitimate API key format — my earlier conclusion that it had to be an OAuth token was wrong.
+- **Model moved to `gemini-3.8-flash`.** `gemini-2.5-flash` is listed on the account but closed to new users and returns 404.
+- **Fixed — responses were being truncated.** Gemini 3.x bills its reasoning against `maxOutputTokens`, and at 4096 the JSON was cut off mid-object and failed validation twice. One eval case failed on this. Raised to 16384, and the retry now sets `thinkingBudget: 0` so the second attempt is a plain extraction. Reasoning tokens are now counted in `llm_cost_inr` too — otherwise the cost per lead understates.
+- **Fixed — the eval gate cried wolf.** A false LOW was defined as "came back LOW while HOT or WARM was expected", which wrongly flagged cases that explicitly allow either. It is now "came back LOW when LOW was never acceptable".
+- **`npm run eval`: 20/20 as expected, 0 false lows, 0 prices spoken** against the live model. That is brief phase P7 done.

@@ -22,7 +22,7 @@ export const env = {
   BOOKING_FALLBACK_EMAIL: process.env.BOOKING_FALLBACK_EMAIL ?? '',
 
   GEMINI_API_KEY: process.env.GEMINI_API_KEY ?? '',
-  GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
 
   TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN ?? '',
   TELEGRAM_DESIGNER_CHAT_ID: process.env.TELEGRAM_DESIGNER_CHAT_ID ?? '',
