@@ -33,7 +33,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 |---|---|
 | `DATABASE_URL` | ✅ set — Neon pooled endpoint, schema applied, 14 leads seeded |
 | `GEMINI_API_KEY`, `GEMINI_MODEL` | ✅ set, `gemini-3.8-flash`. Live grading verified; `npm run eval` 20/20, 0 false lows |
-| `TELEGRAM_BOT_TOKEN` | ✅ set (@aanganNNbot). **Chat ids still needed** — message the bot, then `npm run telegram:ids` |
+| `TELEGRAM_BOT_TOKEN`, chat ids | ✅ set (@aanganNNbot, owner `8939412037`). Daily brief and hot-lead push both delivered live. Designer id is temporarily the owner's until a group exists |
 | `CALCOM_API_KEY`, `CALCOM_EVENT_TYPE_ID` | ✅ set. Event type `7409828`, 60 min, schedule `2476628` Mon–Sat 12–5pm IST. Booking and cancellation verified live |
 | `HUBSPOT_PRIVATE_APP_TOKEN`, `HUBSPOT_PIPELINE_ID` | ✅ set. Dedicated **Aangan Leads** pipeline `2613566173`, 8 stages, `ai_call_cost_inr` created. Deal creation and stage sync verified against the live portal |
 | `VAANI_API_KEY` | ✅ set |

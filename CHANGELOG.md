@@ -146,3 +146,8 @@ Read VaaniVoice's OpenAPI spec properly instead of guessing, and found the webho
 - `call.failed` keeps the row — the caller still rang — and skips grading.
 - `docs/VAANI-SETUP.md`: exactly what to paste into their dashboard, the two tool JSON schemas, and why the agent itself cannot be configured from here (their API has no prompt/instructions/persona field anywhere — a session only references a `flow_id` built in their UI).
 - `verify:db` is now **45 checks**, including a real signed envelope.
+
+## phase-10.1 — two manual steps removed
+- **Cal.com webhook registered via the API** (`POST /v2/webhooks`, id `8c3d3ce1…`) for `BOOKING_CREATED` and `BOOKING_CANCELLED`. I had written this up as a dashboard task without checking whether the API could do it — it can, and I had the key.
+- Demo deals and contacts removed from HubSpot; the **Aangan Leads** pipeline and the `ai_call_cost_inr` property stay. Board rows cleared of their HubSpot ids, so the first real stage move creates a clean deal.
+- Telegram live: owner chat `8939412037`. The designer id points at the same chat **temporarily**, until a designers' group exists.

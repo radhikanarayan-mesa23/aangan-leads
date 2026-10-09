@@ -95,12 +95,7 @@ preferred slots and the webhook books right after the call.
 1. **One event type** — 60 minutes, availability limited to **12, 1, 2, 3 and
    4pm IST, Mon–Sat**. That is what the agent offers. Its numeric id is in the
    event type's URL.
-2. **A webhook** → Settings → Webhooks, subscribe **BOOKING_CREATED** and
-   **BOOKING_CANCELLED** to
-   `https://aangan-leads.vercel.app/api/calcom/webhook`
-   with secret `1da46c44970fe66a33a3db7832e94b3c5c643c2ce1af89b7`.
-   This is what stops a slot someone booked directly in Cal.com from being
-   offered again on the phone.
+2. ~~A webhook~~ — **already registered for you** via the API (id `8c3d3ce1-05da-4b39-bf29-4a68ff53aeee`), covering `BOOKING_CREATED` and `BOOKING_CANCELLED`. This is what stops a slot booked directly in Cal.com from being offered again on the phone.
 
 **Unblocks:** real bookings during the call. Until then the shared calendar
 lives in our own database, which still prevents double booking.
