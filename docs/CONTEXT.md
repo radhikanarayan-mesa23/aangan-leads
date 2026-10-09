@@ -22,7 +22,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 ## In progress / next step
 
 1. **Vaani telephony** — the open question. Their public API has no phone leg and the supplied key does not authenticate against them.
-2. **`DEMO_MAGIC_LINK` must go off** before real caller data lands, which means wiring an email provider for sign-in links.
+2. **`DEMO_MAGIC_LINK` must go off** before real caller data lands. It now controls two things: open demo sign-in on the login page, and printing the magic link instead of emailing it. Turning it off needs an email provider wired first, or nobody can get in.
 3. Cal.com, Telegram and HubSpot keys.
 4. Waiting on the design file to re-token `app/globals.css`.
 

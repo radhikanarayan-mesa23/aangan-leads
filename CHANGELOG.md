@@ -116,3 +116,8 @@ HubSpot moved private apps under *Development → Legacy Apps* and disables crea
 - **Fixed — responses were being truncated.** Gemini 3.x bills its reasoning against `maxOutputTokens`, and at 4096 the JSON was cut off mid-object and failed validation twice. One eval case failed on this. Raised to 16384, and the retry now sets `thinkingBudget: 0` so the second attempt is a plain extraction. Reasoning tokens are now counted in `llm_cost_inr` too — otherwise the cost per lead understates.
 - **Fixed — the eval gate cried wolf.** A false LOW was defined as "came back LOW while HOT or WARM was expected", which wrongly flagged cases that explicitly allow either. It is now "came back LOW when LOW was never acceptable".
 - **`npm run eval`: 20/20 as expected, 0 false lows, 0 prices spoken** against the live model. That is brief phase P7 done.
+
+## phase-7.1 — anyone with the link can walk the whole thing
+The site was public but unusable by a visitor: sign-in required being on the team list and nothing on the page said who was on it. The login page now offers a seat — enter as Nikhil (owner) or as either designer — so someone handed the URL can walk the full journey, including watching a designer get bounced out of the owner dashboard. The email form is still there, tucked behind a disclosure.
+
+Gated on `DEMO_MAGIC_LINK`, so switching that off closes open sign-in **and** stops printing links in one move. Also cleared the stale HubSpot sync error left over from the `.invalid` email bug, which was showing red in the health strip after the fix had landed.
