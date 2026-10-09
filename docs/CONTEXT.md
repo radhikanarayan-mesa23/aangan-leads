@@ -32,8 +32,8 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 |---|---|
 | `DATABASE_URL` | ✅ set — Neon pooled endpoint, schema applied, 14 leads seeded |
 | `GEMINI_API_KEY` | ❌ the credential supplied is an OAuth token, not an API key — Google returns 401. Needs an AI Studio key (`AIza…`) |
-| `TELEGRAM_BOT_TOKEN`, chat ids | missing — pushes are skipped, never crash |
-| `CALCOM_API_KEY`, `CALCOM_EVENT_TYPE_ID` | missing — booking falls back to our own DB, which still prevents double booking |
+| `TELEGRAM_BOT_TOKEN` | ✅ set (@aanganNNbot). **Chat ids still needed** — message the bot, then `npm run telegram:ids` |
+| `CALCOM_API_KEY`, `CALCOM_EVENT_TYPE_ID` | ✅ set. Event type `7409828`, 60 min, schedule `2476628` Mon–Sat 12–5pm IST. Booking and cancellation verified live |
 | `HUBSPOT_PRIVATE_APP_TOKEN`, `HUBSPOT_PIPELINE_ID` | ✅ set. Dedicated **Aangan Leads** pipeline `2613566173`, 8 stages, `ai_call_cost_inr` created. Deal creation and stage sync verified against the live portal |
 | `VAANI_API_KEY` | ✅ set |
 | `VAANI_WEBHOOK_SECRET`, `VAANI_TOOL_SECRET`, `CALCOM_WEBHOOK_SECRET` | ✅ generated and set in Vercel — paste the same values into Vaani and Cal.com |
