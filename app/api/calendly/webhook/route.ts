@@ -3,6 +3,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { env } from '@/lib/env';
 import { one, sql } from '@/lib/db';
 import { logEvent } from '@/lib/leads';
+import { isProduction } from '@/lib/webhook-auth';
 
 export const runtime = 'nodejs';
 
@@ -82,7 +83,8 @@ export async function POST(req: NextRequest) {
 /** Calendly signs as `t=<unix>,v1=<hex hmac of "t.body">`. */
 function verify(header: string | null, raw: string): boolean {
   const key = env.CALENDLY_WEBHOOK_SIGNING_KEY;
-  if (!key) return true; // not configured yet — development only
+  // Unsigned requests are only tolerable on a developer's machine.
+  if (!key) return !isProduction();
   if (!header) return false;
 
   const parts = Object.fromEntries(header.split(',').map((kv) => kv.split('=') as [string, string]));

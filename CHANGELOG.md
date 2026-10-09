@@ -67,3 +67,8 @@
 - **New `POST /api/calendly/webhook`** (`invitee.created`, `invitee.canceled`), signature-verified with a five-minute replay window. A booking made directly in Calendly now holds the slot; a cancellation frees it without dropping the lead.
 - Schema: `calcom_booking_id` → `calendly_event_uri`, plus `calendly_cancel_url`.
 - `verify:db` is now 37 checks, covering the direct-booking hold and the cancellation release.
+
+## phase-5.1 — secrets are mandatory in production
+Going public exposed a hole: every webhook treated a missing shared secret as "allow", which is right on a laptop and wrong on a public URL. An unsigned POST to `/api/calendly/webhook` returned 200, and `/api/vaani/call-ended` would have accepted fabricated calls.
+
+`lib/webhook-auth.ts` now centralises the rule — **a missing secret is a 503 in production, never an open door** — and `/api/vaani/call-ended`, both live call tools, `/api/calendly/webhook` and `/api/cron` all use it. Local development is unchanged.

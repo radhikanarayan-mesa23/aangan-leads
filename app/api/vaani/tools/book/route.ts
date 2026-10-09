@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { one, sql } from '@/lib/db';
 import { calendlyBook } from '@/lib/calendly';
 import { spokenSlot } from '@/lib/time';
-import { toolAuthorised } from '@/lib/tool-auth';
+import { toolAuth } from '@/lib/tool-auth';
 import { logEvent } from '@/lib/leads';
 
 export const runtime = 'nodejs';
@@ -13,7 +13,8 @@ export const runtime = 'nodejs';
  * guarantee. Idempotent on (vani_call_id, start).
  */
 export async function POST(req: NextRequest) {
-  if (!toolAuthorised(req)) return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
+  const auth = toolAuth(req);
+  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   const body = (await req.json().catch(() => ({}))) as {
     call_id?: string;

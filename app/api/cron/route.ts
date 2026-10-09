@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { sql } from '@/lib/db';
 import { env, has } from '@/lib/env';
+import { requireSecret } from '@/lib/webhook-auth';
 import { notifyLead } from '@/lib/pipeline';
 import { digestMessage, sendTelegram } from '@/lib/telegram';
 import { escapeHtml } from '@/lib/utils';
@@ -13,10 +14,12 @@ export const maxDuration = 60;
 
 // Triggered every 10 minutes from cron-job.org with CRON_SECRET.
 export async function GET(req: NextRequest) {
-  const secret = req.headers.get('x-cron-secret') ?? req.nextUrl.searchParams.get('secret') ?? '';
-  if (env.CRON_SECRET && secret !== env.CRON_SECRET) {
-    return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
-  }
+  const auth = requireSecret(
+    env.CRON_SECRET,
+    req.headers.get('x-cron-secret') ?? req.nextUrl.searchParams.get('secret'),
+    'CRON_SECRET'
+  );
+  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   const report: Record<string, unknown> = {};
 

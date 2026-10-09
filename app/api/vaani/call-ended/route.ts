@@ -1,6 +1,6 @@
 import { NextResponse, after, type NextRequest } from 'next/server';
-import { timingSafeEqual } from 'node:crypto';
 import { env } from '@/lib/env';
+import { requireSecret } from '@/lib/webhook-auth';
 import { normalizeVaniPayload } from '@/lib/vaani';
 import { processLead, upsertCall } from '@/lib/pipeline';
 import { logEvent } from '@/lib/leads';
@@ -10,9 +10,12 @@ export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   // 1. verify the secret
-  if (!verifySecret(req)) {
-    return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
-  }
+  const auth = requireSecret(
+    env.VAANI_WEBHOOK_SECRET,
+    req.headers.get('x-vaani-secret') ?? req.headers.get('x-webhook-secret') ?? req.nextUrl.searchParams.get('secret'),
+    'VAANI_WEBHOOK_SECRET'
+  );
+  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   let raw: unknown;
   try {
@@ -49,17 +52,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ ok: true, ticket_no: lead.ticket_no, lead_id: lead.id, replayed: alreadyGraded });
-}
-
-function verifySecret(req: NextRequest): boolean {
-  const expected = env.VAANI_WEBHOOK_SECRET;
-  if (!expected) return true; // not configured yet — open in development only
-  const got =
-    req.headers.get('x-vaani-secret') ??
-    req.headers.get('x-webhook-secret') ??
-    req.nextUrl.searchParams.get('secret') ??
-    '';
-  const a = Buffer.from(got);
-  const b = Buffer.from(expected);
-  return a.length === b.length && timingSafeEqual(a, b);
 }

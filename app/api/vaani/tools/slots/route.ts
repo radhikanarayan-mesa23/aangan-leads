@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { openSlots } from '@/lib/calendly';
-import { toolAuthorised } from '@/lib/tool-auth';
+import { toolAuth } from '@/lib/tool-auth';
 import { takenSlots } from '@/lib/leads';
 
 export const runtime = 'nodejs';
@@ -10,7 +10,8 @@ export const runtime = 'nodejs';
 let cache: { at: number; body: unknown } | null = null;
 
 export async function POST(req: NextRequest) {
-  if (!toolAuthorised(req)) return NextResponse.json({ error: 'unauthorised' }, { status: 401 });
+  const auth = toolAuth(req);
+  if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   if (cache && Date.now() - cache.at < 30_000) return NextResponse.json(cache.body);
 

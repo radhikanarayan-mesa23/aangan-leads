@@ -34,7 +34,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 | `TELEGRAM_BOT_TOKEN`, chat ids | missing — pushes are skipped, never crash |
 | `CALENDLY_API_KEY`, `CALENDLY_EVENT_TYPE_URI` | missing — booking falls back to our own DB, which still prevents double booking. **Needs a paid Calendly plan.** |
 | `HUBSPOT_*` | missing — sync is a no-op |
-| `VAANI_*` | missing — webhook and tools run unauthenticated in development |
+| `VAANI_*` | missing — the webhook and both tools return **503 in production** and only run open locally |
 | `SESSION_SECRET`, `CRON_SECRET` | defaulted in development, **must be set in production** |
 
 ## Open `// ASSUME:` notes
