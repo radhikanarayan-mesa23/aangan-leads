@@ -52,9 +52,20 @@ export function gradeLead(g: GeminiOutput): GradeResult {
     c2 = 'unclear';
   }
 
-  // ── C3 Budget: pure arithmetic. rubric.md §7.
-  const c3: 'pass' | 'fail' | 'unclear' = fit === 'fits' ? 'pass' : fit === 'below' ? 'fail' : 'unclear';
+  // ── C3 Budget: arithmetic, plus the budget floor from rubric.md §7.
+  // A caller at or above the floor passes on their own, because Aangan's
+  // average project sits in that band — but budget_fit keeps recording the
+  // real arithmetic, so the board still shows a designer the gap.
+  const statedBudget = f.budget_inr_max ?? f.budget_inr_min ?? null;
+  const clearsFloor = r.hotBudgetFloorInr != null && statedBudget != null && statedBudget >= r.hotBudgetFloorInr;
+
+  let c3: 'pass' | 'fail' | 'unclear';
+  if (fit === 'fits' || clearsFloor) c3 = 'pass';
+  else if (fit === 'below') c3 = 'fail';
+  else c3 = 'unclear';
+
   if (fit === 'below' || fit === 'close') flags.add('BUDGET');
+  if (clearsFloor && fit !== 'fits') flags.add('BUDGET_FLOOR');
 
   // ── C4 Timeline. Minimum lead time comes from rubric.md §2.
   const minMonths = r.minLeadTimeWeeks / 4.345;
@@ -84,7 +95,7 @@ export function gradeLead(g: GeminiOutput): GradeResult {
   const criteria: Criteria = {
     C1: { result: c1, reason: reasonFor('C1', c1, f, g) },
     C2: { result: c2, reason: g.criteria.C2.reason || reasonFor('C2', c2, f, g) },
-    C3: { result: c3, reason: budgetReason(fit, est.est_min_inr, f) },
+    C3: { result: c3, reason: budgetReason(fit, est.est_min_inr, f, clearsFloor, r.hotBudgetFloorInr) },
     C4: { result: c4, reason: g.criteria.C4.reason || reasonFor('C4', c4, f, g) },
     C5: { result: c5, reason: g.criteria.C5.reason },
   };
@@ -113,7 +124,13 @@ export function gradeLead(g: GeminiOutput): GradeResult {
     reason = lowReason(criteria, fit, est.est_min_inr, f);
   } else if (c1 === 'pass' && c2 === 'pass' && c3 === 'pass' && c4 === 'pass') {
     grade = 'HOT';
-    reason = `In ${f.locality ?? 'the service area'}, in scope, budget fits the internal estimate, and the timeline works.`;
+    const budgetBit =
+      fit === 'fits'
+        ? 'budget covers the internal estimate'
+        : clearsFloor
+          ? `budget clears the ₹${((r.hotBudgetFloorInr ?? 0) / 100000).toFixed(0)}L floor`
+          : 'budget works';
+    reason = `In ${f.locality ?? 'the service area'}, in scope, ${budgetBit}, and the timeline works.`;
   } else {
     grade = 'WARM';
     reason = warmReason(criteria, fit);
@@ -153,8 +170,13 @@ function normaliseFlag(f: string) {
   return f.trim().toUpperCase().replace(/\s+/g, '_');
 }
 
-function budgetReason(fit: BudgetFit, estMin: number | null, f: LeadFields) {
+function budgetReason(fit: BudgetFit, estMin: number | null, f: LeadFields, clearsFloor = false, floor: number | null = null) {
   const b = f.budget_inr_max ?? f.budget_inr_min;
+  if (clearsFloor && fit !== 'fits') {
+    const lakh = floor ? `₹${(floor / 100000).toFixed(0)}L` : 'the floor';
+    const gap = fit === 'below' ? 'below' : 'close to';
+    return `Stated budget clears the ${lakh} floor, so it passes — though it is still ${gap} the internal estimate.`;
+  }
   if (fit === 'unknown') {
     if (!b) return 'No budget stated — never counted against the caller.';
     return 'No usable area for an estimate, so budget fit cannot be judged.';

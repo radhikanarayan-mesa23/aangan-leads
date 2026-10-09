@@ -1,8 +1,8 @@
 # Aangan Studio: Enquiry Rubric
 
-> **Version:** v1.0 (filled from `source/services.md`, `source/pricing.md`, `source/qualified.md`) · **Last updated:** 2026-10-08
+> **Version:** v1.1 · **Last updated:** 2026-10-09 · **Approved by Nikhil (via Radhika), 2026-10-09**
 > **Used by:** (1) the Vaani voice agent, as its knowledge during the call · (2) Gemini Flash, as the system prompt for grading after the call · (3) `scripts/eval.ts`, as the answer logic.
-> Every value below is traceable to a source file. Items marked **ASSUME** were not in the sources and need Nikhil's confirmation.
+> Every value below is traceable to a source file. The six items that were not in the sources were confirmed on 2026-10-09 — see §14.
 
 ---
 
@@ -120,6 +120,8 @@ Bands from `pricing.md` (indicative only, varies by site):
 - **Painting only:** out of scope — no estimate, `budget_fit = unknown`.
 - **`est_max`** = carpet area × the highest rate of the band matching the stated style: premium / high-end words → Premium band max; luxury / bespoke / imported → Luxury band max; otherwise Standard band max.
 
+**Budget floor (added v1.1):** a stated budget of **₹8,00,000** or more passes C3 on its own, whatever the estimate says. Aangan's average project is ₹8–14 lakh, so a caller at or above that figure is worth a designer regardless of how the per-sq-ft maths lands. `budget_fit` below still records the arithmetic truth, because the Designer Board and Owner Dashboard need it.
+
 **Budget fit:**
 
 | budget_fit | Rule |
@@ -139,7 +141,7 @@ Each criterion is scored `pass` / `fail` / `unclear`.
 |---|---|---|---|---|
 | **C1** | Location | Locality in the served list (section 3) | Locality in "not served" (Talegaon, Lonavala, Nashik, Mumbai, outside Pune/PCMC) | Case-by-case Pune/PCMC area, or not stated |
 | **C2** | Real project and in scope | Scope is offered **and** it is design + execution | Not offered (painting only, decor/styling only, standalone furniture or Vastu, architecture/structural, restaurant/hotel/retail/gym), or advice only, or caller will self-execute | Not stated |
-| **C3** | Budget | `budget_fit` = fits | `budget_fit` = below | `close` or `unknown` |
+| **C3** | Budget | `budget_fit` = fits, **OR stated budget ≥ ₹8,00,000** | `budget_fit` = below *and* budget < ₹8,00,000 | `close` or `unknown` |
 | **C4** | Timeline | Completion needed **≥ 6 weeks** away and **≤ 3 months** away | Needed in under 6 weeks **and** the caller refused a later completion; or more than 6 months away; or "just exploring" | 3–6 months away, or not stated |
 | **C5** | Decision and readiness | Decision-maker is on the call, or the caller confirms they are authorised to move forward; property owned, or rented with no structural changes | Caller has no say and won't name or reach the decision-maker (e.g. "just doing initial research for my in-laws") | Not stated, or authority unclear |
 
@@ -161,6 +163,7 @@ Apply the rules **top to bottom**. The first match wins.
 
 **Care rules (be wary with budget):**
 - **No budget stated is never LOW.** It is C3 = unclear, which means WARM at worst. (`qualified.md`: "If budget is not mentioned, treat as qualified.")
+- **A stated budget of ₹8,00,000 or more passes C3** even when it is below the internal estimate. The card still shows the real `budget_fit`, so a designer can see the gap before the consultation.
 - **When in doubt between WARM and LOW, choose WARM.** A false LOW loses a ₹8–14 lakh project. A false WARM costs a designer 5 minutes.
 - **Code overrides on maths.** If Gemini's grade conflicts with the code-computed `budget_fit`, the code's `budget_fit` wins and the lead is regraded. The disagreement is logged.
 - **Large-job signal:** carpet area ≥ **2,000 sq ft**, or a villa or office → flag `LARGE`. It does not change the grade.
@@ -266,7 +269,7 @@ The agent may offer a consultation slot when **all** of these are true:
 | A | 3BHK, 1,100 sq ft, Baner, full home, ₹22–25L, complete in 2 months, couple deciding | **HOT** | est_min = 1,100 × 1,800 = ₹19.8L → fits; C1–C4 all pass |
 | B | 2BHK, 850 sq ft, Wakad, full home, budget not shared, 4 months | **WARM** | C3 unknown, C4 unclear: never LOW for a missing budget |
 | C | 2BHK, 900 sq ft, Kothrud, full home, ₹14L, 2 months | **WARM** | est_min ₹16.2L; ₹14L ≥ 0.8 × 16.2L = ₹12.96L → close |
-| D | 2BHK, 900 sq ft, Hadapsar, full home, ₹6L | **LOW** | ₹6L < ₹12.96L → below, C3 fail |
+| D | 2BHK, 900 sq ft, Hadapsar, full home, ₹6L | **LOW** | ₹6L is below the estimate *and* under the ₹8L floor → C3 fail |
 | E | Kitchen only, budget ₹3L, Aundh, 3 months | **LOW** | single-room band starts at ₹3.5L; ₹3L < 0.8 × ₹3.5L = ₹2.8L is false → ₹3L ≥ ₹2.8L → **close**, so **WARM** |
 | F | Wants it complete in 3 weeks, refuses a later date | **LOW** | C4 fail, flag `DEADLINE` |
 | G | "My wardrobe from your team is broken and nobody is answering" | **ESCALATE** | existing client |
@@ -280,16 +283,20 @@ The agent may offer a consultation slot when **all** of these are true:
 
 ---
 
-## 14. Open questions for Nikhil (ASSUME until confirmed)
+## 14. Confirmed decisions (approved 2026-10-09)
 
-1. **Working days** — Mon–Sat assumed. Mon–Fri instead?
-2. **"Adjoining areas"** — which fringe localities (Wagholi, Bavdhan, Katraj, Moshi, Chakan) are in, and which are out?
-3. **Painting only** — confirmed as not offered? `services.md` implies it, but it is never named.
-4. **Single-room band** — is ₹3.5L–₹8L the right comparison for a kitchen-only or wardrobe-only job, or should those be lower?
-5. **Large-job threshold** — 2,000 sq ft assumed; `services.md` only caps commercial at ~3,000 sq ft.
-6. **Office cap** — a 4,000 sq ft office: hard decline, or escalate to Nikhil?
+These six were not stated in the source files. They were assumed in v1.0 and **confirmed as-is** on 2026-10-09.
 
----
+| # | Question | Confirmed |
+|---|---|---|
+| 1 | Working days | **Mon–Sat** |
+| 2 | "Adjoining areas" | Any unlisted Pune / PCMC locality is **unclear, never a fail** — it goes to a designer to judge |
+| 3 | Painting only | **Not offered** |
+| 4 | Single-room band | **₹3.5L – ₹8L** is the right comparison for a kitchen-only or wardrobe-only job |
+| 5 | Large-job threshold | **2,000 sq ft** |
+| 6 | Office over 3,000 sq ft | Out of the standard scope; treat as **unclear**, not an automatic decline |
+
+**Also added in v1.1:** the ₹8,00,000 budget floor (§7).
 
 ## 15. Change control
 

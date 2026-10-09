@@ -13,6 +13,8 @@ export type ParsedRubric = {
   scopeOffered: Record<string, boolean>;
   minLeadTimeWeeks: number;
   largeSqft: number;
+  /** A stated budget at or above this passes C3 on its own (rubric.md §7). */
+  hotBudgetFloorInr: number | null;
   slotHours: number[];
   slotDaysAhead: number;
   warnings: string[];
@@ -78,6 +80,7 @@ function parse(text: string): ParsedRubric {
   }
 
   const lead = text.match(/Minimum lead time[^.\n]*?(\d+)\s*weeks/i);
+  const floor = text.match(/Budget floor[^:]*:\*\*\s*a stated budget of \*\*₹([\d,]+)\*\*/i);
   const large = text.match(/carpet area ≥ \*{0,2}([\d,]+)\s*sq ft/i);
   const hours = text.match(/\*\*(\d+)pm, (\d+)pm, (\d+)pm, (\d+)pm, (\d+)pm\*\*/);
   const days = text.match(/next \*\*(\d+)\*\* working days/i);
@@ -94,6 +97,7 @@ function parse(text: string): ParsedRubric {
       : { full_home: true, partial: true, single_room: true, painting: false, office: true },
     minLeadTimeWeeks: lead ? Number(lead[1]) : 6,
     largeSqft: large ? Number(large[1].replace(/,/g, '')) : 2000,
+    hotBudgetFloorInr: floor ? Number(floor[1].replace(/,/g, '')) : null,
     slotHours: hours ? hours.slice(1, 6).map((h) => (Number(h) === 12 ? 12 : Number(h) + 12)) : [12, 13, 14, 15, 16],
     slotDaysAhead: days ? Number(days[1]) : 5,
     warnings,

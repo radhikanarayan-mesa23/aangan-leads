@@ -220,7 +220,7 @@ export const SEED_CALLS: SeedCall[] = [
       insights: { intent: 'hot', concerns: ['finishing before Diwali'], objections: [], sentiment: 'positive', suggested_opener: 'You mentioned wanting it done before Diwali — let’s check what that means for material lead times.' },
       off_script_questions: [], price_mentioned: false, confidence: 0.91,
     },
-    expect: 'WARM (code overrides Gemini: ₹14L is within 20% below ₹16.2L → close)',
+    expect: 'HOT (budget_fit is close, but ₹14L clears the ₹8L floor added in rubric v1.1)',
   },
   {
     key: 'warm-kitchen-aundh',

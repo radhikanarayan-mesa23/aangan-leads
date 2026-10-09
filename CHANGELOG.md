@@ -91,3 +91,9 @@ Going public exposed a hole: every webhook treated a missing shared secret as "a
 
 ## phase-6.1 — corrected HubSpot instructions
 HubSpot moved private apps under *Development → Legacy Apps* and disables creation for existing accounts on **26 October 2026**. `docs/KEYS.md` now reflects that, names Service Keys as the successor, and notes that `HUBSPOT_PRIVATE_APP_TOKEN` accepts either credential.
+
+## phase-6.2 — rubric v1.1: approved, plus a ₹8L budget floor
+- All six open assumptions confirmed; `rubric.md` §14 is now the approval record.
+- **New:** a stated budget ≥ ₹8,00,000 passes C3 on its own. The threshold is parsed out of `rubric.md`, not hardcoded.
+- `budget_fit` still records the arithmetic, so the board shows the real gap; leads that pass on the floor carry flag `BUDGET_FLOOR` and say so in the grade reason.
+- One seeded lead moved: AAN-0004 Warm → Hot. 14/14 checks, 38/38 DB checks.

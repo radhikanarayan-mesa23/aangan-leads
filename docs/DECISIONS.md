@@ -125,3 +125,19 @@ currently public beta. It is a bearer token against the same CRM endpoints, so
 **Rejected.** Going straight to Service Keys now. It is beta, the auth shape is
 unverified against this codebase, and the fallback path would be closed by the
 time we found out.
+
+---
+
+## 2026-10-09 — rubric.md v1.1 approved, plus a ₹8L budget floor
+
+**Approval.** Radhika confirmed all six assumptions carried in v1.0 §14 as-is: Mon–Sat working days; unlisted Pune/PCMC localities are *unclear*, never a fail; painting-only is not offered; ₹3.5L–₹8L is the right band for a single room; 2,000 sq ft is the large-job threshold; an office over 3,000 sq ft is *unclear* rather than an automatic decline. §14 is now the record of that decision rather than a list of open questions.
+
+**New rule.** A stated budget of **₹8,00,000 or more passes C3 on its own**, whatever the per-sq-ft estimate says. Aangan's average project is ₹8–14 lakh, so a caller at that figure is worth a designer regardless of how the arithmetic lands.
+
+**How it is implemented.** The threshold lives in `rubric.md` §7 and is *parsed* by `lib/rubric.ts` as `hotBudgetFloorInr` — not hardcoded. `budget_fit` still records the arithmetic truth (`fits` / `close` / `below` / `unknown`) because the board and dashboard need it; only the C3 verdict changes. A lead that passes on the floor rather than the maths gets flag `BUDGET_FLOOR`, and its grade reason says so plainly: *"budget clears the ₹8L floor"*, never "budget covers the estimate".
+
+**Effect.** Exactly one seeded lead moved: AAN-0004, Sameer Joshi — 900 sq ft in Kothrud, ₹14L against a ₹16.2L minimum. Previously Warm on `close`; now **Hot**. Worked example C in §13 was updated to match.
+
+**The risk, stated.** The floor is absolute, so ₹8L on a 2,000 sq ft villa (estimate ~₹36L) would also grade Hot. The card still shows *Budget below*, so a designer sees the gap before the consultation — but if that starts wasting designer time, the fix is to require the budget also be within some fraction of the estimate. Worth watching once real calls are flowing.
+
+**Rejected.** Making the floor replace `budget_fit` entirely. The dashboard's pipeline value and the designer's "can they actually afford this" judgement both need the arithmetic kept.

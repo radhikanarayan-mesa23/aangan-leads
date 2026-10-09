@@ -4,7 +4,7 @@ _Updated 2026-10-08._
 
 ## What is built
 
-- **Phase 0** — `source/` holds Nikhil's three files. `rubric.md` v1.0 is filled from them (no placeholders left except six open questions in §14). `vaani_agent_prompt.md` matches rubric §4–6 and §10.
+- **Phase 0** — `source/` holds Nikhil's three files. `rubric.md` is at **v1.1, approved 2026-10-09**: all six assumptions confirmed, plus a ₹8L budget floor on C3. `vaani_agent_prompt.md` matches rubric §4–6 and §10.
 - **P1 Scaffold** — Next.js 15 (App Router, TS) + Tailwind, migrations for `users` / `leads` / `lead_events` / `magic_tokens`, magic-link auth with owner/designer roles, middleware role separation, 14 seeded calls.
 - **P2 Intake pipeline** — `POST /api/vaani/call-ended` (secret → normalise → upsert → 200 → `after()`), one Gemini call with `rubric.md` as the system prompt, Zod validation with one retry, code-side estimate / budget fit / grade with override, callback promise, costs, Telegram. `scripts/replay.ts` and `scripts/check-grading.ts`.
 - **P3 Designer Board** — `/board` Kanban, 8 columns, dnd-kit drag (pointer + touch), filters (grade, mine, locality, date, designer), claim, card detail panel (contact, requirement grid, budget vs internal estimate, criteria, handoff note, off-script questions, recording, transcript, timeline, stage dropdown, notes), `/board/calendar` week view.
@@ -46,7 +46,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 - `lib/vaani.ts` — Vaani's call-ended payload shape is unverified; the normaliser accepts the common shapes.
 - `lib/calcom.ts` — written from Cal.com's published v2 reference; `POST /v2/bookings` and `GET /v2/slots` are unverified against a live account. The slots parser accepts both documented shapes.
 - `lib/storage.ts` — on Neon, recordings stream through the auth-gated proxy. We keep no copy, so an expiring Vaani URL would lose the audio. TODO: Vercel Blob or S3.
-- `rubric.md` §14 — six questions for Nikhil (working days, fringe localities, painting, single-room band, large threshold, office cap).
+- ~~`rubric.md` §14 — six questions for Nikhil~~ — all confirmed 2026-10-09.
 - `source/enquiries.pdf` is image-only; no text could be extracted, so no real transcript informed the seeds.
 - The project folder was renamed to `~/Desktop/ai-building/vaani` (the old name ended in a space, which broke tooling).
 
