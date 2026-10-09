@@ -2,10 +2,53 @@ import type { TranscriptTurn } from './schema';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // The ONLY file that knows Vaani's payload shape (CLAUDE.md §10).
-// ASSUME: Vaani's exact call-ended body is unverified. This normaliser accepts
-// the common shapes and falls back safely; when the real payload arrives, only
-// this file changes.
+//
+// Written against VaaniVoice's published OpenAPI 3.1 spec. Every outbound
+// delivery is an envelope:
+//
+//   { id: "evt_…", type: "call.completed", created: <unix>, data: { … } }
+//
+// signed with `X-VaaniVoice-Signature: sha256=<hex>` over the raw bytes. The
+// spec warns that "no sub-field is guaranteed" and that phone numbers are
+// masked, so everything below is a defensive parse.
 // ─────────────────────────────────────────────────────────────────────────────
+
+/** Event types the spec says a subscription may carry. */
+export type VaaniEvent =
+  | 'call.completed'
+  | 'call.failed'
+  | 'meeting.ended'
+  | 'lead.created'
+  | 'usage.charged'
+  | 'low_balance.warned'
+  | 'webhook.ping';
+
+export type VaaniEnvelope = {
+  event_id: string | null;
+  type: VaaniEvent | string;
+  created: number | null;
+  data: any;
+  /** True when the body was NOT an envelope — a bare payload from a test or another vendor. */
+  bare: boolean;
+};
+
+/**
+ * Unwraps the envelope. Falls back to treating the whole body as the payload,
+ * so `scripts/replay.ts` and any non-Vaani source still work.
+ */
+export function readEnvelope(raw: any): VaaniEnvelope {
+  const looksLikeEnvelope = raw && typeof raw === 'object' && typeof raw.type === 'string' && 'data' in raw;
+  if (!looksLikeEnvelope) {
+    return { event_id: null, type: 'call.completed', created: null, data: raw, bare: true };
+  }
+  return {
+    event_id: typeof raw.id === 'string' ? raw.id : null,
+    type: raw.type,
+    created: Number.isFinite(raw.created) ? Number(raw.created) : null,
+    data: raw.data ?? {},
+    bare: false,
+  };
+}
 
 export type NormalisedCall = {
   vani_call_id: string;
@@ -27,7 +70,9 @@ export type NormalisedCall = {
 };
 
 export function normalizeVaniPayload(raw: any): NormalisedCall {
-  const call = raw?.call ?? raw?.data ?? raw ?? {};
+  // Accept an envelope, a bare body, or a {call:…} wrapper.
+  const unwrapped = readEnvelope(raw).data ?? raw ?? {};
+  const call = unwrapped?.call ?? unwrapped ?? {};
   const meta = call?.metadata ?? call?.custom_data ?? raw?.metadata ?? {};
 
   return {

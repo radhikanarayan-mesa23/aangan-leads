@@ -7,7 +7,7 @@ import { seedAll } from './seed';
 import { getLead, listEvents, listLeads, listUsers, takenSlots, logEvent } from '../lib/leads';
 import { byLocality, bySource, costVsRevenue, funnel, health, heatmap, insights, kpis, leadsOverTime, loadRows, loadStageReach, team } from '../lib/analytics';
 import { upsertCall } from '../lib/pipeline';
-import { normalizeVaniPayload } from '../lib/vaani';
+import { normalizeVaniPayload, readEnvelope } from '../lib/vaani';
 import { openSlotsFromDb } from '../lib/calcom';
 import { SEED_CALLS } from '../seed/calls';
 
@@ -236,6 +236,39 @@ async function main() {
     "select callback_due_at, flags from leads where vani_call_id = 'seed-escalate-existing-client'"
   );
   ok('the escalation keeps its "right away" promise', !!escalated?.callback_due_at);
+
+  // ── Vaani webhook: the real envelope, signed the way their spec says ──────
+  const { createHmac } = await import('node:crypto');
+  const secret = 'vv_whk_test_secret';
+  const envelope = {
+    id: 'evt_test_0001',
+    type: 'call.completed',
+    created: Math.floor(Date.now() / 1000),
+    data: {
+      call: {
+        call_id: 'vaani-envelope-test',
+        from: '+9198******34',
+        duration: 212,
+        ended_reason: 'completed',
+        transcript: 'Agent: Namaste, thank you for calling Aangan Studio.\nCaller: I have a 3BHK in Baner, 1100 square feet, full home.',
+        metadata: { caller_name: 'Envelope Test' },
+      },
+    },
+  };
+  const rawBody = JSON.stringify(envelope);
+  const sig = 'sha256=' + createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex');
+  ok('signature is the hex HMAC of the raw bytes', /^sha256=[0-9a-f]{64}$/.test(sig));
+
+  const unwrapped = normalizeVaniPayload(JSON.parse(rawBody));
+  ok('envelope unwraps to the call', unwrapped.vani_call_id === 'vaani-envelope-test', `id=${unwrapped.vani_call_id}`);
+  ok('transcript parses out of the envelope', unwrapped.transcript.length === 2, `${unwrapped.transcript.length} turns`);
+  ok('caller name read from metadata', unwrapped.caller_name === 'Envelope Test');
+  ok('masked number kept as given', unwrapped.caller_number === '+9198******34', String(unwrapped.caller_number));
+
+  const env2 = readEnvelope(JSON.parse(rawBody));
+  ok('event id captured for de-duplication', env2.event_id === 'evt_test_0001' && !env2.bare);
+  const bare = readEnvelope({ call: { call_id: 'x' } });
+  ok('a bare body still works (replay script, other vendors)', bare.bare === true);
 
   console.log(checks.join('\n'));
   console.log(`\n${checks.length - failures}/${checks.length} checks passed`);

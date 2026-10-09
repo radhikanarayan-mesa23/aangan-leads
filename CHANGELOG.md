@@ -135,3 +135,14 @@ Gated on `DEMO_MAGIC_LINK`, so switching that off closes open sign-in **and** st
 - The same highlight appears in three places and is built once: the 9pm Telegram message, the top of the dashboard, and the downloaded file — so they cannot drift.
 - **`GET /api/owner/brief`** downloads the detail as Markdown, or `?format=csv` for every lead. Owner-only, since it carries internal estimates (hard rule 1); the cron secret also opens it so the Telegram link works.
 - **`vercel.json` cron** runs the brief at 21:00 IST without any external service. The 10-minute sweep still wants cron-job.org. `/api/cron` now also accepts Vercel's `Authorization: Bearer` form.
+
+## phase-10 — the Vaani receiver now matches their actual contract
+Read VaaniVoice's OpenAPI spec properly instead of guessing, and found the webhook I had built would not have worked:
+
+- Deliveries are an envelope — `{ id: "evt_…", type, created, data }` — not a bare call object. `lib/vaani.ts` now unwraps it, and still accepts a bare body so the replay script and any other vendor keep working.
+- They sign with **`X-VaaniVoice-Signature: sha256=<hex>`**, an HMAC-SHA256 over the raw body bytes keyed with a `vv_whk_…` secret. I had been checking a plain shared-secret header, which their webhook never sends. Both forms are now accepted; the HMAC is compared in constant time over the raw bytes, before parsing.
+- Retries **reuse the same `evt_` id** for up to 8 attempts, so delivery is now de-duplicated on it as well as on `vani_call_id`.
+- `webhook.ping` from the dashboard Test button is acknowledged; unhandled event types return 200 so the subscription is never auto-disabled after five "failures" that were really just us being strict.
+- `call.failed` keeps the row — the caller still rang — and skips grading.
+- `docs/VAANI-SETUP.md`: exactly what to paste into their dashboard, the two tool JSON schemas, and why the agent itself cannot be configured from here (their API has no prompt/instructions/persona field anywhere — a session only references a `flow_id` built in their UI).
+- `verify:db` is now **45 checks**, including a real signed envelope.
