@@ -121,3 +121,10 @@ HubSpot moved private apps under *Development → Legacy Apps* and disables crea
 The site was public but unusable by a visitor: sign-in required being on the team list and nothing on the page said who was on it. The login page now offers a seat — enter as Nikhil (owner) or as either designer — so someone handed the URL can walk the full journey, including watching a designer get bounced out of the owner dashboard. The email form is still there, tucked behind a disclosure.
 
 Gated on `DEMO_MAGIC_LINK`, so switching that off closes open sign-in **and** stops printing links in one move. Also cleared the stale HubSpot sync error left over from the `.invalid` email bug, which was showing red in the health strip after the fix had landed.
+
+## phase-8 — premium blue theme
+- Palette rebuilt from the Show Prime badge: deep navy ground (`#050B22`–`#111C4A`), royal blue ramp (`#2742C4`–`#8EA3F7`), cool off-white page (`#F4F6FC`). The warm Notion-ish tokens are gone. Every value is still a CSS variable at the top of `app/globals.css`, so the next swap is the same one-file job.
+- **New: the dashboard opens with a dark hero band** — one plain-English sentence about the state of the board ("4 callbacks are owed."), the three numbers Nikhil asks about, and a bar chart of where this month's leads came from, brightest where the hot ones are.
+- Charts recoloured to the blue ramp; the funnel bars and the heatmap now run on a navy→blue gradient. Grade chips stay semantic (hot red, warm amber, escalate purple) and still carry their word, so colour is never the only signal.
+- Nav is a navy pill with a gradient mark; primary buttons carry the badge's blue→navy gradient.
+- **Fixed on the way:** `heroCopy()` was exported from a `'use client'` module and called from the server page, which type-checked and built cleanly but crashed at runtime. Moved to `lib/hero-copy.ts`.

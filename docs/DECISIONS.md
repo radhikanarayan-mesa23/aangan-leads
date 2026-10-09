@@ -141,3 +141,17 @@ time we found out.
 **The risk, stated.** The floor is absolute, so ₹8L on a 2,000 sq ft villa (estimate ~₹36L) would also grade Hot. The card still shows *Budget below*, so a designer sees the gap before the consultation — but if that starts wasting designer time, the fix is to require the budget also be within some fraction of the estimate. Worth watching once real calls are flowing.
 
 **Rejected.** Making the floor replace `budget_fit` entirely. The dashboard's pipeline value and the designer's "can they actually afford this" judgement both need the arithmetic kept.
+
+---
+
+## 2026-10-09 — premium blue theme from the Show Prime badge
+
+**Decision.** The palette comes from the ID badge Radhika supplied: deep navy ground, royal blue gradient, silver-periwinkle highlights. The layout reference was an agent-console screenshot — a light page carrying one dark hero card.
+
+**What I kept light.** The page stays cool off-white rather than going fully dark. A designer reads this board between site visits on a phone, and a dense Kanban of fourteen cards in dark mode is harder to scan, not more premium. The weight goes into the hero band and the navy ink instead — restraint reads as expensive, decoration does not.
+
+**Grade chips stayed semantic.** Hot is still red, warm amber, escalate purple, retuned to sit beside the blue. Making them all blue would have looked cleaner and destroyed the one thing the board is for. They still carry their word, so colour is never the only signal.
+
+**Everything is still a token.** `app/globals.css` holds the whole palette as CSS variables; no component hardcodes a colour. The next rebrand is the same one-file job this one was.
+
+**Rejected.** A fully dark dashboard, for the readability reason above. Also rejected: recolouring the grade chips into the brand ramp.
