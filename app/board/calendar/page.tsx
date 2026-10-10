@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { currentUser } from '@/lib/auth';
 import { sql } from '@/lib/db';
-import { Chrome } from '@/components/Chrome';
+import { Shell } from '@/components/Shell';
 import { SetupNeeded } from '@/components/SetupNeeded';
 import { nextWorkingDays, SLOT_HOURS, slotInstant, fmtIST } from '@/lib/time';
 import { GradeChip } from '@/components/Chips';
@@ -26,7 +26,7 @@ export default async function CalendarPage() {
   const byIso = new Map(booked.map((b) => [new Date(b.booked_at).toISOString(), b]));
 
   return (
-    <Chrome user={user} active="calendar">
+    <Shell user={user} active="calendar">
       <div className="mb-4">
         <h1 className="text-lg font-semibold">Consultation slots</h1>
         <p className="text-sm text-ink-2">Five one-hour slots a day on the shared studio calendar. A booked slot is never offered again.</p>
@@ -66,6 +66,6 @@ export default async function CalendarPage() {
           ))}
         </div>
       </div>
-    </Chrome>
+    </Shell>
   );
 }

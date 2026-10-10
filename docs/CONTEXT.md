@@ -4,6 +4,7 @@ _Updated 2026-10-08._
 
 ## What is built
 
+- **Shell** — dark navigation rail (`components/Shell.tsx`), collapsing to a button on mobile.
 - **Look** — palette from the Show Prime badge; dark hero band on the dashboard and a gradient welcome card on sign-in. All tokens in `app/globals.css`.
 - **Phase 0** — `source/` holds Nikhil's three files. `rubric.md` is at **v1.1, approved 2026-10-09**: all six assumptions confirmed, plus a ₹8L budget floor on C3. `vaani_agent_prompt.md` matches rubric §4–6 and §10.
 - **P1 Scaffold** — Next.js 15 (App Router, TS) + Tailwind, migrations for `users` / `leads` / `lead_events` / `magic_tokens`, magic-link auth with owner/designer roles, middleware role separation, 14 seeded calls.

@@ -230,3 +230,19 @@ Rows now behave like cards rather than spreadsheet lines: a gradient avatar per 
 The **Unclaimed** row is deliberately styled apart — dashed avatar, italic label, grey accent that turns amber on hover — because it is a gap, not a person.
 
 **Fixed while testing:** `loadRows()` never selected `lost_reason`, `call_attempts`, `last_attempt_at` or `last_outcome`, so *"most often lost"* could never render no matter what the data said. The column was dead on arrival; it now shows Sneha's actual commonest reason.
+
+## phase-16 — the dashboard stops being generic
+
+**Navigation is now a dark rail**, not tabs across the top: gradient mark, icons with a one-line hint under each label, an active state with a blue inset edge, and the signed-in user at the foot. It collapses behind a button under `lg` — designers open this on a phone between site visits. `components/Chrome.tsx` is replaced by `components/Shell.tsx`.
+
+**New section — "What's making money."** The rest of the dashboard is about leads; this is about revenue, and it answers the questions an owner actually asks:
+
+- **By property type** — 2BHK, 3BHK, villa, office. Donut plus a table carrying enquiries, won, average value and **win rate by type**. The last column is the one nobody has: *you take plenty of 2BHK enquiries and convert half; every 3BHK you quote, you win.*
+- **By scope** — full home, partial, single room, office fit-out, same treatment.
+- `lib/revenue.ts` normalises free-text property types (`3 BHK`, `3bhk`, `3 bedroom` → `3BHK`; villas and offices stand apart).
+
+**New — "Return on answering the phone."** ₹48L won against ₹248 spent is **₹19,341 back per ₹1**, with the cost per project won beside it. Deliberately measured against the *full* AI spend, not just the calls that converted — the leads that went nowhere are part of what the wins had to cover. This is the number that justifies the system and it was nowhere on screen.
+
+**Designer performance cards** replace the table: avatar, a gradient win-rate ring, won / revenue / lost, what is being let down, their commonest lost reason, and how fast they typically answer.
+
+**Every money panel states its own confidence.** Below five won projects it says *"2 won projects so far — too few to read a pattern"* rather than drawing an authoritative donut from n=2. The shapes fill in honestly as real calls land.

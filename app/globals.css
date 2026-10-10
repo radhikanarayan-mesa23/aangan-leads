@@ -150,6 +150,21 @@ html, body {
   }
   .hero-divider { border-color: rgba(142, 163, 247, 0.18); }
 
+  /* The navigation rail. */
+  .hero-rail {
+    background: linear-gradient(185deg, var(--navy-800) 0%, var(--navy-900) 48%, var(--navy-950) 100%);
+    border-right: 1px solid rgba(142, 163, 247, 0.12);
+  }
+  .rail-link {
+    @apply flex items-center gap-3 rounded-card px-3 py-2.5 text-white/70 transition-all;
+  }
+  .rail-link:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+  .rail-link.is-active {
+    color: #fff;
+    background: linear-gradient(100deg, rgba(58, 91, 240, 0.34) 0%, rgba(58, 91, 240, 0.08) 100%);
+    box-shadow: inset 2px 0 0 var(--blue-400);
+  }
+
   /* The welcome card. Same badge palette as the dashboard hero, with a little
      more lift in the bloom — navy ground, royal blue, nothing brighter. */
   .hero-vivid {

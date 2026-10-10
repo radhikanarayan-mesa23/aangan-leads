@@ -3,7 +3,7 @@ import { currentUser } from '@/lib/auth';
 import { listLeads, listUsers } from '@/lib/leads';
 import { toBoardLead } from '@/lib/view';
 import { Board } from '@/components/Board';
-import { Chrome } from '@/components/Chrome';
+import { Shell } from '@/components/Shell';
 import { SetupNeeded } from '@/components/SetupNeeded';
 
 export const dynamic = 'force-dynamic';
@@ -23,11 +23,11 @@ export default async function BoardPage({ searchParams }: { searchParams: Promis
   const leads = rows.map((r) => toBoardLead(r, names));
 
   return (
-    <Chrome user={user} active="board">
+    <Shell user={user} active="board">
       {sp.denied === 'owner' && (
         <p className="mb-4 card p-3 text-sm text-ink-2">The overview is Nikhil's. You have the board.</p>
       )}
       <Board leads={leads} users={users} me={user} openLeadId={sp.lead} />
-    </Chrome>
+    </Shell>
   );
 }
