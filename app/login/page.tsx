@@ -129,11 +129,6 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
               </div>
             )}
 
-            {demo && (
-              <p className="mt-5 text-[12px]" style={{ color: 'rgba(222,231,255,0.55)' }}>
-                Fourteen example calls, no real callers. A designer who opens the owner dashboard gets sent back to the board — do try it.
-              </p>
-            )}
           </div>
         </section>
 
