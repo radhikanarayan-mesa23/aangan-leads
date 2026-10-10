@@ -74,6 +74,7 @@ export const SEED_CALLS: SeedCall[] = [
         ownership: 'owned', style: 'modern, warm, wood', budget_volunteered: true,
         budget_inr_min: 2200000, budget_inr_max: 2500000, completion_needed_by: 'in 2 months',
         timeline_months: 2, decision_maker: 'self and spouse', source: null,
+        languages: ['en'], language_switched: false,
       },
       criteria: {
         C1: c('pass', 'Baner is in the service area.'),
@@ -119,6 +120,7 @@ export const SEED_CALLS: SeedCall[] = [
         current_state: 'new', ownership: 'rented', style: null, budget_volunteered: true,
         budget_inr_min: 4000000, budget_inr_max: 4000000, completion_needed_by: 'in 3 months',
         timeline_months: 3, decision_maker: 'self, with finance sign-off', source: null,
+        languages: ['en'], language_switched: false,
       },
       criteria: {
         C1: c('pass', 'Hinjewadi is in PCMC.'),
@@ -161,6 +163,7 @@ export const SEED_CALLS: SeedCall[] = [
         carpet_area_sqft: 850, locality: 'Wakad', scope: 'full_home', rooms: [], current_state: 'lived_in',
         ownership: 'owned', style: null, budget_volunteered: false, budget_inr_min: null, budget_inr_max: null,
         completion_needed_by: 'in about 4 months', timeline_months: 4, decision_maker: null, source: null,
+        languages: ['en', 'hi'], language_switched: true,
       },
       criteria: {
         C1: c('pass', 'Wakad is in the service area.'),
@@ -206,6 +209,7 @@ export const SEED_CALLS: SeedCall[] = [
         carpet_area_sqft: 900, locality: 'Kothrud', scope: 'full_home', rooms: [], current_state: 'renovation',
         ownership: 'owned', style: null, budget_volunteered: true, budget_inr_min: 1400000, budget_inr_max: 1400000,
         completion_needed_by: 'before Diwali, about 2 months', timeline_months: 2, decision_maker: 'self and spouse', source: 'referral',
+        languages: ['mr', 'en'], language_switched: true,
       },
       criteria: {
         C1: c('pass', 'Kothrud is in the service area.'),
@@ -246,6 +250,7 @@ export const SEED_CALLS: SeedCall[] = [
         locality: 'Aundh', scope: 'single_room', rooms: ['kitchen'], current_state: 'lived_in', ownership: 'owned',
         style: null, budget_volunteered: true, budget_inr_min: 300000, budget_inr_max: 300000,
         completion_needed_by: 'in 3 months', timeline_months: 3, decision_maker: 'self', source: 'instagram',
+        languages: ['en'], language_switched: false,
       },
       criteria: {
         C1: c('pass', 'Aundh is in the service area.'),
@@ -290,6 +295,7 @@ export const SEED_CALLS: SeedCall[] = [
         carpet_area_sqft: 1050, locality: 'Bavdhan', scope: 'full_home', rooms: [], current_state: null,
         ownership: null, style: null, budget_volunteered: false, budget_inr_min: null, budget_inr_max: null,
         completion_needed_by: 'three to four months', timeline_months: 4, decision_maker: 'self and brother', source: null,
+        languages: ['en', 'hi'], language_switched: true,
       },
       criteria: {
         C1: c('unclear', 'Bavdhan is not on the served list — adjoining area, case by case.'),
@@ -333,6 +339,7 @@ export const SEED_CALLS: SeedCall[] = [
         locality: 'Hadapsar', scope: 'full_home', rooms: [], current_state: 'lived_in', ownership: 'owned',
         style: null, budget_volunteered: true, budget_inr_min: 600000, budget_inr_max: 600000,
         completion_needed_by: 'in 2 months', timeline_months: 2, decision_maker: 'self', source: 'google',
+        languages: ['hi'], language_switched: false,
       },
       criteria: {
         C1: c('pass', 'Hadapsar is in the service area.'),
@@ -371,6 +378,7 @@ export const SEED_CALLS: SeedCall[] = [
         locality: 'Talegaon', scope: 'full_home', rooms: [], current_state: null, ownership: 'owned',
         style: null, budget_volunteered: false, budget_inr_min: null, budget_inr_max: null,
         completion_needed_by: null, timeline_months: null, decision_maker: null, source: null,
+        languages: ['mr'], language_switched: false,
       },
       criteria: {
         C1: c('fail', 'Talegaon is outside the service area.'),
@@ -409,6 +417,7 @@ export const SEED_CALLS: SeedCall[] = [
         locality: 'Koregaon Park', scope: 'other', rooms: [], current_state: 'lived_in', ownership: 'owned',
         style: null, budget_volunteered: false, budget_inr_min: null, budget_inr_max: null,
         completion_needed_by: null, timeline_months: null, decision_maker: 'self', source: null,
+        languages: ['en'], language_switched: false,
       },
       criteria: {
         C1: c('pass', 'Koregaon Park is in the service area.'),
@@ -447,6 +456,7 @@ export const SEED_CALLS: SeedCall[] = [
         carpet_area_sqft: 780, locality: 'Pimple Saudagar', scope: 'full_home', rooms: [], current_state: 'lived_in',
         ownership: 'owned', style: null, budget_volunteered: false, budget_inr_min: null, budget_inr_max: null,
         completion_needed_by: 'in 3 weeks', timeline_months: 0.75, decision_maker: 'self', source: null,
+        languages: ['hi'], language_switched: false,
       },
       criteria: {
         C1: c('pass', 'Pimple Saudagar is in PCMC.'),
@@ -485,6 +495,7 @@ export const SEED_CALLS: SeedCall[] = [
         locality: null, scope: null, rooms: [], current_state: null, ownership: null, style: null,
         budget_volunteered: false, budget_inr_min: null, budget_inr_max: null, completion_needed_by: null,
         timeline_months: null, decision_maker: null, source: null,
+        languages: ['mr', 'en'], language_switched: true,
       },
       criteria: {
         C1: c('unclear', 'Not an enquiry.'), C2: c('unclear', 'Not an enquiry.'),
@@ -518,6 +529,7 @@ export const SEED_CALLS: SeedCall[] = [
         locality: null, scope: null, rooms: [], current_state: null, ownership: null, style: null,
         budget_volunteered: false, budget_inr_min: null, budget_inr_max: null, completion_needed_by: null,
         timeline_months: null, decision_maker: null, source: null,
+        languages: ['en'], language_switched: false,
       },
       criteria: {
         C1: c('unclear', ''), C2: c('unclear', ''), C3: c('unclear', ''), C4: c('unclear', ''), C5: c('unclear', ''),
@@ -559,6 +571,7 @@ export const SEED_CALLS: SeedCall[] = [
         ownership: 'owned', style: 'premium', budget_volunteered: true, budget_inr_min: 3000000,
         budget_inr_max: 3000000, completion_needed_by: 'within 3 months', timeline_months: 3,
         decision_maker: 'self and spouse', source: 'referral',
+        languages: ['en'], language_switched: false,
       },
       criteria: {
         C1: c('pass', 'Viman Nagar is in the service area.'),
@@ -599,6 +612,7 @@ export const SEED_CALLS: SeedCall[] = [
         locality: 'Aundh', scope: 'full_home', rooms: [], current_state: 'lived_in', ownership: 'owned',
         style: 'minimal', budget_volunteered: true, budget_inr_min: 2000000, budget_inr_max: 2000000,
         completion_needed_by: 'in 2 months', timeline_months: 2, decision_maker: 'self', source: 'google',
+        languages: ['en', 'hi'], language_switched: true,
       },
       criteria: {
         C1: c('pass', 'Aundh is in the service area.'),

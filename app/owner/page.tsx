@@ -8,7 +8,8 @@ import { CostVsRevenue, FunnelChart, Heatmap, LeadsOverTime, LocalityChart, Sour
 import { OwnerHero } from '@/components/OwnerHero';
 import { MoneyPanel, ReturnPanel } from '@/components/MoneySection';
 import { DesignerCards } from '@/components/DesignerCards';
-import { returnOnCalls, revenueByPropertyType, revenueByScope } from '@/lib/revenue';
+import { languageMix, returnOnCalls, revenueByPropertyType, revenueByScope } from '@/lib/revenue';
+import { LanguagePanel } from '@/components/LanguagePanel';
 import { heroCopy } from '@/lib/hero-copy';
 import { buildDailyBrief } from '@/lib/brief';
 import { byLocality, bySource, costVsRevenue, funnel, health, heatmap, insights, kpis, leadsOverTime, loadRows, loadStageReach, team } from '@/lib/analytics';
@@ -40,6 +41,7 @@ export default async function OwnerPage() {
   const byType = revenueByPropertyType(rows);
   const byScope = revenueByScope(rows);
   const roi = returnOnCalls(rows);
+  const languages = languageMix(rows);
   const designers = team(rows, users);
 
   const deltaLeads = pct(k.month.count, k.prevMonth.count);
@@ -186,7 +188,10 @@ export default async function OwnerPage() {
             breakdown={byScope}
           />
         </div>
-        <ReturnPanel {...roi} />
+        <div className="grid gap-3">
+          <ReturnPanel {...roi} />
+          <LanguagePanel {...languages} />
+        </div>
       </div>
 
       {/* team */}

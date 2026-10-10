@@ -246,3 +246,12 @@ The **Unclaimed** row is deliberately styled apart — dashed avatar, italic lab
 **Designer performance cards** replace the table: avatar, a gradient win-rate ring, won / revenue / lost, what is being let down, their commonest lost reason, and how fast they typically answer.
 
 **Every money panel states its own confidence.** Below five won projects it says *"2 won projects so far — too few to read a pattern"* rather than drawing an authoritative donut from n=2. The shapes fill in honestly as real calls land.
+
+## phase-17 — the agent follows the caller's language
+- **Fixed a setting that looked right and did nothing:** `auto_detect` was on, but STT was pinned to `language: "en"`. Hindi mid-call would have been transcribed as nonsense and graded on that. Deepgram `nova-3` now runs `language: "multi"`, code-switching mid-sentence.
+- The LLM follows via `brain.llm.auto_detect`. The docs name it `auto_detect_llm`; that key is silently ignored.
+- **40 recognition keywords** — every served locality plus `BHK`, `carpet area`, `lakh`, `modular kitchen`, `possession`, `vastu`. "Wakad" vs "worked" decides whether the locality criterion can be judged.
+- **Agent temperature 0.7 → 0.3.** It reads from a rubric and must not improvise.
+- **`rubric.md` v1.2** records `languages` and `language_switched`; the `LANGUAGE` flag is now set from them.
+- **New dashboard panel** — language mix donut, share who switched mid-call, and **win rate by language**. On the seeded board: 14 calls, 64% English / 21% Marathi / 14% Hindi, **36% switched mid-call**.
+- Re-synced the HubSpot demo deal, which reseeding had orphaned against an old ticket number.

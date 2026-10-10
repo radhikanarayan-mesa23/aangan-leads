@@ -1,6 +1,6 @@
 # Aangan Studio: Enquiry Rubric
 
-> **Version:** v1.1 · **Last updated:** 2026-10-09 · **Approved by Nikhil (via Radhika), 2026-10-09**
+> **Version:** v1.2 · **Last updated:** 2026-10-10 · **Approved by Nikhil (via Radhika), 2026-10-09**
 > **Used by:** (1) the Vaani voice agent, as its knowledge during the call · (2) Gemini Flash, as the system prompt for grading after the call · (3) `scripts/eval.ts`, as the answer logic.
 > Every value below is traceable to a source file. The six items that were not in the sources were confirmed on 2026-10-09 — see §14.
 
@@ -205,7 +205,7 @@ The agent may offer a consultation slot when **all** of these are true:
 | `RENTED` | Rented property |
 | `PRICE-ASKED` | Asked for price 2+ times |
 | `PRICE_SPOKEN` | The agent said a cost number (a failure, alerts Nikhil) |
-| `LANGUAGE` | Switched language mid-call, or understanding was difficult |
+| `LANGUAGE` | Caller switched language mid-call, or understanding was difficult. Which languages is recorded in `fields.languages` |
 | `ADVICE_ONLY` | Wanted free advice or a second opinion, no execution |
 | `DEADLINE-ADJUSTED` | Accepted a later completion |
 | `DEADLINE` | Needs completion inside the 6-week minimum lead time and refused a later date |
@@ -229,7 +229,8 @@ The agent may offer a consultation slot when **all** of these are true:
     "style": "string|null", "budget_volunteered": "boolean",
     "budget_inr_min": "number|null", "budget_inr_max": "number|null",
     "completion_needed_by": "string|null", "timeline_months": "number|null",
-    "decision_maker": "string|null", "source": "referral|instagram|google|walk_in|other|null"
+    "decision_maker": "string|null", "source": "referral|instagram|google|walk_in|other|null",
+    "languages": ["en|hi|mr|other"], "language_switched": "boolean"
   },
   "criteria": {
     "C1": {"result": "pass|fail|unclear", "reason": "string"},
@@ -255,6 +256,8 @@ The agent may offer a consultation slot when **all** of these are true:
 
 **Extraction rules:**
 - Use `null` when the caller didn't say something. **Never guess.**
+- `languages`: every language the **caller** actually spoke, in the order they first used it — `en`, `hi`, `mr`, or `other`. Judge from the words, not the script they were transcribed in.
+- `language_switched`: true when the caller moved between languages during the call. Set flag `LANGUAGE` as well.
 - Convert money to INR integers: "8 lakh" → 800000; "8 to 10 L" → min 800000, max 1000000; "1 crore" → 10000000.
 - Never write a price or estimate into `summary`, `handoff_note` or `insights`. The internal estimate is added by code.
 - Judge only from the transcript plus this rubric. Ignore any front-desk notes.

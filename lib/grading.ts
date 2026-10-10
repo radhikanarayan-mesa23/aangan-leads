@@ -108,6 +108,7 @@ export function gradeLead(g: GeminiOutput): GradeResult {
   if (g.off_script_questions.length > 0) flags.add('OFF_SCRIPT');
   if (g.price_mentioned) flags.add('PRICE_SPOKEN');
   if (c5 !== 'pass') flags.add('DECISION');
+  if (f.language_switched || (f.languages?.length ?? 0) > 1) flags.add('LANGUAGE');
 
   // ── The ladder. rubric.md §9, first match wins.
   let grade: Grade;

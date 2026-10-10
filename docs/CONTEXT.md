@@ -6,7 +6,7 @@ _Updated 2026-10-08._
 
 - **Shell** — dark navigation rail (`components/Shell.tsx`), collapsing to a button on mobile.
 - **Look** — palette from the Show Prime badge; dark hero band on the dashboard and a gradient welcome card on sign-in. All tokens in `app/globals.css`.
-- **Phase 0** — `source/` holds Nikhil's three files. `rubric.md` is at **v1.1, approved 2026-10-09**: all six assumptions confirmed, plus a ₹8L budget floor on C3. `vaani_agent_prompt.md` matches rubric §4–6 and §10.
+- **Phase 0** — `source/` holds Nikhil's three files. `rubric.md` is at **v1.2** (approved v1.1 2026-10-09, language capture added 2026-10-10): all six assumptions confirmed, plus a ₹8L budget floor on C3. `vaani_agent_prompt.md` matches rubric §4–6 and §10.
 - **P1 Scaffold** — Next.js 15 (App Router, TS) + Tailwind, migrations for `users` / `leads` / `lead_events` / `magic_tokens`, magic-link auth with owner/designer roles, middleware role separation, 14 seeded calls.
 - **P2 Intake pipeline** — `POST /api/vaani/call-ended` (secret → normalise → upsert → 200 → `after()`), one Gemini call with `rubric.md` as the system prompt, Zod validation with one retry, code-side estimate / budget fit / grade with override, callback promise, costs, Telegram. `scripts/replay.ts` and `scripts/check-grading.ts`.
 - **Worklist** — every card says what to do next (`lib/next-action.ts`) and the board sorts by urgency. Call outcomes are recorded from the card.

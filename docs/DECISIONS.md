@@ -174,3 +174,23 @@ time we found out.
 **What designers *do* see, deliberately:** the internal estimate on the card, labelled *internal — never share*. A designer needs to know whether a caller's stated budget covers the job before walking into a consultation. Pipeline value, forecast, cost per lead and the daily brief stay with Nikhil.
 
 **Rejected.** Showing designers only their assigned leads, for the stalling problem above. A middle path — own leads plus the unclaimed pool — was offered and not needed.
+
+---
+
+## 2026-10-10 — the agent follows the caller's language, and we record it
+
+**Decision.** Dynamic language switching is on, and every call records which languages the caller used.
+
+**What was actually wrong.** `senses_capabilities.auto_detect` was true, but speech-to-text was pinned to `language: "en"`. A Pune caller who opens in English and slips into Hindi for the budget would have had that Hindi transcribed as nonsense — and since the grade is derived from the transcript, the grade would have followed it. Auto-detect at the top level was a setting that looked right and did nothing.
+
+**Now:** Deepgram `nova-3` runs with `language: "multi"`, which code-switches mid-sentence rather than guessing one language per call. The LLM follows via `brain.llm.auto_detect` — note the published docs call this `auto_detect_llm`, which the API silently ignores; the stored field is `auto_detect`. Enabling it also swapped the primary model to a multilingual one on the platform's side.
+
+**Also added: 40 recognition keywords** — every served locality plus `BHK`, `carpet area`, `lakh`, `modular kitchen`, `possession`, `vastu`. This is the difference between hearing "Wakad" and "worked", which decides whether C1 can be judged at all.
+
+**And lowered the agent's temperature from 0.7 to 0.3.** It reads from a rubric and is forbidden from improvising; 0.7 invites exactly the embroidery the guardrails exist to prevent.
+
+**On the dashboard.** `rubric.md` v1.2 asks Gemini for `languages` (in the order the caller used them) and `language_switched`. The panel shows the mix, the share who switched mid-call, and **win rate by language** — which for a Pune studio is a staffing question: if a third of callers open in Marathi, that is who the designer ringing them back needs to be.
+
+**Why count the opening language.** A lead sits under the language the caller *started* in, because that is what the agent had to handle first and what a human receptionist would have needed to speak. Switching is counted separately, since it is the hard case and worth watching on its own.
+
+**Rejected.** Counting every language equally per call — it would have made a caller who said two words of Hindi look like a Hindi caller, and inflated the case for Hindi-speaking designers.

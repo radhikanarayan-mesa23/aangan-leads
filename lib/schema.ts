@@ -31,6 +31,10 @@ export const FieldsSchema = z.object({
   source: z.enum(['referral', 'instagram', 'google', 'walk_in', 'other']).nullable().catch(null),
   /** Area of the rooms being done, when a partial job gave one. */
   partial_area_sqft: nullableNumber.optional(),
+  /** Every language the caller actually spoke, first use first (rubric.md §12). */
+  languages: z.array(z.enum(['en', 'hi', 'mr', 'other'])).default([]),
+  /** True when they moved between languages during the call. */
+  language_switched: z.boolean().catch(false),
 });
 
 export const InsightsSchema = z.object({

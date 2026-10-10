@@ -134,3 +134,47 @@ export function returnOnCalls(rows: Row[]) {
     confident: won.length > 0 && spend > 0,
   };
 }
+
+const LANGUAGE_NAMES: Record<string, string> = { en: 'English', hi: 'Hindi', mr: 'Marathi', other: 'Other' };
+
+/**
+ * What language callers actually use — and whether it changes the outcome.
+ *
+ * A lead is counted under the language the caller OPENED in, because that is
+ * what the agent had to handle first and what a human receptionist would have
+ * needed to speak. Calls where they switched are counted separately, since
+ * switching is the hard case for a voice agent and worth watching on its own.
+ */
+export function languageMix(rows: Row[]) {
+  const groups = new Map<string, { label: string; rows: Row[] }>();
+  let switched = 0;
+  let known = 0;
+
+  for (const r of rows) {
+    const langs: string[] = r.fields?.languages ?? [];
+    if (!langs.length) continue;
+    known++;
+    if (r.fields?.language_switched || langs.length > 1) switched++;
+    const first = langs[0];
+    const label = LANGUAGE_NAMES[first] ?? first;
+    if (!groups.has(first)) groups.set(first, { label, rows: [] });
+    groups.get(first)!.rows.push(r);
+  }
+
+  const breakdown = build(groups);
+  // Callers matter here more than revenue — the question is who rings, not who pays.
+  const slices = breakdown.slices
+    .map((s) => ({ ...s }))
+    .sort((a, b) => b.leads - a.leads);
+
+  return {
+    ...breakdown,
+    slices,
+    known,
+    switched,
+    switchedShare: known ? switched / known : 0,
+    /** Enough callers to say anything about the mix. */
+    confident: known >= CONFIDENT_AT,
+    caveat: known >= CONFIDENT_AT ? null : `${known} call${known === 1 ? '' : 's'} with a language recorded — too few to read a pattern.`,
+  };
+}

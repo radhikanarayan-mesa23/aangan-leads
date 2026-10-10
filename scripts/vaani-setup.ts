@@ -109,6 +109,19 @@ async function main() {
     return;
   }
 
+  // Words a Pune caller will say that a generic model mishears. Boosting them
+  // is the difference between "Wakad" and "worked", which decides whether the
+  // locality criterion can be judged at all.
+  const keywords = [
+    'Aangan', 'Pune', 'PCMC',
+    'Kothrud', 'Baner', 'Aundh', 'Wakad', 'Koregaon Park', 'Kalyani Nagar', 'Viman Nagar',
+    'Hadapsar', 'Magarpatta', 'NIBM', 'Kondhwa', 'Undri', 'Shivane', 'Warje', 'Erandwane',
+    'Deccan', 'Pimpri', 'Chinchwad', 'Pimple Saudagar', 'Pimple Nilakh', 'Ravet', 'Hinjewadi',
+    'Bavdhan', 'Wagholi', 'Balewadi',
+    'BHK', 'carpet area', 'built-up', 'lakh', 'crore', 'sq ft',
+    'modular kitchen', 'wardrobe', 'false ceiling', 'possession', 'renovation', 'vastu',
+  ];
+
   await api(`/api/agent/${agent.id}/persona`, {
     method: 'PATCH',
     body: JSON.stringify({
@@ -122,10 +135,41 @@ async function main() {
           let_user_speak_first: false,
         },
       },
-      senses_capabilities: { language: 'en', auto_detect: true },
+      senses_capabilities: {
+        language: 'en',
+        auto_detect: true,
+        ears: {
+          stt: {
+            primary: {
+              // Deepgram nova-3 'multi' code-switches mid-sentence, which is how
+              // Pune actually speaks — a caller starts in English, slips into
+              // Hindi for the budget, and back again. Pinned to 'en' it would
+              // transcribe the Hindi as nonsense and the grade would follow.
+              language: 'multi',
+              keywords,
+              config: { language: 'multi' },
+            },
+          },
+        },
+        brain: {
+          llm: {
+            // Let the platform pick the model that handles whatever language
+            // was detected, rather than running Hindi through an English model.
+            // The docs call this `auto_detect_llm`; the stored field is
+            // `brain.llm.auto_detect`, and sending the documented name is
+            // silently ignored. Send the real one.
+            auto_detect: true,
+            primary: {
+              // The agent reads from a rubric and must not improvise; 0.7 invites
+              // exactly the embroidery the guardrails forbid.
+              parameters: { temperature: 0.3, top_p: 0.7, max_tokens: 1000 },
+            },
+          },
+        },
+      },
     }),
   });
-  console.log('✓ persona — system prompt and greeting');
+  console.log('✓ persona — prompt, greeting, multilingual STT, ' + keywords.length + ' recognition keywords');
 
   await api(`/api/agent/${agent.id}/training`, {
     method: 'PATCH',
