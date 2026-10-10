@@ -20,6 +20,10 @@ export type Row = {
   booked_at: string | null;
   callback_due_at: string | null;
   callback_done_at: string | null;
+  lost_reason: string | null;
+  call_attempts: number;
+  last_attempt_at: string | null;
+  last_outcome: string | null;
   est_min_inr: string | null;
   est_max_inr: string | null;
   deal_value_inr: string | null;
@@ -35,6 +39,7 @@ export async function loadRows(): Promise<Row[]> {
   return sql<Row>(
     `select id, ticket_no, created_at, started_at, duration_s, ended_reason, grade, gemini_grade, stage,
             assigned_to, first_contact_at, booked_at, callback_due_at, callback_done_at,
+            lost_reason, call_attempts, last_attempt_at, last_outcome,
             est_min_inr::text, est_max_inr::text, deal_value_inr::text, cost_inr::text,
             price_mentioned, hubspot_sync_error, fields, flags, off_script_questions
      from leads order by created_at desc limit 5000`
@@ -249,7 +254,7 @@ export function team(rows: Row[], users: { email: string; name: string; role: st
 
     const lostTally = new Map<string, number>();
     for (const r of lost) {
-      const why = (r as any).lost_reason?.trim();
+      const why = r.lost_reason?.trim();
       if (why) lostTally.set(why, (lostTally.get(why) ?? 0) + 1);
     }
     const topLost = [...lostTally.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;

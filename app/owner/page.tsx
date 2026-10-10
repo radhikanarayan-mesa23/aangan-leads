@@ -10,7 +10,7 @@ import { heroCopy } from '@/lib/hero-copy';
 import { buildDailyBrief } from '@/lib/brief';
 import { byLocality, bySource, costVsRevenue, funnel, health, heatmap, insights, kpis, leadsOverTime, loadRows, loadStageReach, team } from '@/lib/analytics';
 import { inr } from '@/lib/pricing';
-import { cn } from '@/lib/utils';
+import { cn, initials } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -161,76 +161,116 @@ export default async function OwnerPage() {
       </div>
 
       {/* team */}
-      <section className="mt-3 card p-4 overflow-x-auto scrollbar-thin">
-        <div className="mb-3">
+      <section className="mt-3 card p-4 sm:p-5 overflow-x-auto scrollbar-thin">
+        <div className="mb-4">
           <p className="text-sm font-medium">Designers</p>
           <p className="text-xs text-ink-3">
             What each person is carrying, what they closed, and what is being let down right now.
           </p>
         </div>
 
-        <table className="w-full text-sm min-w-[760px]">
-          <thead>
-            <tr className="text-left text-ink-3 text-[11px] uppercase tracking-wider">
-              <th className="font-medium pb-2">Designer</th>
-              <th className="font-medium pb-2 text-right">Open</th>
-              <th className="font-medium pb-2 text-right">Consults</th>
-              <th className="font-medium pb-2 text-right">Converted</th>
-              <th className="font-medium pb-2 text-right">Not converted</th>
-              <th className="font-medium pb-2 text-right">Win rate</th>
-              <th className="font-medium pb-2 text-right">1st contact</th>
-              <th className="font-medium pb-2">Needs attention</th>
-            </tr>
-          </thead>
-          <tbody>
-            {team(rows, users).map((t) => (
-              <tr key={t.email ?? t.name} className="border-t border-line align-top">
-                <td className="py-2.5">
-                  <span className={cn('font-medium', !t.email && 'text-ink-2 italic')}>{t.name}</span>
-                  {t.topLostReason && (
-                    <span className="block text-[11px] text-ink-3 mt-0.5 max-w-[230px] truncate" title={t.topLostReason}>
-                      most often lost: {t.topLostReason}
-                    </span>
-                  )}
-                </td>
-                <td className="py-2.5 text-right tabular-nums">{t.open}</td>
-                <td className="py-2.5 text-right tabular-nums">{t.consultations}</td>
-                <td className="py-2.5 text-right tabular-nums">
-                  {t.converted}
-                  {t.revenue > 0 && <span className="block text-[11px]" style={{ color: 'var(--ok)' }}>{inr(t.revenue)}</span>}
-                </td>
-                <td className="py-2.5 text-right tabular-nums">{t.notConverted}</td>
-                <td className="py-2.5 text-right">
-                  {t.winRate == null ? (
-                    <span className="text-ink-3">—</span>
-                  ) : (
-                    <span className="inline-flex flex-col items-end gap-1">
-                      <span className="tabular-nums">{Math.round(t.winRate * 100)}%</span>
-                      <span className="h-1 w-14 rounded-chip bg-surface-2 overflow-hidden">
+        {(() => {
+          const snapshot = team(rows, users);
+          const maxOpen = Math.max(...snapshot.map((t) => t.open), 1);
+
+          return (
+            <table className="w-full text-sm min-w-[820px] border-separate border-spacing-0">
+              <thead>
+                <tr className="text-left text-ink-3 text-[10px] uppercase tracking-[0.09em]">
+                  <th className="font-semibold pb-3 pl-3">Designer</th>
+                  <th className="font-semibold pb-3 w-[132px]">Open</th>
+                  <th className="font-semibold pb-3 text-right">Consults</th>
+                  <th className="font-semibold pb-3 text-right">Converted</th>
+                  <th className="font-semibold pb-3 text-right">Lost</th>
+                  <th className="font-semibold pb-3 w-[104px]">Win rate</th>
+                  <th className="font-semibold pb-3 text-right">1st contact</th>
+                  <th className="font-semibold pb-3 pl-4">Needs attention</th>
+                </tr>
+              </thead>
+              <tbody>
+                {snapshot.map((t) => (
+                  <tr key={t.email ?? t.name} className={cn('team-row border-t border-line align-middle', !t.email && 'is-unclaimed')}>
+                    <td className="py-3 pl-3">
+                      <div className="flex items-center gap-2.5">
                         <span
-                          className="block h-full rounded-chip"
-                          style={{ width: `${t.winRate * 100}%`, background: 'linear-gradient(90deg, var(--navy-700), var(--blue-500))' }}
-                        />
+                          className={cn(
+                            'grid place-items-center size-8 rounded-full text-[11px] font-semibold shrink-0',
+                            t.email ? 'text-white' : 'text-ink-3 border border-dashed border-line-strong'
+                          )}
+                          style={t.email ? { background: 'linear-gradient(140deg, var(--blue-500), var(--navy-800))' } : undefined}
+                          aria-hidden
+                        >
+                          {t.email ? initials(t.name) : '—'}
+                        </span>
+                        <span className="min-w-0">
+                          <span className={cn('block font-medium leading-tight', !t.email && 'text-ink-2 italic')}>{t.name}</span>
+                          {t.topLostReason ? (
+                            <span className="block text-[11px] text-ink-3 max-w-[210px] truncate" title={t.topLostReason}>
+                              most often lost: {t.topLostReason}
+                            </span>
+                          ) : (
+                            <span className="block text-[11px] text-ink-3">{t.email ? 'designer' : 'nobody has claimed these'}</span>
+                          )}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="py-3 pr-4">
+                      <span className="block tabular-nums mb-1 leading-none">{t.open}</span>
+                      <span className="load-bar" aria-hidden>
+                        <span style={{ width: `${(t.open / maxOpen) * 100}%` }} />
                       </span>
-                    </span>
-                  )}
-                </td>
-                <td className="py-2.5 text-right tabular-nums">
-                  {t.medianFirstContactMin == null ? <span className="text-ink-3">—</span> : fmtMins(t.medianFirstContactMin)}
-                </td>
-                <td className="py-2.5">
-                  {t.needsAttention === 0 ? (
-                    <span className="chip fit-fits">Nothing waiting</span>
-                  ) : (
-                    <span className="chip fit-below" title={t.attentionReasons.join(' · ')}>
-                      {t.attentionReasons.join(' · ')}
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    </td>
+
+                    <td className="py-3 text-right tabular-nums">{t.consultations || <span className="text-ink-3">—</span>}</td>
+
+                    <td className="py-3 text-right">
+                      {t.converted ? (
+                        <span className="inline-flex flex-col items-end">
+                          <span className="tabular-nums">{t.converted}</span>
+                          {t.revenue > 0 && <span className="chip fit-fits mt-0.5">{inr(t.revenue)}</span>}
+                        </span>
+                      ) : (
+                        <span className="text-ink-3">—</span>
+                      )}
+                    </td>
+
+                    <td className="py-3 text-right tabular-nums">
+                      {t.notConverted ? t.notConverted : <span className="text-ink-3">—</span>}
+                    </td>
+
+                    <td className="py-3 pr-4">
+                      {t.winRate == null ? (
+                        <span className="text-ink-3">—</span>
+                      ) : (
+                        <>
+                          <span className="block tabular-nums mb-1 leading-none">{Math.round(t.winRate * 100)}%</span>
+                          <span className="load-bar" aria-hidden>
+                            <span style={{ width: `${t.winRate * 100}%` }} />
+                          </span>
+                        </>
+                      )}
+                    </td>
+
+                    <td className="py-3 text-right tabular-nums">
+                      {t.medianFirstContactMin == null ? <span className="text-ink-3">—</span> : fmtMins(t.medianFirstContactMin)}
+                    </td>
+
+                    <td className="py-3 pl-4">
+                      {t.needsAttention === 0 ? (
+                        <span className="chip fit-fits">✓ Nothing waiting</span>
+                      ) : (
+                        <span className="chip fit-below" title={t.attentionReasons.join(' · ')}>
+                          ⚠︎ {t.attentionReasons.join(' · ')}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          );
+        })()}
       </section>
 
     </Chrome>

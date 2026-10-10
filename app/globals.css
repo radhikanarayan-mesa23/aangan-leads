@@ -116,6 +116,30 @@ html, body {
   }
   .kpi > * { position: relative; z-index: 1; }
 
+  /* The designer table. Rows behave like cards — a hairline accent on the left
+     that lights up on hover, so scanning down the column has somewhere to rest. */
+  .team-row {
+    transition: background-color 0.2s ease;
+  }
+  .team-row td:first-child {
+    box-shadow: inset 3px 0 0 -1px transparent;
+    transition: box-shadow 0.2s ease;
+  }
+  .team-row:hover { background: var(--surface-2); }
+  .team-row:hover td:first-child { box-shadow: inset 3px 0 0 -1px var(--blue-500); }
+  .team-row.is-unclaimed td:first-child { box-shadow: inset 3px 0 0 -1px var(--line-strong); }
+  .team-row.is-unclaimed:hover td:first-child { box-shadow: inset 3px 0 0 -1px var(--warm); }
+
+  /* A workload bar sitting behind the open-lead count. */
+  .load-bar {
+    @apply relative h-1.5 w-full rounded-chip overflow-hidden;
+    background: var(--surface-2);
+  }
+  .load-bar > span {
+    @apply absolute inset-y-0 left-0 rounded-chip;
+    background: linear-gradient(90deg, var(--navy-700), var(--blue-500));
+  }
+
   /* The dark band the dashboard leads with. */
   .hero {
     background:

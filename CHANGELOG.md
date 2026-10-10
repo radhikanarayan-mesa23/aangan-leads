@@ -223,3 +223,10 @@ The team table was four columns of activity (claimed, median contact, consultati
 - **Most often lost** surfaces each designer's commonest `lost_reason`, which is where a coaching conversation actually starts.
 - **An "Unclaimed" row** is included deliberately. Work nobody owns is precisely what a per-person table tends to hide; on the seeded board it immediately shows 8 open leads and 3 overdue callbacks belonging to no one.
 - Times read as `1h 35m` rather than `95m`.
+
+## phase-15.1 — the designer table, designed
+Rows now behave like cards rather than spreadsheet lines: a gradient avatar per designer, a hairline accent down the left edge that lights blue on hover, and a row tint. **Open** and **Win rate** each carry a small navy→blue bar, so workload and conversion are scannable down the column instead of read figure by figure. Revenue sits in a green chip; *needs attention* in a red one with the reason spelled out; empty cells are a muted dash rather than a zero.
+
+The **Unclaimed** row is deliberately styled apart — dashed avatar, italic label, grey accent that turns amber on hover — because it is a gap, not a person.
+
+**Fixed while testing:** `loadRows()` never selected `lost_reason`, `call_attempts`, `last_attempt_at` or `last_outcome`, so *"most often lost"* could never render no matter what the data said. The column was dead on arrival; it now shows Sneha's actual commonest reason.
