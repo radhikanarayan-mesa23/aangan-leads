@@ -17,7 +17,9 @@
     "check": "tsx scripts/check-grading.ts",
     "verify:db": "tsx scripts/verify-db.ts",
     "telegram:ids": "tsx scripts/telegram-chat-ids.ts",
-    "vaani:setup": "tsx scripts/vaani-setup.ts"
+    "vaani:setup": "tsx scripts/vaani-setup.ts",
+    "simulate-call": "tsx scripts/simulate-call.ts",
+    "show-call": "tsx scripts/show-call.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "6.1.0",
