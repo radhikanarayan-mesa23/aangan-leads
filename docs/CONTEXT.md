@@ -44,6 +44,11 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 | `VAANI_WEBHOOK_SECRET`, `VAANI_TOOL_SECRET`, `CALCOM_WEBHOOK_SECRET` | ✅ generated and set in Vercel — paste the same values into Vaani and Cal.com |
 | `SESSION_SECRET`, `CRON_SECRET` | defaulted in development, **must be set in production** |
 
+## Diagram
+
+`docs/aangan-components-map.png` (SVG source beside it) — the eleven actors and
+what each one is allowed to decide. Regenerate from the SVG with headless Chrome.
+
 ## Deploying
 
 Vercel **blocks** any deployment whose commit author email is not an address on

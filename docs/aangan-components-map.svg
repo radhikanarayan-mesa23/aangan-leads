@@ -1,0 +1,223 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1558" viewBox="0 0 1800 1558" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<defs><marker id="a" markerWidth="9" markerHeight="9" refX="7.5" refY="3.2" orient="auto"><path d="M0,0 L7.5,3.2 L0,6.4 z" fill="#9aa2bd"/></marker></defs>
+<rect width="1800" height="1558" fill="#ffffff"/>
+<text x="900.0" y="40" text-anchor="middle" font-family="Georgia, serif" font-size="27" font-weight="bold" fill="#1e2a5a">Aangan Leads</text>
+<text x="900.0" y="64" text-anchor="middle" font-size="13.5" fill="#5d6party"> </text>
+<text x="900.0" y="64" text-anchor="middle" font-size="13.5" fill="#616a92">Aangan Studio, Pune / Every phone enquiry, answered and graded — Components Map</text>
+<rect x="0" y="86" width="1800" height="38" fill="#1e2a5a"/>
+<text x="118.0" y="110" text-anchor="middle" font-size="11.5" font-weight="bold" letter-spacing="1.6" fill="#ffffff">ACTOR</text>
+<text x="366.33333333333337" y="110" text-anchor="middle" font-size="11.5" font-weight="bold" letter-spacing="1.6" fill="#ffffff">TRIGGER</text>
+<text x="627.0" y="110" text-anchor="middle" font-size="11.5" font-weight="bold" letter-spacing="1.6" fill="#ffffff">INPUT</text>
+<text x="887.6666666666667" y="110" text-anchor="middle" font-size="11.5" font-weight="bold" letter-spacing="1.6" fill="#ffffff">CONTEXT</text>
+<text x="1148.3333333333333" y="110" text-anchor="middle" font-size="11.5" font-weight="bold" letter-spacing="1.6" fill="#ffffff">PROCESSING</text>
+<text x="1409.0" y="110" text-anchor="middle" font-size="11.5" font-weight="bold" letter-spacing="1.6" fill="#ffffff">AI</text>
+<text x="1669.6666666666667" y="110" text-anchor="middle" font-size="11.5" font-weight="bold" letter-spacing="1.6" fill="#ffffff">OUTPUT</text>
+<rect x="236" y="124" width="1564" height="122" fill="#f2f3fd"/>
+<rect x="0" y="124" width="236" height="122" fill="#1b2550"/>
+<line x1="0" y1="124" x2="1800" y2="124" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="496.6666666666667" y1="124" x2="496.6666666666667" y2="246" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="757.3333333333334" y1="124" x2="757.3333333333334" y2="246" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1018.0" y1="124" x2="1018.0" y2="246" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1278.6666666666667" y1="124" x2="1278.6666666666667" y2="246" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1539.3333333333335" y1="124" x2="1539.3333333333335" y2="246" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<text x="22" y="183.0" font-size="15.5" font-weight="bold" fill="#ffffff">Caller</text>
+<text x="22" y="203.0" font-size="11" fill="#9aa3c8">Pune homeowner</text>
+<rect x="259.0" y="150.5" width="214.66666666666669" height="69" rx="9" fill="#eceefc" stroke="#4a52a8" stroke-width="1.7"/>
+<text x="366.33333333333337" y="168.5" text-anchor="middle" font-size="10.6" fill="#23306e">Rings Aangan Studio — day, night,</text>
+<text x="366.33333333333337" y="183.5" text-anchor="middle" font-size="10.6" fill="#23306e">Sunday, mid-dinner. ~200 enquiries</text>
+<text x="366.33333333333337" y="198.5" text-anchor="middle" font-size="10.6" fill="#23306e">a month, every one answered</text>
+<rect x="236" y="246" width="1564" height="122" fill="#edf5fc"/>
+<rect x="0" y="246" width="236" height="122" fill="#1b2550"/>
+<line x1="0" y1="246" x2="1800" y2="246" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="496.6666666666667" y1="246" x2="496.6666666666667" y2="368" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="757.3333333333334" y1="246" x2="757.3333333333334" y2="368" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1018.0" y1="246" x2="1018.0" y2="368" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1278.6666666666667" y1="246" x2="1278.6666666666667" y2="368" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1539.3333333333335" y1="246" x2="1539.3333333333335" y2="368" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<text x="22" y="305.0" font-size="15.5" font-weight="bold" fill="#ffffff">Vaani agent</text>
+<text x="22" y="325.0" font-size="11" fill="#9aa3c8">Voice · follows the caller</text>
+<rect x="519.6666666666667" y="265.0" width="214.66666666666669" height="84" rx="9" fill="#e3f0fb" stroke="#2a7fc0" stroke-width="1.7"/>
+<text x="627.0000000000001" y="283.0" text-anchor="middle" font-size="10.6" fill="#17496e">Nine intake questions, conversational.</text>
+<text x="627.0000000000001" y="298.0" text-anchor="middle" font-size="10.6" fill="#17496e">Switches to Hindi or Marathi if the</text>
+<text x="627.0000000000001" y="313.0" text-anchor="middle" font-size="10.6" fill="#17496e">caller does. Never says a price —</text>
+<text x="627.0000000000001" y="328.0" text-anchor="middle" font-size="10.6" fill="#17496e">not a rate, not a range, ever</text>
+<rect x="236" y="368" width="1564" height="122" fill="#f6f1fc"/>
+<rect x="0" y="368" width="236" height="122" fill="#1b2550"/>
+<line x1="0" y1="368" x2="1800" y2="368" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="496.6666666666667" y1="368" x2="496.6666666666667" y2="490" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="757.3333333333334" y1="368" x2="757.3333333333334" y2="490" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1018.0" y1="368" x2="1018.0" y2="490" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1278.6666666666667" y1="368" x2="1278.6666666666667" y2="490" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1539.3333333333335" y1="368" x2="1539.3333333333335" y2="490" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<text x="22" y="427.0" font-size="15.5" font-weight="bold" fill="#ffffff">Live booking</text>
+<text x="22" y="447.0" font-size="11" fill="#9aa3c8">aangan_slots · aangan_book</text>
+<rect x="780.3333333333334" y="394.5" width="214.66666666666669" height="69" rx="9" fill="#f0e9fa" stroke="#7c4ec4" stroke-width="1.7"/>
+<text x="887.6666666666667" y="412.5" text-anchor="middle" font-size="10.6" fill="#432272">Reads the real calendar mid-call.</text>
+<text x="887.6666666666667" y="427.5" text-anchor="middle" font-size="10.6" fill="#432272">Offers only times the tool returns —</text>
+<text x="887.6666666666667" y="442.5" text-anchor="middle" font-size="10.6" fill="#432272">the agent cannot see a day otherwise</text>
+<rect x="1041.0" y="387.0" width="214.66666666666669" height="84" rx="9" fill="#f0e9fa" stroke="#7c4ec4" stroke-width="1.7"/>
+<text x="1148.3333333333333" y="405.0" text-anchor="middle" font-size="10.6" fill="#432272">Cal.com: 5 shared slots, 12–5pm,</text>
+<text x="1148.3333333333333" y="420.0" text-anchor="middle" font-size="10.6" fill="#432272">Mon–Sat. Re-checked the moment</text>
+<text x="1148.3333333333333" y="435.0" text-anchor="middle" font-size="10.6" fill="#432272">before booking · unique index on</text>
+<text x="1148.3333333333333" y="450.0" text-anchor="middle" font-size="10.6" fill="#432272">booked_at, so no double booking</text>
+<rect x="236" y="490" width="1564" height="122" fill="#eef7f1"/>
+<rect x="0" y="490" width="236" height="122" fill="#1b2550"/>
+<line x1="0" y1="490" x2="1800" y2="490" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="496.6666666666667" y1="490" x2="496.6666666666667" y2="612" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="757.3333333333334" y1="490" x2="757.3333333333334" y2="612" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1018.0" y1="490" x2="1018.0" y2="612" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1278.6666666666667" y1="490" x2="1278.6666666666667" y2="612" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1539.3333333333335" y1="490" x2="1539.3333333333335" y2="612" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<text x="22" y="549.0" font-size="15.5" font-weight="bold" fill="#ffffff">Webhook</text>
+<text x="22" y="569.0" font-size="11" fill="#9aa3c8">POST /api/vaani/call-ended</text>
+<rect x="1041.0" y="509.0" width="214.66666666666669" height="84" rx="9" fill="#e5f4ea" stroke="#3f8f5c" stroke-width="1.7"/>
+<text x="1148.3333333333333" y="527.0" text-anchor="middle" font-size="10.6" fill="#1e4b32">Secret → normalise → upsert → 200,</text>
+<text x="1148.3333333333333" y="542.0" text-anchor="middle" font-size="10.6" fill="#1e4b32">then the rest in after(). A call that</text>
+<text x="1148.3333333333333" y="557.0" text-anchor="middle" font-size="10.6" fill="#1e4b32">never connected is dropped, not carded.</text>
+<text x="1148.3333333333333" y="572.0" text-anchor="middle" font-size="10.6" fill="#1e4b32">A mid-call hold is adopted by its call</text>
+<rect x="236" y="612" width="1564" height="122" fill="#fef7ea"/>
+<rect x="0" y="612" width="236" height="122" fill="#1b2550"/>
+<line x1="0" y1="612" x2="1800" y2="612" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="496.6666666666667" y1="612" x2="496.6666666666667" y2="734" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="757.3333333333334" y1="612" x2="757.3333333333334" y2="734" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1018.0" y1="612" x2="1018.0" y2="734" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1278.6666666666667" y1="612" x2="1278.6666666666667" y2="734" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1539.3333333333335" y1="612" x2="1539.3333333333335" y2="734" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<text x="22" y="661.0" font-size="15.5" font-weight="bold" fill="#ffffff">Gemini</text>
+<text x="22" y="679.0" font-size="15.5" font-weight="bold" fill="#ffffff">3.8 Flash</text>
+<text x="22" y="699.0" font-size="11" fill="#9aa3c8">Extracts and proposes</text>
+<rect x="780.3333333333334" y="631.0" width="214.66666666666669" height="84" rx="9" fill="#fdf1dc" stroke="#d59324" stroke-width="1.7"/>
+<text x="887.6666666666667" y="649.0" text-anchor="middle" font-size="10.6" fill="#6e4a08">Reads rubric.md as its system prompt.</text>
+<text x="887.6666666666667" y="664.0" text-anchor="middle" font-size="10.6" fill="#6e4a08">Pulls out the fields, writes the summary,</text>
+<text x="887.6666666666667" y="679.0" text-anchor="middle" font-size="10.6" fill="#6e4a08">handoff note and suggested opener.</text>
+<text x="887.6666666666667" y="694.0" text-anchor="middle" font-size="10.6" fill="#6e4a08">Temperature 0, JSON mode, Zod-checked</text>
+<rect x="1301.6666666666667" y="638.5" width="214.66666666666669" height="69" rx="9" fill="#fdf1dc" stroke="#d59324" stroke-width="1.7"/>
+<text x="1409.0" y="656.5" text-anchor="middle" font-size="10.6" fill="#6e4a08">Proposes a grade:</text>
+<text x="1409.0" y="671.5" text-anchor="middle" font-size="10.6" fill="#6e4a08">HOT · WARM · LOW</text>
+<text x="1409.0" y="686.5" text-anchor="middle" font-size="10.6" fill="#6e4a08">ESCALATE · NOT_ENQUIRY</text>
+<rect x="236" y="734" width="1564" height="122" fill="#eef7f1"/>
+<rect x="0" y="734" width="236" height="122" fill="#1b2550"/>
+<line x1="0" y1="734" x2="1800" y2="734" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="496.6666666666667" y1="734" x2="496.6666666666667" y2="856" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="757.3333333333334" y1="734" x2="757.3333333333334" y2="856" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1018.0" y1="734" x2="1018.0" y2="856" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1278.6666666666667" y1="734" x2="1278.6666666666667" y2="856" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1539.3333333333335" y1="734" x2="1539.3333333333335" y2="856" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<text x="22" y="793.0" font-size="15.5" font-weight="bold" fill="#ffffff">Grading code</text>
+<text x="22" y="813.0" font-size="11" fill="#9aa3c8">lib/grading.ts · rubric.md</text>
+<rect x="1041.0" y="760.5" width="214.66666666666669" height="69" rx="9" fill="#e5f4ea" stroke="#3f8f5c" stroke-width="1.7"/>
+<text x="1148.3333333333333" y="778.5" text-anchor="middle" font-size="10.6" fill="#1e4b32">Re-derives every criterion from the rubric</text>
+<text x="1148.3333333333333" y="793.5" text-anchor="middle" font-size="10.6" fill="#1e4b32">and the pricing bands — area × band vs</text>
+<text x="1148.3333333333333" y="808.5" text-anchor="middle" font-size="10.6" fill="#1e4b32">stated budget, area, scope, timeline</text>
+<rect x="1301.6666666666667" y="760.5" width="214.66666666666669" height="69" rx="9" fill="none" stroke="#3f8f5c" stroke-width="1.7" stroke-dasharray="5 4"/>
+<text x="1409.0" y="778.5" text-anchor="middle" font-size="10.6" font-weight="bold" fill="#1e4b32">Where the two disagree on</text>
+<text x="1409.0" y="793.5" text-anchor="middle" font-size="10.6" font-weight="bold" fill="#1e4b32">the budget maths, code wins.</text>
+<text x="1409.0" y="808.5" text-anchor="middle" font-size="10.6" font-weight="bold" fill="#1e4b32">Gemini judges; it never counts.</text>
+<rect x="236" y="856" width="1564" height="122" fill="#eef6f5"/>
+<rect x="0" y="856" width="236" height="122" fill="#1b2550"/>
+<line x1="0" y1="856" x2="1800" y2="856" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="496.6666666666667" y1="856" x2="496.6666666666667" y2="978" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="757.3333333333334" y1="856" x2="757.3333333333334" y2="978" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1018.0" y1="856" x2="1018.0" y2="978" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1278.6666666666667" y1="856" x2="1278.6666666666667" y2="978" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1539.3333333333335" y1="856" x2="1539.3333333333335" y2="978" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<text x="22" y="915.0" font-size="15.5" font-weight="bold" fill="#ffffff">Neon Postgres</text>
+<text x="22" y="935.0" font-size="11" fill="#9aa3c8">One row per call</text>
+<rect x="780.3333333333334" y="882.5" width="214.66666666666669" height="69" rx="9" fill="#e2f3f1" stroke="#2f8d84" stroke-width="1.7"/>
+<text x="887.6666666666667" y="900.5" text-anchor="middle" font-size="10.6" fill="#17504a">Transcript, recording, grade and reason,</text>
+<text x="887.6666666666667" y="915.5" text-anchor="middle" font-size="10.6" fill="#17504a">internal estimate, booking, costs,</text>
+<text x="887.6666666666667" y="930.5" text-anchor="middle" font-size="10.6" fill="#17504a">every stage move in lead_events</text>
+<rect x="236" y="978" width="1564" height="122" fill="#edf5fc"/>
+<rect x="0" y="978" width="236" height="122" fill="#1b2550"/>
+<line x1="0" y1="978" x2="1800" y2="978" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="496.6666666666667" y1="978" x2="496.6666666666667" y2="1100" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="757.3333333333334" y1="978" x2="757.3333333333334" y2="1100" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1018.0" y1="978" x2="1018.0" y2="1100" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1278.6666666666667" y1="978" x2="1278.6666666666667" y2="1100" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1539.3333333333335" y1="978" x2="1539.3333333333335" y2="1100" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<text x="22" y="1037.0" font-size="15.5" font-weight="bold" fill="#ffffff">Telegram</text>
+<text x="22" y="1057.0" font-size="11" fill="#9aa3c8">@aanganNNbot</text>
+<rect x="1562.3333333333335" y="997.0" width="214.66666666666669" height="84" rx="9" fill="#e3f0fb" stroke="#2a7fc0" stroke-width="1.7"/>
+<text x="1669.6666666666667" y="1015.0" text-anchor="middle" font-size="10.6" fill="#17496e">HOT / WARM → the designers' chat.</text>
+<text x="1669.6666666666667" y="1030.0" text-anchor="middle" font-size="10.6" fill="#17496e">ESCALATE → Nikhil, any hour.</text>
+<text x="1669.6666666666667" y="1045.0" text-anchor="middle" font-size="10.6" fill="#17496e">LOW waits for the 9pm digest.</text>
+<text x="1669.6666666666667" y="1060.0" text-anchor="middle" font-size="10.6" fill="#17496e">9pm–9am pushes queue until 9am</text>
+<rect x="236" y="1100" width="1564" height="122" fill="#eef7f1"/>
+<rect x="0" y="1100" width="236" height="122" fill="#1b2550"/>
+<line x1="0" y1="1100" x2="1800" y2="1100" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="496.6666666666667" y1="1100" x2="496.6666666666667" y2="1222" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="757.3333333333334" y1="1100" x2="757.3333333333334" y2="1222" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1018.0" y1="1100" x2="1018.0" y2="1222" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1278.6666666666667" y1="1100" x2="1278.6666666666667" y2="1222" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1539.3333333333335" y1="1100" x2="1539.3333333333335" y2="1222" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<text x="22" y="1159.0" font-size="15.5" font-weight="bold" fill="#ffffff">Designer board</text>
+<text x="22" y="1179.0" font-size="11" fill="#9aa3c8">/board — designers + owner</text>
+<rect x="1562.3333333333335" y="1119.0" width="214.66666666666669" height="84" rx="9" fill="#e5f4ea" stroke="#3f8f5c" stroke-width="1.7"/>
+<text x="1669.6666666666667" y="1137.0" text-anchor="middle" font-size="10.6" fill="#1e4b32">Eight columns, drag to move. Each card:</text>
+<text x="1669.6666666666667" y="1152.0" text-anchor="middle" font-size="10.6" fill="#1e4b32">recording, transcript, handoff note,</text>
+<text x="1669.6666666666667" y="1167.0" text-anchor="middle" font-size="10.6" fill="#1e4b32">what to do next — and the internal</text>
+<text x="1669.6666666666667" y="1182.0" text-anchor="middle" font-size="10.6" fill="#1e4b32">estimate, labelled never share</text>
+<rect x="236" y="1222" width="1564" height="122" fill="#f6f1fc"/>
+<rect x="0" y="1222" width="236" height="122" fill="#1b2550"/>
+<line x1="0" y1="1222" x2="1800" y2="1222" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="496.6666666666667" y1="1222" x2="496.6666666666667" y2="1344" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="757.3333333333334" y1="1222" x2="757.3333333333334" y2="1344" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1018.0" y1="1222" x2="1018.0" y2="1344" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1278.6666666666667" y1="1222" x2="1278.6666666666667" y2="1344" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1539.3333333333335" y1="1222" x2="1539.3333333333335" y2="1344" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<text x="22" y="1281.0" font-size="15.5" font-weight="bold" fill="#ffffff">HubSpot</text>
+<text x="22" y="1301.0" font-size="11" fill="#9aa3c8">Aangan Leads pipeline</text>
+<rect x="1562.3333333333335" y="1248.5" width="214.66666666666669" height="69" rx="9" fill="#f0e9fa" stroke="#7c4ec4" stroke-width="1.7"/>
+<text x="1669.6666666666667" y="1266.5" text-anchor="middle" font-size="10.6" fill="#432272">Deal created the first time a card leaves</text>
+<text x="1669.6666666666667" y="1281.5" text-anchor="middle" font-size="10.6" fill="#432272">New. Every later move syncs the stage;</text>
+<text x="1669.6666666666667" y="1296.5" text-anchor="middle" font-size="10.6" fill="#432272">a failed sync is retried by cron</text>
+<rect x="236" y="1344" width="1564" height="122" fill="#fef7ea"/>
+<rect x="0" y="1344" width="236" height="122" fill="#1b2550"/>
+<line x1="0" y1="1344" x2="1800" y2="1344" stroke="#ffffff" stroke-width="1.6"/>
+<line x1="496.6666666666667" y1="1344" x2="496.6666666666667" y2="1466" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="757.3333333333334" y1="1344" x2="757.3333333333334" y2="1466" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1018.0" y1="1344" x2="1018.0" y2="1466" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1278.6666666666667" y1="1344" x2="1278.6666666666667" y2="1466" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<line x1="1539.3333333333335" y1="1344" x2="1539.3333333333335" y2="1466" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+<text x="22" y="1403.0" font-size="15.5" font-weight="bold" fill="#ffffff">Owner dashboard</text>
+<text x="22" y="1423.0" font-size="11" fill="#9aa3c8">/owner — Nikhil only</text>
+<rect x="1562.3333333333335" y="1363.0" width="214.66666666666669" height="84" rx="9" fill="#fdf1dc" stroke="#d59324" stroke-width="1.7"/>
+<text x="1669.6666666666667" y="1381.0" text-anchor="middle" font-size="10.6" fill="#6e4a08">What actually makes money: by property</text>
+<text x="1669.6666666666667" y="1396.0" text-anchor="middle" font-size="10.6" fill="#6e4a08">type and by scope. Cost per hot lead,</text>
+<text x="1669.6666666666667" y="1411.0" text-anchor="middle" font-size="10.6" fill="#6e4a08">funnel drop-off, designer outcomes,</text>
+<text x="1669.6666666666667" y="1426.0" text-anchor="middle" font-size="10.6" fill="#6e4a08">language mix, a 70-word daily brief</text>
+<circle cx="366.33333333333337" cy="224.5" r="3.6" fill="#2f8d5c"/>
+<path d="M366.33333333333337,227.5 L366.33333333333337,242.25 L627.0000000000001,242.25 L627.0000000000001,259.0" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="627.0000000000001" cy="354.0" r="3.6" fill="#2f8d5c"/>
+<path d="M627.0000000000001,357.0 L627.0000000000001,371.75 L887.6666666666667,371.75 L887.6666666666667,388.5" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="1004.0" cy="429.0" r="3.6" fill="#2f8d5c"/>
+<path d="M1008.0,429.0 L1035.0,429.0" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="535.0000000000001" cy="354.0" r="3.6" fill="#2f8d5c"/>
+<path d="M535.0000000000001,357.0 L535.0000000000001,472 L1148.3333333333333,472 L1148.3333333333333,503.0" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="1148.3333333333333" cy="598.0" r="3.6" fill="#2f8d5c"/>
+<path d="M1148.3333333333333,601.0 L1148.3333333333333,612.0 L887.6666666666667,612.0 L887.6666666666667,625.0" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="1004.0" cy="673.0" r="3.6" fill="#2f8d5c"/>
+<path d="M1008.0,673.0 L1295.6666666666667,673.0" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="1409.0" cy="712.5" r="3.6" fill="#2f8d5c"/>
+<path d="M1409.0,715.5 L1409.0,734.0 L1409.0,734.0 L1409.0,754.5" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="887.6666666666667" cy="720.0" r="3.6" fill="#2f8d5c"/>
+<path d="M887.6666666666667,723.0 L887.6666666666667,737.75 L1148.3333333333333,737.75 L1148.3333333333333,754.5" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="1148.3333333333333" cy="834.5" r="3.6" fill="#2f8d5c"/>
+<path d="M1148.3333333333333,837.5 L1148.3333333333333,856.0 L887.6666666666667,856.0 L887.6666666666667,876.5" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="1252.3333333333333" cy="476.0" r="3.6" fill="#2f8d5c"/>
+<path d="M1252.3333333333333,479.0 L1252.3333333333333,840 L887.6666666666667,840 L887.6666666666667,876.5" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="887.6666666666667" cy="956.5" r="3.6" fill="#2f8d5c"/>
+<path d="M887.6666666666667,959.5 L887.6666666666667,974.25 L1669.6666666666667,974.25 L1669.6666666666667,991.0" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="801.6666666666667" cy="956.5" r="3.6" fill="#2f8d5c"/>
+<path d="M801.6666666666667,959.5 L801.6666666666667,1086 L1669.6666666666667,1086 L1669.6666666666667,1113.0" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="1669.6666666666667" cy="1208.0" r="3.6" fill="#2f8d5c"/>
+<path d="M1669.6666666666667,1211.0 L1669.6666666666667,1225.75 L1669.6666666666667,1225.75 L1669.6666666666667,1242.5" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<circle cx="783.6666666666667" cy="956.5" r="3.6" fill="#2f8d5c"/>
+<path d="M783.6666666666667,959.5 L783.6666666666667,1332 L1669.6666666666667,1332 L1669.6666666666667,1357.0" fill="none" stroke="#9aa2bd" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<rect x="0" y="1466" width="1800" height="92" fill="#f7f8fc"/>
+<line x1="0" y1="1466" x2="1800" y2="1466" stroke="#d8dcea" stroke-width="1"/>
+<text x="34" y="1496" font-size="11.8" font-style="italic" fill="#3d4askip"> </text>
+<text x="34" y="1496" font-size="11.8" font-style="italic" fill="#434d75">No price ever reaches a caller · the agent books only what a tool confirms · a failed call never becomes a lead · nothing is silently dropped — a LOW lead stays on the board until someone closes it with a reason</text>
+<text x="34" y="1528" font-family="SFMono-Regular, Menlo, monospace" font-size="10.6" fill="#5e6party"> </text>
+<text x="34" y="1528" font-family="SFMono-Regular, Menlo, monospace" font-size="10.6" fill="#5e678f">Live: aangan-leads.vercel.app · Next.js 15 on Vercel · Neon Postgres · Gemini 3.8 Flash (JSON mode, temperature 0) · Vaani AI voice + custom tools · Cal.com v2 · Telegram Bot API · HubSpot CRM · Asia/Kolkata</text>
+</svg>

@@ -302,3 +302,7 @@ Registering them was not straightforward. The **Tools & Actions** page creates a
 phase-22 sat at `BLOCKED` through two pushes. Not a build failure: Vercel rejects a commit whose author email is not on the GitHub account, and this repo had no `user.email`, so git fell back to `radhikanarayan@Radhikas-MacBook-Air.local`. Production quietly kept serving phase-21 the whole time. `user.email` is now set locally and the symptom is written down in `docs/CONTEXT.md`, because the dashboard is the only place that says why.
 
 Verified live afterwards: a failed call returns `dropped: call_failed`, a completed call with an empty transcript returns `dropped: empty transcript`, and neither creates a card. `aangan_slots` still answers with real availability.
+
+## phase-24 — components map
+
+`docs/aangan-components-map.png` — caller through to dashboard across eleven actors, in the same swimlane format as the earlier Roomiess map. It is drawn to make the decision boundaries visible: Gemini proposes a grade in the AI column, and the code column next to it says plainly that where the two disagree on budget maths, code wins. SVG source kept alongside so it can be regenerated.
