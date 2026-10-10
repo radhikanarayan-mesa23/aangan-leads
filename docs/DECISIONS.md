@@ -155,3 +155,22 @@ time we found out.
 **Everything is still a token.** `app/globals.css` holds the whole palette as CSS variables; no component hardcodes a colour. The next rebrand is the same one-file job this one was.
 
 **Rejected.** A fully dark dashboard, for the readability reason above. Also rejected: recolouring the grade chips into the brand ramp.
+
+---
+
+## 2026-10-10 — designers see the whole board, not only their own leads
+
+**Decision.** Confirmed by Radhika. A designer signs in to the **Board** and the **Calendar** and nothing else. On the board they see **every** lead, including ones nobody has claimed — not a filtered view of their own.
+
+**Why not "only mine".** A new Hot lead belongs to nobody. If designers could only see their own, no one would ever see it to pick it up, and every lead would need Nikhil to assign it by hand — which puts a person back in the path the system exists to remove. The **Mine** filter narrows to their own work in one click when they want it.
+
+**How role separation is enforced** — three independent layers, so removing any one does not open the door:
+1. `middleware.ts` redirects `/owner` to `/board?denied=owner`
+2. `requireOwner()` blocks the page render
+3. the nav never offers the Overview tab
+
+`/api/owner/brief` returns 403 to a designer. The owner-only board extras — designer filter, team load strip — do not render. Verified in production against a real designer session.
+
+**What designers *do* see, deliberately:** the internal estimate on the card, labelled *internal — never share*. A designer needs to know whether a caller's stated budget covers the job before walking into a consultation. Pipeline value, forecast, cost per lead and the daily brief stay with Nikhil.
+
+**Rejected.** Showing designers only their assigned leads, for the stalling problem above. A middle path — own leads plus the unclaimed pool — was offered and not needed.
