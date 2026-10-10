@@ -263,3 +263,12 @@ The **Unclaimed** row is deliberately styled apart — dashed avatar, italic lab
 **Win rate — checked, and the maths is right.** `won / (won + lost)` everywhere, and won + lost + open reconciles exactly to the lead count. **The presentation was the problem:** "3BHK — 100%" came from a single closed deal, as did Arjun's 100%. Every win rate now carries its denominator — *"100% of 1 closed"*, *"50% of 2 closed"* — on the designer rings, the property-type table, the scope table and the language table. The figure is unchanged; what it was computed from is no longer hidden.
 
 **Listen to the call.** The player is now a card at the top of the Call tab with the call's duration and time beside it, and a line making clear the audio is streamed through the app rather than sitting behind a public link. The transcript below reads as a conversation — the agent's turns tinted, the caller's on white and labelled with their first name — with the turn count and the languages they moved through (*"English → Hindi"*) in the header.
+
+## phase-20 — the agent, checked end to end in the dashboard
+Confirmed the agent is live and carrying our configuration: **Running**, 12,654-char system prompt, correct greeting, multilingual speech with 40 keywords, **Call Type: Inbound**, webhook registered. The only empty field is the inbound phone number.
+
+**Two things found by looking:**
+- The agent was created from a template that left **"Amaze Developers" / "Delhi NCR"** in its metadata — someone else's company, sitting in the agent's context. Overwritten with Aangan Studio / Pune and PCMC.
+- `know_how.guardrails` returns 200 and is silently dropped; the platform keeps only `faq` and `pain_points`. The script no longer pretends to send it, and the comment explains that the guardrails live in the system prompt instead.
+
+`docs/VAANI-SETUP.md` now records the live state and the **Start Web (RTC) Call** path — a real call, through the real webhook, with no phone number needed.

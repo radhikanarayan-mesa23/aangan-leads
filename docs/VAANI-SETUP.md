@@ -16,6 +16,33 @@ receive the result, and that side is now written against their exact contract.
 
 ---
 
+## Current state (2026-10-10)
+
+The agent **exists and is configured** — `npm run vaani:setup` pushes it from
+this repo, so the prompt lives in git rather than drifting in a dashboard.
+
+| | |
+|---|---|
+| Agent | `040c5b84-2b3d-427d-8efe-9f32cc5a80b7` — "Lead Qualification", **Running** |
+| System prompt | 12,654 chars — `vaani_agent_prompt.md` plus the rubric's non-negotiable sections |
+| Greeting | the verbatim opening line |
+| Speech | Deepgram `nova-3`, `language: multi`, 40 Pune-specific keywords |
+| Call Type | **Inbound** |
+| Webhook | registered, `call_ended` + `call_postprocessing`, tested end to end |
+| **Missing** | **an inbound phone number** — Design → Telephony → Add Phone Number |
+
+**Test it without a number:** agent page → **Start Test → Start Web (RTC) Call**
+and talk to it in the browser. It is a real call, so it fires the webhook and
+lands on the board like any other.
+
+Two platform quirks worth knowing:
+
+- `know_how.guardrails` is accepted with a 200 and **silently dropped** — only
+  `faq` and `pain_points` persist. The guardrails therefore live in the system
+  prompt, which is the surface we can prove stuck.
+- The agent was created from a template that left **"Amaze Developers",
+  "Delhi NCR"** in its metadata. Overwritten with Aangan's.
+
 ## 1. Build the flow in the Vaani dashboard
 
 | Field | What to paste |

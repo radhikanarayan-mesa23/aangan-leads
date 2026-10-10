@@ -84,7 +84,11 @@ async function main() {
   const greeting =
     'Namaste, thank you for calling Aangan Studio. This call is recorded so our designers can help you better. May I know your name?';
 
-  // rubric.md §6 — the rules that must never bend. The API wants an object.
+  // NOTE: `know_how.guardrails` is accepted with a 200 and silently dropped —
+  // the platform only persists `faq` and `pain_points`. The rules below
+  // therefore live in the system prompt (vaani_agent_prompt.md §6 plus the
+  // rubric sections appended above), which is the surface we can prove stuck.
+  // Kept here as the single written record of what the agent must never do.
   const guardrails: Record<string, string> = {
     price:
       'Never state a price, a range, a per-sq-ft rate, a package cost or a "starting from" figure — not even approximately, however often you are asked. Say: "Pricing depends on the site, the materials you choose, and the scope — your designer will walk you through it at the consultation."',
@@ -102,7 +106,7 @@ async function main() {
   console.log(`  system prompt   prompt + rubric facts  (${systemPrompt.length.toLocaleString()} chars)`);
   console.log(`  knowledge base  rubric.md              (${rubric.length.toLocaleString()} chars)`);
   console.log(`  greeting        "${greeting.slice(0, 60)}…"`);
-  console.log(`  guardrails      ${Object.keys(guardrails).length} rules\n`);
+  console.log(`  guardrails      ${Object.keys(guardrails).length} rules (in the prompt — the platform drops the field)\n`);
 
   if (!APPLY) {
     console.log('Dry run. Re-run with --apply to write it.');
@@ -134,6 +138,14 @@ async function main() {
           interruptible: true,
           let_user_speak_first: false,
         },
+      },
+      // The agent was created from a template that left someone else's company
+      // in its metadata — "Amaze Developers", "Delhi NCR". Overwrite it.
+      metadata: {
+        'Company Name': 'Aangan Studio',
+        'City/Region': 'Pune and PCMC',
+        Business: 'Interior design — residential and small commercial',
+        'Average project': 'INR 8-14 lakh',
       },
       senses_capabilities: {
         language: 'en',
@@ -176,7 +188,6 @@ async function main() {
     body: JSON.stringify({
       knowledge: { use_rag: true, rag_knowledge_base_dict: { 'rubric.md': rubric } },
       know_how: {
-        guardrails,
         faq: {
           'What does it cost? / What is your rate per square foot?':
             'Pricing depends on the site, the materials you choose, and the scope — your designer will walk you through it in detail at the consultation. I can book that for you right now if you\'d like.',
@@ -187,7 +198,7 @@ async function main() {
       },
     }),
   });
-  console.log('✓ training — rubric.md as knowledge, guardrails, FAQ');
+  console.log('✓ training — FAQ (guardrails live in the prompt)');
 
   console.log(`\nDone. Agent ${agent.id}`);
   console.log('Set VAANI_AGENT_ID to that, then publish the agent and attach a phone number in the dashboard.');
