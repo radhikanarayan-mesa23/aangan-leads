@@ -31,7 +31,9 @@ export function toBoardLead(l: LeadRow, names: Record<string, string> = {}): Boa
   return {
     id: l.id,
     ticket_no: l.ticket_no,
-    caller_name: l.caller_name,
+    // Fall back to what the transcript gave us, so a card is never nameless
+    // when the name was said out loud.
+    caller_name: l.caller_name ?? l.fields?.caller_name ?? null,
     grade: l.grade,
     stage: l.stage,
     created_at: l.created_at,

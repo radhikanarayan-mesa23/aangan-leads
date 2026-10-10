@@ -272,3 +272,13 @@ Confirmed the agent is live and carrying our configuration: **Running**, 12,654-
 - `know_how.guardrails` returns 200 and is silently dropped; the platform keeps only `faq` and `pain_points`. The script no longer pretends to send it, and the comment explains that the guardrails live in the system prompt instead.
 
 `docs/VAANI-SETUP.md` now records the live state and the **Start Web (RTC) Call** path — a real call, through the real webhook, with no phone number needed.
+
+## phase-21 — the caller's name was being thrown away
+
+The first real call came in as **"Unnamed caller"** while its own summary read *"Radhika called regarding a full-home renovation…"*. The name was extracted and then discarded.
+
+`caller_name` and `caller_email` were only ever written at upsert, from the payload. A WebRTC call carries no caller id and a phone number arrives masked, so for a real call those columns stayed null — even though the caller says their name in the first ten seconds and Gemini captures it.
+
+The grading step now backfills both with `coalesce`, so what the platform told us still outranks what a model inferred, and the card falls back to the extracted name as well. Every existing lead was backfilled: AAN-0042 is now **Radhika**, with her email.
+
+This is the same class of bug as the earlier `upsertCall` fix — a later step having better information than the first one and not being allowed to use it.

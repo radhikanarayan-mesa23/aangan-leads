@@ -100,6 +100,12 @@ export async function processLead(leadId: string): Promise<void> {
 
     await sql(
       `update leads set
+         -- The payload may carry no name at all — a WebRTC call has no caller
+         -- id, and a phone number arrives masked. Gemini heard the caller say
+         -- it, so fill the gaps from the transcript. coalesce, never overwrite:
+         -- what the platform told us outranks what a model inferred.
+         caller_name  = coalesce(caller_name,  $20),
+         caller_email = coalesce(caller_email, $21),
          fields = $2, grade = $3, grade_reason = $4, gemini_grade = $5, criteria = $6,
          est_min_inr = $7, est_max_inr = $8, budget_fit = $9, confidence = $10,
          price_mentioned = $11, flags = $12, summary = $13, handoff_note = $14,
@@ -126,6 +132,8 @@ export async function processLead(leadId: string): Promise<void> {
         g.output.off_script_questions.length,
         llmCost(g.input_tokens, g.output_tokens),
         stage,
+        g.output.fields.caller_name,
+        g.output.fields.caller_email,
       ]
     );
 

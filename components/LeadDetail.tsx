@@ -118,7 +118,7 @@ export function LeadDetail({
             <div className="sticky top-0 bg-[var(--surface-blur)] backdrop-blur border-b border-line px-5 py-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h2 className="text-lg font-semibold truncate">{lead.caller_name ?? 'Unnamed caller'}</h2>
+                  <h2 className="text-lg font-semibold truncate">{lead.caller_name ?? f.caller_name ?? 'Unnamed caller'}</h2>
                   <p className="text-xs text-ink-3 tabular-nums">
                     {lead.ticket_no} · {fmtIST(lead.started_at ?? lead.created_at)} · {lead.duration_s ?? 0}s
                   </p>
