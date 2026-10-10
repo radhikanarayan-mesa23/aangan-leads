@@ -44,6 +44,13 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 | `VAANI_WEBHOOK_SECRET`, `VAANI_TOOL_SECRET`, `CALCOM_WEBHOOK_SECRET` | ✅ generated and set in Vercel — paste the same values into Vaani and Cal.com |
 | `SESSION_SECRET`, `CRON_SECRET` | defaulted in development, **must be set in production** |
 
+## Deploying
+
+Vercel **blocks** any deployment whose commit author email is not an address on
+the GitHub account — it shows as `BLOCKED`, never builds, and production keeps
+serving the previous commit. This repo now sets `user.email` locally; if the
+block reappears, check `git log --format='%ae' -1` before looking at the build.
+
 ## Open `// ASSUME:` notes
 
 - `lib/db.ts` — Neon, decided 2026-10-08. One Postgres URL; nothing above it knows the host.

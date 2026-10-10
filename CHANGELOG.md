@@ -296,3 +296,9 @@ Registering them was not straightforward. The **Tools & Actions** page creates a
 **A failed call no longer becomes a lead.** A call that never connected has no transcript, no caller and nothing to grade; a card for it was noise on the designers' board. It is acknowledged and dropped, as is a completed call with an empty transcript. A row that already exists is kept and only marked, because that one does represent a real caller.
 
 `npm run verify:db` 53/53.
+
+## phase-23 — the deployment that never built
+
+phase-22 sat at `BLOCKED` through two pushes. Not a build failure: Vercel rejects a commit whose author email is not on the GitHub account, and this repo had no `user.email`, so git fell back to `radhikanarayan@Radhikas-MacBook-Air.local`. Production quietly kept serving phase-21 the whole time. `user.email` is now set locally and the symptom is written down in `docs/CONTEXT.md`, because the dashboard is the only place that says why.
+
+Verified live afterwards: a failed call returns `dropped: call_failed`, a completed call with an empty transcript returns `dropped: empty transcript`, and neither creates a card. `aangan_slots` still answers with real availability.
