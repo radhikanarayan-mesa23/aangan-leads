@@ -8,6 +8,7 @@ import { humanScope } from '@/lib/telegram';
 import { fmtIST } from '@/lib/time';
 import { cn } from '@/lib/utils';
 import type { LeadDetailData } from '@/lib/view';
+import { nextAction, URGENCY_STYLE } from '@/lib/next-action';
 
 export function LeadDetail({
   leadId,
@@ -73,6 +74,25 @@ export function LeadDetail({
     onMoved();
   }
 
+  /** What happened when the designer rang. */
+  async function logCall(outcome: 'spoke' | 'no_answer' | 'call_later' | 'wrong_number') {
+    setBusy(true);
+    setError(null);
+    const res = await fetch(`/api/leads/${leadId}/contact`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ outcome, note: note.trim() || undefined }),
+    });
+    setBusy(false);
+    if (!res.ok) {
+      setError((await res.json().catch(() => ({}))).error ?? 'That did not save.');
+      return;
+    }
+    setNote('');
+    await load();
+    onMoved();
+  }
+
   async function addNote() {
     if (!note.trim()) return;
     setBusy(true);
@@ -105,6 +125,15 @@ export function LeadDetail({
                 </div>
                 <button className="btn" onClick={onClose}>Close</button>
               </div>
+
+              {(() => {
+                const na = nextAction(lead as any);
+                return na.urgency === 'done' ? null : (
+                  <p className={cn('mt-3 chip w-full justify-start', URGENCY_STYLE[na.urgency])}>
+                    {na.urgency === 'overdue' ? '⚠︎' : na.urgency === 'now' ? '→' : '·'} {na.label}
+                  </p>
+                );
+              })()}
 
               <div className="mt-3 flex flex-wrap gap-1.5">
                 <GradeChip grade={lead.grade} />
@@ -141,6 +170,24 @@ export function LeadDetail({
                   {users.map((u) => <option key={u.email} value={u.email}>{u.name}</option>)}
                 </select>
               </div>
+              {lead.caller_number && (
+                <div className="mt-3">
+                  <p className="label mb-1.5">After you call</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    <button className="btn text-xs" disabled={busy} onClick={() => logCall('spoke')}>Spoke to them</button>
+                    <button className="btn text-xs" disabled={busy} onClick={() => logCall('no_answer')}>No answer</button>
+                    <button className="btn text-xs" disabled={busy} onClick={() => logCall('call_later')}>Call later</button>
+                    <button className="btn text-xs" disabled={busy} onClick={() => logCall('wrong_number')}>Wrong number</button>
+                  </div>
+                  {!!lead.call_attempts && (
+                    <p className="mt-1.5 text-[11px] text-ink-3">
+                      {lead.call_attempts} attempt{lead.call_attempts > 1 ? 's' : ''} so far
+                      {lead.last_attempt_at ? ` · last ${fmtIST(lead.last_attempt_at)}` : ''}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {error && <p className="mt-2 text-sm text-[var(--hot)]">{error}</p>}
 
               <nav className="mt-4 flex gap-1">

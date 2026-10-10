@@ -47,6 +47,9 @@ export type LeadRow = {
   telegram_sent_at: string | null;
   telegram_queued_for: string | null;
   step_errors: { step: string; error: string; at: string }[];
+  call_attempts: number;
+  last_attempt_at: string | null;
+  last_outcome: string | null;
   vaani_cost_inr: string | number;
   llm_cost_inr: string | number;
   cost_inr: string | number;

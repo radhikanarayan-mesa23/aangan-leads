@@ -19,6 +19,12 @@ export type BoardLead = {
   carpet_area_sqft: number | null;
   deal_value_inr: number | null;
   flags: string[];
+  // what the card needs to say what to do next
+  callback_due_at: string | null;
+  callback_done_at: string | null;
+  first_contact_at: string | null;
+  call_attempts: number;
+  last_outcome: string | null;
 };
 
 export function toBoardLead(l: LeadRow, names: Record<string, string> = {}): BoardLead {
@@ -39,6 +45,11 @@ export function toBoardLead(l: LeadRow, names: Record<string, string> = {}): Boa
     carpet_area_sqft: l.fields?.carpet_area_sqft ?? null,
     deal_value_inr: n(l.deal_value_inr),
     flags: l.flags ?? [],
+    callback_due_at: l.callback_due_at,
+    callback_done_at: l.callback_done_at,
+    first_contact_at: l.first_contact_at,
+    call_attempts: (l as any).call_attempts ?? 0,
+    last_outcome: (l as any).last_outcome ?? null,
   };
 }
 

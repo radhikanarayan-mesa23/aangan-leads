@@ -199,3 +199,16 @@ The accent sits on the rule, never on the figure, so the number stays the most l
 
 ## phase-13.3 — readable tooltip on the hero chart
 The locality tooltip was a navy card on a navy hero, so the figure under the cursor was barely legible. It is now a white card with ink text and a drop shadow — matching the tooltips on the charts below — and the hover cursor is a light wash rather than a dark one.
+
+## phase-14 — the board becomes a worklist
+
+**The hole this closes.** A designer who rang a lead had nowhere to record the outcome — the only way to register activity was dragging a card. So "called twice, nobody picked up" was invisible, and *callbacks on time* was measuring a missing button rather than the team.
+
+- **`POST /api/leads/:id/contact`** records an outcome: *spoke · no answer · call later · wrong number*. Reaching someone sets `first_contact_at`, settles the callback promise, moves the card out of New and creates the HubSpot deal — the same trigger as dragging it, reached the way a designer actually works.
+- **`lib/next-action.ts`** computes, in code, what each lead needs right now: *"Callback 3d overdue"*, *"Hot and unclaimed for 2h"*, *"Consultation in 40m"*, *"Try again (attempt 2)"*. Every card carries it, colour-coded by urgency.
+- **The board sorts by urgency first**, then grade, then age. Opening it from a 9am Telegram push now tells you where to start instead of showing fourteen cards sorted by grade.
+- `migrations/004` adds `call_attempts`, `last_attempt_at`, `last_outcome`.
+
+**Two bugs found while testing it, both fixed:**
+- A job seeker was being told *"Claim and call"*. `NOT_ENQUIRY` and wrong numbers now ask for nobody's time, while still staying on the board.
+- After *"no answer"* the card kept nagging *"Callback 3d overdue"* — the promise outranked the attempt. The last thing the designer did now wins, with an hour's grace before the next attempt is suggested.

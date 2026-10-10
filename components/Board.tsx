@@ -19,6 +19,7 @@ import { GradeChip, FitChip } from './Chips';
 import { LeadDetail } from './LeadDetail';
 import { cn, ageLabel, initials } from '@/lib/utils';
 import { humanScope } from '@/lib/telegram';
+import { nextAction, URGENCY_RANK, URGENCY_STYLE } from '@/lib/next-action';
 import { fmtIST } from '@/lib/time';
 import type { BoardLead } from '@/lib/view';
 
@@ -60,6 +61,9 @@ export function Board({ leads, users, me, openLeadId }: Props) {
       })
       .filter((l) => (designer === 'all' ? true : l.assigned_to === designer))
       .sort((a, b) => {
+        // Urgency first — the board is a worklist, not a filing cabinet.
+        const u = URGENCY_RANK[nextAction(a).urgency] - URGENCY_RANK[nextAction(b).urgency];
+        if (u !== 0) return u;
         const g = (GRADE_ORDER[a.grade ?? ''] ?? 9) - (GRADE_ORDER[b.grade ?? ''] ?? 9);
         if (g !== 0) return g;
         return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
@@ -290,6 +294,15 @@ function Card({
           .join(' · ') || 'Details not captured'}
       </p>
 
+      {(() => {
+        const na = nextAction(lead);
+        return na.urgency === 'done' ? null : (
+          <p className={cn('mt-2 chip w-full justify-start', URGENCY_STYLE[na.urgency])}>
+            {na.urgency === 'overdue' ? '⚠︎' : na.urgency === 'now' ? '→' : '·'} {na.label}
+          </p>
+        );
+      })()}
+
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
         <FitChip fit={lead.budget_fit} />
         {lead.booked_at && <span className="chip fit-fits">📅 {fmtIST(lead.booked_at, 'EEE d, h:mma')}</span>}
@@ -297,7 +310,7 @@ function Card({
       </div>
 
       <div className="mt-2.5 flex items-center justify-between text-[11px] text-ink-3">
-        <span>{ageLabel(lead.created_at)} old</span>
+        <span>{ageLabel(lead.created_at)} old{lead.call_attempts ? ` · ${lead.call_attempts} call${lead.call_attempts > 1 ? 's' : ''}` : ''}</span>
         {lead.assigned_to ? (
           <span
             className="grid place-items-center size-5 rounded-full bg-surface-2 border text-[10px] font-medium text-ink-2"
