@@ -16,6 +16,7 @@ import { z } from 'zod';
  */
 export async function upsertCall(call: NormalisedCall): Promise<LeadRow> {
   const transcript = z.array(TranscriptTurnSchema).catch([]).parse(call.transcript);
+  await adoptHold(call);
   const row = await one<LeadRow>(
     `insert into leads (
        vani_call_id, raw_payload, caller_name, caller_number, caller_email,
@@ -58,6 +59,25 @@ export async function upsertCall(call: NormalisedCall): Promise<LeadRow> {
   );
   if (!row) throw new Error('upsert returned no row');
   return row;
+}
+
+/**
+ * A slot booked mid-call is written by /api/vaani/tools/book before the call
+ * has ended, under `hold:<caller digits>` — the agent is never told its own
+ * call id. Rename that row to the real call id so the upsert merges into it.
+ * Without this the booking and the graded lead would be two separate cards.
+ */
+async function adoptHold(call: NormalisedCall): Promise<void> {
+  const digits = (call.caller_number ?? '').replace(/\D/g, '');
+  if (!digits) return;
+  // Only ever adopt a row that is still a hold, and only when this call has no
+  // row of its own yet — a replay must not steal a booking from another lead.
+  await sql(
+    `update leads set vani_call_id = $1
+      where vani_call_id = $2
+        and not exists (select 1 from leads l2 where l2.vani_call_id = $1)`,
+    [call.vani_call_id, `hold:${digits}`]
+  ).catch(() => undefined);
 }
 
 /**

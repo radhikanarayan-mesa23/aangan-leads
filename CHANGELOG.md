@@ -282,3 +282,17 @@ The first real call came in as **"Unnamed caller"** while its own summary read *
 The grading step now backfills both with `coalesce`, so what the platform told us still outranks what a model inferred, and the card falls back to the extracted name as well. Every existing lead was backfilled: AAN-0042 is now **Radhika**, with her email.
 
 This is the same class of bug as the earlier `upsertCall` fix — a later step having better information than the first one and not being allowed to use it.
+
+## phase-22 — the agent can finally see the calendar
+
+Until now the agent had no tools at all, so when a caller asked for an appointment it did the only thing a language model can do without facts: it made some up. It offered five slots, confirmed one, and read out a ticket number. None of it existed. The last prompt change stopped the lying; this one removes the reason for it.
+
+`aangan_slots` and `aangan_book` are now registered in Vaani and enabled on the Lead Qualification agent, pointing at the endpoints that were already built and secret-checked. The agent reads out only what `aangan_slots` returns and tells a caller they are booked only when `aangan_book` answers `ok: true`.
+
+Registering them was not straightforward. The **Tools & Actions** page creates a custom tool with no client scope, so every attempt saved to a row nobody can see and then failed with *"Function 'get_slots' already exists"* — the name was taken by an invisible record. Creating the same tool from **the agent's own Actions panel** sends `client_id` and works. Two orphaned names, `get_slots` and `aangan_get_slots`, are burnt.
+
+**The booking had to be made to survive the call.** Vaani never hands the agent its own call id, so a mid-call booking arrives without one. `/tools/book` now keys its placeholder on the caller's phone number (`hold:<digits>`), and `upsertCall` adopts that row when the call-ended webhook lands — matching on the number, refusing to adopt if this call already has a row of its own. Otherwise the booking and the graded lead would have been two separate cards for one caller. Four checks cover it, including a second caller who must not inherit someone else's held slot.
+
+**A failed call no longer becomes a lead.** A call that never connected has no transcript, no caller and nothing to grade; a card for it was noise on the designers' board. It is acknowledged and dropped, as is a completed call with an empty transcript. A row that already exists is kept and only marked, because that one does represent a real caller.
+
+`npm run verify:db` 53/53.

@@ -1,6 +1,6 @@
 # Context — where this project is right now
 
-_Updated 2026-10-08._
+_Updated 2026-10-10._
 
 ## What is built
 
@@ -13,7 +13,7 @@ _Updated 2026-10-08._
 - **Worklist** — every card says what to do next (`lib/next-action.ts`) and the board sorts by urgency. Call outcomes are recorded from the card.
 - **P3 Designer Board** — `/board` Kanban, 8 columns, dnd-kit drag (pointer + touch), filters (grade, mine, locality, date, designer), claim, card detail panel (contact, requirement grid, budget vs internal estimate, criteria, handoff note, off-script questions, recording, transcript, timeline, stage dropdown, notes), `/board/calendar` week view.
 - **P4 Owner Dashboard** — `/owner` KPI row, health strip, code-computed insights, leads over time, funnel with drop-off, locality, source, cost vs revenue, hour × weekday heatmap, and a designed per-designer snapshot (open, consultations, converted ₹, not converted, win rate, time to first contact, what is being let down — plus an Unclaimed row).
-- **Live call tools** — `POST /api/vaani/tools/slots` and `/book` (secret-checked, 30s cache, availability re-checked before booking).
+- **Live call tools** — `POST /api/vaani/tools/slots` and `/book` (secret-checked, 30s cache, availability re-checked before booking). Both are **registered in Vaani and enabled on the agent** as `aangan_slots` and `aangan_book`, so a caller is booked during the call rather than promised one.
 - **Cron** — `GET /api/cron`: queued pushes, hot-lead nudges, overdue callbacks, HubSpot retries, 9pm brief. Scheduled daily by `vercel.json`; the 10-minute sweep still needs cron-job.org.
 - **Daily brief** — `lib/brief.ts`, 70-word highlight + Markdown/CSV download at `/api/owner/brief`.
 - **HubSpot** — client, stage resolution via `resolveStageId()`, `scripts/hubspot-setup.ts` (falls back to the portal's existing pipeline when it cannot create one — extra pipelines need Sales Hub Professional), deal created on the first move out of New, retried by cron.
@@ -26,7 +26,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 
 ## In progress / next step
 
-1. **Vaani telephony** — the open question. Their public API has no phone leg and the supplied key does not authenticate against them.
+1. **An inbound phone number** — the last missing piece. The agent is configured, the tools are attached and the webhook is verified; buying and attaching a number is Nikhil's action, because it charges the account.
 2. **`DEMO_MAGIC_LINK` must go off** before real caller data lands. It now controls two things: open demo sign-in on the login page, and printing the magic link instead of emailing it. Turning it off needs an email provider wired first, or nobody can get in.
 3. Cal.com, Telegram and HubSpot keys.
 4. ~~Waiting on the design file~~ — palette taken from the Show Prime badge, 2026-10-09. Deep navy + royal blue, dark hero band on the dashboard.
@@ -57,7 +57,7 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 
 ## Known gaps
 
-- No **Neon** database has been touched yet. The schema, the seed and every query are verified against an embedded Postgres via `npm run verify:db` (34 checks), so what remains unproven is only Neon-specific: TLS, the pooled endpoint and connection limits.
+- No **Neon** database has been touched yet. The schema, the seed and every query are verified against an embedded Postgres via `npm run verify:db` (53 checks), so what remains unproven is only Neon-specific: TLS, the pooled endpoint and connection limits.
 - `scripts/eval.ts` has never run against the live model.
 - Recording playback is untested without a real recording URL.
 

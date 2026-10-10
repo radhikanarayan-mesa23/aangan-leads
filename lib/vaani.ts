@@ -162,15 +162,29 @@ export function normalizeTranscript(t: any): TranscriptTurn[] {
       .map((line) => line.trim())
       .filter(Boolean)
       .map((line) => {
-        const m = line.match(/^(agent|assistant|bot|ai|caller|user|customer|human)\s*[:\-]\s*(.*)$/i);
-        return m
-          ? { speaker: speakerOf(m[1]), text: m[2].trim(), t: null }
-          : { speaker: 'caller' as const, text: line, t: null };
+        // Vaani prefixes each line with a timestamp: "[09:29:22] AGENT: …".
+        // Without allowing for it, every turn fell through to the default and
+        // the whole call was attributed to the caller — including the agent's
+        // own words, which is exactly what Gemini is asked to judge.
+        const m = line.match(
+          /^(?:\[?(\d{1,2}:\d{2}(?::\d{2})?)\]?\s*)?(agent|assistant|bot|ai|caller|user|customer|human)\s*[:\-]\s*(.*)$/i
+        );
+        if (!m) return { speaker: 'caller' as const, text: line, t: null };
+        return { speaker: speakerOf(m[2]), text: m[3].trim(), t: clockToSeconds(m[1]) };
       })
       .filter((turn) => turn.text.length > 0);
   }
 
   return [];
+}
+
+/** "09:29:22" → seconds past midnight, so turns can be ordered and offset. */
+function clockToSeconds(clock?: string): number | null {
+  if (!clock) return null;
+  const parts = clock.split(':').map(Number);
+  if (parts.some((p) => !Number.isFinite(p))) return null;
+  const [h, m, sec = 0] = parts;
+  return h * 3600 + m * 60 + sec;
 }
 
 function speakerOf(v: any): TranscriptTurn['speaker'] {

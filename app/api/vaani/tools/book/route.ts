@@ -37,12 +37,19 @@ export async function POST(req: NextRequest) {
     'select id, vani_call_id from leads where booked_at = $1',
     [start.toISOString()]
   );
-  if (clash && clash.vani_call_id !== body.call_id) {
+  const mine = (id: string) => id === body.call_id || (!!digits(body.phone) && id === `hold:${digits(body.phone)}`);
+  if (clash && !mine(clash.vani_call_id)) {
     return NextResponse.json({ ok: false, say: 'That one has just been taken — may I offer you another time?' });
   }
-  if (clash && clash.vani_call_id === body.call_id) {
+  if (clash) {
     return NextResponse.json({ ok: true, say: `You're confirmed for ${spokenSlot(start)}.`, already: true });
   }
+
+  // Vaani does not hand the agent its own call id, so a booking made mid-call
+  // arrives without one. Key the hold on the caller's number instead: when the
+  // call-ended webhook lands, adoptHold() renames this row to the real call id
+  // and the upsert merges into it, rather than leaving a duplicate behind.
+  const holdKey = body.call_id ?? (digits(body.phone) ? `hold:${digits(body.phone)}` : `hold:${start.getTime()}`);
 
   // Create a placeholder row if the call hasn't ended yet, so the slot is held.
   const lead = await one<{ id: string; ticket_no: string }>(
@@ -54,7 +61,7 @@ export async function POST(req: NextRequest) {
        caller_name = coalesce(leads.caller_name, excluded.caller_name),
        caller_email = coalesce(leads.caller_email, excluded.caller_email)
      returning id, ticket_no`,
-    [body.call_id ?? `hold-${start.getTime()}`, body.name ?? null, body.email ?? null, body.phone ?? null, start.toISOString()]
+    [holdKey, body.name ?? null, body.email ?? null, body.phone ?? null, start.toISOString()]
   ).catch(() => null);
 
   if (!lead) {
@@ -87,4 +94,9 @@ export async function POST(req: NextRequest) {
     // Hard rule 1: nothing about price, ever.
     say: `Done — ${spokenSlot(start)} at our studio. Your reference is ${lead.ticket_no}. You'll get an email invite shortly.`,
   });
+}
+
+/** Just the digits, so +91 98765 43210 and 919876543210 are the same caller. */
+function digits(v: string | undefined): string {
+  return (v ?? '').replace(/\D/g, '');
 }

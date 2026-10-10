@@ -144,6 +144,44 @@ async function main() {
   ok('webhook fills the placeholder without blanking it', merged.caller_name === 'Booked In Call' && merged.caller_email === 'booked@example.com' && !!merged.booked_at,
     `name=${merged.caller_name} email=${merged.caller_email} booked=${!!merged.booked_at}`);
 
+  // ── a slot held mid-call, under the caller's number ───────────────────────
+  // Vaani never tells the agent its own call id, so /tools/book keys the hold
+  // on the phone number and upsertCall has to adopt it. Without that the
+  // booking and the graded lead would be two separate cards.
+  const holdSlot = new Date(Date.now() + 2 * 86_400_000).toISOString();
+  await sql(
+    `insert into leads (vani_call_id, caller_name, caller_number, booked_at, stage, started_at)
+     values ('hold:919000000003', 'Held By Phone', '+91 90000 00003', $1, 'Consultation booked', now())`,
+    [holdSlot]
+  );
+  const adopted = await upsertCall(
+    normalizeVaniPayload({
+      call: {
+        call_id: 'verify-real-call-id',
+        from: '+91 90000 00003',
+        duration: 240,
+        transcript: [{ speaker: 'caller', text: 'Three oclock on Monday, perfect.' }],
+      },
+    })
+  );
+  ok('a hold keyed on the phone number is adopted by the real call', adopted.booked_at !== null && adopted.vani_call_id === 'verify-real-call-id',
+    `booked=${!!adopted.booked_at} id=${adopted.vani_call_id}`);
+  const holdLeft = await one<{ c: string }>("select count(*)::text c from leads where vani_call_id like 'hold:%'");
+  ok('the hold row is not left behind as a duplicate', holdLeft?.c === '0', `${holdLeft?.c} hold rows`);
+  const adoptedCount = await one<{ c: string }>("select count(*)::text c from leads where booked_at = $1", [holdSlot]);
+  ok('the adopted booking is one card, not two', adoptedCount?.c === '1', `${adoptedCount?.c} rows on that slot`);
+
+  // A second caller must never inherit someone else's held slot.
+  await sql(
+    `insert into leads (vani_call_id, caller_name, caller_number, booked_at, stage, started_at)
+     values ('hold:919000000004', 'Someone Else', '+919000000004', $1, 'Consultation booked', now())`,
+    [new Date(Date.now() + 3 * 86_400_000).toISOString()]
+  );
+  const stranger = await upsertCall(
+    normalizeVaniPayload({ call: { call_id: 'verify-stranger', from: '+919000000005', duration: 20 } })
+  );
+  ok('a different number does not steal the held slot', stranger.booked_at === null, `booked=${stranger.booked_at}`);
+
   // ── stage move, exactly as the route writes it ────────────────────────────
   const mover = leads.find((l) => l.stage === 'New')!;
   await sql(

@@ -51,6 +51,29 @@ export async function POST(req: NextRequest) {
 
   const call = normalizeVaniPayload(body);
 
+  // A call that never connected is not an enquiry. Nobody spoke, there is
+  // nothing to grade, and a card for it would be noise on the designers'
+  // board — so it is acknowledged and dropped. If a row already exists (the
+  // transcript arrived first, or a slot was held mid-call) it is kept and
+  // only marked, because that row does represent a real caller.
+  if (eventType === 'call_failed') {
+    const existing = await one<{ id: string; ticket_no: string }>(
+      'select id, ticket_no from leads where vani_call_id = $1',
+      [call.vani_call_id]
+    ).catch(() => null);
+    if (!existing) return NextResponse.json({ ok: true, dropped: 'call_failed' });
+
+    await sql("update leads set ended_reason = coalesce(ended_reason, 'failed') where id = $1", [existing.id]).catch(() => undefined);
+    return NextResponse.json({ ok: true, ticket_no: existing.ticket_no, graded: false });
+  }
+
+  // Likewise a completed call where nobody ever said anything: a wrong number
+  // hung up on, or a connection that dropped before the greeting landed.
+  if (eventType === 'call_postprocessing' && (call.transcript?.length ?? 0) === 0) {
+    const existing = await one<{ id: string }>('select id from leads where vani_call_id = $1', [call.vani_call_id]).catch(() => null);
+    if (!existing) return NextResponse.json({ ok: true, dropped: 'empty transcript' });
+  }
+
   let lead;
   try {
     lead = await upsertCall(call);
@@ -63,13 +86,6 @@ export async function POST(req: NextRequest) {
   const alreadyGraded = !!lead.grade;
   if (!alreadyGraded) {
     await logEvent({ lead_id: lead.id, type: 'created', note: `Call ${call.vani_call_id} stored (${eventType ?? 'call.completed'}).` }).catch(() => undefined);
-  }
-
-  // A call that failed on their side has no transcript worth grading, but the
-  // caller still rang: keep the row so nothing is silently dropped.
-  if (eventType === 'call_failed') {
-    await sql("update leads set ended_reason = coalesce(ended_reason, 'failed') where id = $1", [lead.id]).catch(() => undefined);
-    return NextResponse.json({ ok: true, ticket_no: lead.ticket_no, graded: false });
   }
 
   // call_ended carries only timing. Wait for call_postprocessing, which brings
