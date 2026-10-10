@@ -18,7 +18,7 @@ export function LanguagePanel({
   confident,
   caveat,
 }: {
-  slices: { key: string; label: string; leads: number; won: number; winRate: number | null }[];
+  slices: { key: string; label: string; leads: number; won: number; winRate: number | null; closed: number }[];
   known: number;
   switched: number;
   switchedShare: number;
@@ -73,7 +73,14 @@ export function LanguagePanel({
                     <td className="py-1.5 text-right tabular-nums">{s.leads}</td>
                     <td className="py-1.5 text-right tabular-nums">{s.won || <span className="text-ink-3">—</span>}</td>
                     <td className={cn('py-1.5 text-right tabular-nums', s.winRate != null && s.winRate >= 0.5 && 'font-medium')}>
-                      {s.winRate == null ? <span className="text-ink-3">—</span> : `${Math.round(s.winRate * 100)}%`}
+                      {s.winRate == null ? (
+                        <span className="text-ink-3">—</span>
+                      ) : (
+                        <>
+                          {Math.round(s.winRate * 100)}%
+                          <span className="text-ink-3 font-normal"> of {s.closed}</span>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))}

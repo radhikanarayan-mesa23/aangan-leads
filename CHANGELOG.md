@@ -255,3 +255,11 @@ The **Unclaimed** row is deliberately styled apart — dashed avatar, italic lab
 - **`rubric.md` v1.2** records `languages` and `language_switched`; the `LANGUAGE` flag is now set from them.
 - **New dashboard panel** — language mix donut, share who switched mid-call, and **win rate by language**. On the seeded board: 14 calls, 64% English / 21% Marathi / 14% Hindi, **36% switched mid-call**.
 - Re-synced the HubSpot demo deal, which reseeding had orphaned against an old ticket number.
+
+## phase-18 — language insight, honest win rates, listen to the call
+
+**The language switch is now on the dashboard itself**, not just in a panel. "What stands out" carries it as a computed bullet — *"20% of callers switched language mid-call — the agent followed every one."* It falls back to *"X% opened in Hindi or Marathi, not English"* when nobody switched. This is the line that says what a human receptionist could not have done.
+
+**Win rate — checked, and the maths is right.** `won / (won + lost)` everywhere, and won + lost + open reconciles exactly to the lead count. **The presentation was the problem:** "3BHK — 100%" came from a single closed deal, as did Arjun's 100%. Every win rate now carries its denominator — *"100% of 1 closed"*, *"50% of 2 closed"* — on the designer rings, the property-type table, the scope table and the language table. The figure is unchanged; what it was computed from is no longer hidden.
+
+**Listen to the call.** The player is now a card at the top of the Call tab with the call's duration and time beside it, and a line making clear the audio is streamed through the app rather than sitting behind a public link. The transcript below reads as a conversation — the agent's turns tinted, the caller's on white and labelled with their first name — with the turn count and the languages they moved through (*"English → Hindi"*) in the header.

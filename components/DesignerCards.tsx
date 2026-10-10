@@ -68,7 +68,12 @@ export function DesignerCards({ team }: { team: DesignerRow[] }) {
                 </p>
               </div>
 
-              <Ring value={t.winRate} />
+              <div className="text-center shrink-0">
+                <Ring value={t.winRate} />
+                <p className="text-[10px] text-ink-3 mt-0.5">
+                  {t.closed ? `of ${t.closed} closed` : 'none closed'}
+                </p>
+              </div>
             </div>
 
             <dl className="mt-4 grid grid-cols-3 gap-2 text-center">

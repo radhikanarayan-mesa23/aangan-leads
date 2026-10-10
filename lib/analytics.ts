@@ -337,6 +337,20 @@ export function insights(rows: Row[]): string[] {
     if (Number(top[1]) > 0) out.push(`Most low leads this month failed on ${top[0]} (${top[1]} of ${low.length}).`);
   }
 
+  // The thing a human receptionist could not have done.
+  const withLang = month.filter((r) => (r.fields?.languages?.length ?? 0) > 0);
+  if (withLang.length >= 3) {
+    const switched = withLang.filter((r) => r.fields?.language_switched || (r.fields?.languages?.length ?? 0) > 1);
+    const nonEnglish = withLang.filter((r) => r.fields?.languages?.[0] && r.fields.languages[0] !== 'en');
+    if (switched.length) {
+      out.push(
+        `${Math.round((switched.length / withLang.length) * 100)}% of callers switched language mid-call — the agent followed every one.`
+      );
+    } else if (nonEnglish.length) {
+      out.push(`${Math.round((nonEnglish.length / withLang.length) * 100)}% of callers opened in Hindi or Marathi, not English.`);
+    }
+  }
+
   const offScript = month.flatMap((r) => r.off_script_questions ?? []);
   if (offScript.length >= 3) out.push(`${offScript.length} callers asked something the agent could not answer — worth adding to the rubric.`);
 

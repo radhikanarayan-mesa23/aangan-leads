@@ -333,23 +333,66 @@ export function LeadDetail({
 
               {tab === 'call' && (
                 <>
-                  <section>
-                    <p className="label mb-2">Recording</p>
+                  {/* Listen to it. A transcript tells you what was said; the
+                      recording tells you how it landed — and it is the only way
+                      to check a grade you disagree with. */}
+                  <section className="card p-3.5" style={{ background: 'var(--surface-2)' }}>
+                    <div className="flex items-center justify-between gap-3 mb-2.5">
+                      <p className="label">Listen to the call</p>
+                      <span className="text-[11px] text-ink-3 tabular-nums">
+                        {lead.duration_s ? `${Math.floor(lead.duration_s / 60)}m ${lead.duration_s % 60}s` : '—'}
+                        {lead.started_at ? ` · ${fmtIST(lead.started_at)}` : ''}
+                      </span>
+                    </div>
+
                     {data?.has_recording ? (
-                      <audio controls preload="none" className="w-full" src={`/api/leads/${leadId}/recording`} />
+                      <>
+                        <audio controls preload="none" className="w-full" src={`/api/leads/${leadId}/recording`}>
+                          Your browser cannot play this recording.
+                        </audio>
+                        <p className="mt-2 text-[11px] text-ink-3">
+                          Private to the team — streamed through the app, never a public link.
+                        </p>
+                      </>
                     ) : (
-                      <p className="text-sm text-ink-3">No recording on this call.</p>
+                      <p className="text-sm text-ink-3">
+                        No recording on this call.
+                        {lead.transcript?.length ? ' The transcript below is what was said.' : ''}
+                      </p>
                     )}
                   </section>
+
                   <section>
-                    <p className="label mb-2">Transcript</p>
-                    <div className="space-y-2.5">
-                      {(lead.transcript ?? []).map((t: any, i: number) => (
-                        <div key={i} className={cn('text-sm leading-relaxed', t.speaker === 'agent' ? 'text-ink-2' : '')}>
-                          <span className="label mr-2">{t.speaker === 'agent' ? 'Agent' : t.speaker === 'system' ? 'System' : 'Caller'}</span>
-                          {t.text}
-                        </div>
-                      ))}
+                    <div className="flex items-baseline justify-between gap-3 mb-2">
+                      <p className="label">Transcript</p>
+                      {!!lead.transcript?.length && (
+                        <span className="text-[11px] text-ink-3">
+                          {lead.transcript.length} turns
+                          {(lead.fields?.languages?.length ?? 0) > 0 && (
+                            <> · {(lead.fields.languages as string[]).map(languageName).join(' → ')}</>
+                          )}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      {(lead.transcript ?? []).map((t: any, i: number) => {
+                        const agent = t.speaker === 'agent';
+                        return (
+                          <div
+                            key={i}
+                            className={cn(
+                              'rounded-card px-3 py-2 text-sm leading-relaxed',
+                              agent ? 'bg-surface-2 text-ink-2' : 'bg-surface border border-line'
+                            )}
+                          >
+                            <span className="label mr-2">
+                              {agent ? 'Agent' : t.speaker === 'system' ? 'System' : lead.caller_name?.split(' ')[0] || 'Caller'}
+                            </span>
+                            {t.text}
+                          </div>
+                        );
+                      })}
                       {!lead.transcript?.length && <p className="text-sm text-ink-3">No transcript captured.</p>}
                     </div>
                   </section>
@@ -398,6 +441,9 @@ export function LeadDetail({
     </div>
   );
 }
+
+const LANGUAGE_NAMES: Record<string, string> = { en: 'English', hi: 'Hindi', mr: 'Marathi', other: 'Other' };
+const languageName = (c: string) => LANGUAGE_NAMES[c] ?? c;
 
 function KV({ k, v }: { k: string; v: any }) {
   return (

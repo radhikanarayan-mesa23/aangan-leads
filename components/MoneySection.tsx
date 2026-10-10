@@ -74,7 +74,14 @@ export function MoneyPanel({
                 <td className="py-1.5 text-right tabular-nums">{s.won || <span className="text-ink-3">—</span>}</td>
                 <td className="py-1.5 text-right tabular-nums">{s.avgValue ? inr(s.avgValue) : <span className="text-ink-3">—</span>}</td>
                 <td className={cn('py-1.5 text-right tabular-nums', s.winRate != null && s.winRate >= 0.5 && 'font-medium')}>
-                  {s.winRate == null ? <span className="text-ink-3">—</span> : `${Math.round(s.winRate * 100)}%`}
+                  {s.winRate == null ? (
+                    <span className="text-ink-3">—</span>
+                  ) : (
+                    <>
+                      {Math.round(s.winRate * 100)}%
+                      <span className="text-ink-3 font-normal"> of {s.closed}</span>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}

@@ -29,6 +29,8 @@ export type Slice = {
   avgValue: number | null;
   /** won / (won + lost), null when nothing has closed. */
   winRate: number | null;
+  /** The denominator. A 100% win rate off one deal is arithmetic, not evidence. */
+  closed: number;
 };
 
 export type Breakdown = {
@@ -68,6 +70,7 @@ function build(groups: Map<string, { label: string; rows: Row[] }>): Breakdown {
         revenue,
         avgValue: won.length ? Math.round(revenue / won.length) : null,
         winRate: closed ? won.length / closed : null,
+        closed,
       };
     })
     .sort((a, b) => b.revenue - a.revenue || b.leads - a.leads);
