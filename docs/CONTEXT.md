@@ -44,6 +44,12 @@ slot grid, and a funnel that mis-credited lost leads. See `CHANGELOG.md`.
 | `VAANI_WEBHOOK_SECRET`, `VAANI_TOOL_SECRET`, `CALCOM_WEBHOOK_SECRET` | ✅ generated and set in Vercel — paste the same values into Vaani and Cal.com |
 | `SESSION_SECRET`, `CRON_SECRET` | defaulted in development, **must be set in production** |
 
+## Write-ups
+
+`docs/CLOSING-THE-LOOP.md` — the customer side of the journey: what the caller
+hears after hanging up (nothing), why that is the remaining hole, and the four
+messages that would close it. Not built; scoped.
+
 ## Diagram
 
 `docs/aangan-components-map.png` (SVG source beside it) — the eleven actors and

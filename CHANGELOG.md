@@ -306,3 +306,7 @@ Verified live afterwards: a failed call returns `dropped: call_failed`, a comple
 ## phase-24 — components map
 
 `docs/aangan-components-map.png` — caller through to dashboard across eleven actors, in the same swimlane format as the earlier Roomiess map. It is drawn to make the decision boundaries visible: Gemini proposes a grade in the AI column, and the code column next to it says plainly that where the two disagree on budget maths, code wins. SVG source kept alongside so it can be regenerated.
+
+## phase-25 — closing the loop, written up
+
+`docs/CLOSING-THE-LOOP.md`. The system notifies designers, Nikhil, HubSpot and the board the moment a call ends, and tells the caller nothing. Four of the five pieces needed to fix that already exist — the ticket number, the spoken promise in `callback_due_at`, the confirmed slot and a cron sweep already watching it. The missing piece is a way to reach her. Scoped, not built.
