@@ -179,7 +179,23 @@ async function main() {
   ok('bySource', bySource(rows).length > 0);
   ok('costVsRevenue', costVsRevenue(rows).length === 6 && costVsRevenue(rows).some((m) => m.revenue > 0));
   ok('heatmap', heatmap(rows).length === 7 * 24);
-  ok('team table', team(rows, await listUsers()).length === 2);
+  const snapshot = team(rows, await listUsers());
+  const designers = snapshot.filter((t) => t.email);
+  ok('designer snapshot has a row per designer', designers.length === 2, designers.map((d) => d.name).join(', '));
+  ok(
+    'unassigned work gets its own row rather than disappearing',
+    snapshot.some((t) => !t.email && t.open > 0),
+    `${snapshot.find((t) => !t.email)?.open ?? 0} unclaimed open`
+  );
+  ok(
+    'win rate is converted over closed, not over everything',
+    designers.every((d) => d.winRate === null || (d.closed > 0 && d.winRate === d.converted / d.closed))
+  );
+  ok(
+    'leads being let down are surfaced per person',
+    snapshot.every((t) => t.needsAttention === 0 || t.attentionReasons.length > 0),
+    snapshot.filter((t) => t.needsAttention).map((t) => `${t.name}: ${t.attentionReasons.join(' + ')}`).join(' | ') || 'none'
+  );
   const h = health(rows);
   ok('health: no price was ever spoken', h.pricesSpoken === 0, `prices=${h.pricesSpoken} agreement=${h.gradeAgreement}% callbacks=${h.callbacksOnTime}%`);
   ok('health: grade agreement is reported', h.gradeAgreement >= 0 && h.gradeAgreement <= 100);

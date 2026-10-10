@@ -196,26 +196,90 @@ export function heatmap(rows: Row[]) {
   return grid;
 }
 
-export function team(rows: Row[], users: { email: string; name: string; role: string }[]) {
-  return users
+export type DesignerRow = {
+  name: string;
+  email: string | null;
+  /** Still in play — not won, not lost. */
+  open: number;
+  consultations: number;
+  converted: number;
+  revenue: number;
+  notConverted: number;
+  /** Closed one way or the other. The denominator for a win rate. */
+  closed: number;
+  winRate: number | null;
+  medianFirstContactMin: number | null;
+  /** Leads this designer owns that are being let down right now. */
+  needsAttention: number;
+  attentionReasons: string[];
+  /** The most common reason their leads were lost. */
+  topLostReason: string | null;
+};
+
+/**
+ * Per-designer snapshot for Nikhil: what each person is carrying, what they
+ * closed, and — the part a claimed-count hides — what is being let down.
+ *
+ * Unassigned leads get their own row, because work nobody owns is exactly the
+ * thing a per-person table tends to hide.
+ */
+export function team(rows: Row[], users: { email: string; name: string; role: string }[]): DesignerRow[] {
+  const now = Date.now();
+
+  const build = (name: string, email: string | null, mine: Row[]): DesignerRow => {
+    const won = mine.filter((r) => WON_STAGES.includes(r.stage));
+    const lost = mine.filter((r) => r.stage === 'Not converted');
+    const closed = won.length + lost.length;
+
+    const times = mine
+      .filter((r) => r.first_contact_at)
+      .map((r) => new Date(r.first_contact_at!).getTime() - new Date(r.created_at).getTime())
+      .sort((a, b) => a - b);
+
+    // What is actually going wrong on this person's leads, right now.
+    const overdue = mine.filter(
+      (r) => r.callback_due_at && !r.callback_done_at && !r.first_contact_at && new Date(r.callback_due_at).getTime() < now
+    );
+    const stuckHot = mine.filter(
+      (r) => r.grade === 'HOT' && r.stage === 'New' && now - new Date(r.created_at).getTime() > 3_600_000
+    );
+    const reasons: string[] = [];
+    if (overdue.length) reasons.push(`${overdue.length} callback${overdue.length > 1 ? 's' : ''} overdue`);
+    if (stuckHot.length) reasons.push(`${stuckHot.length} hot untouched`);
+
+    const lostTally = new Map<string, number>();
+    for (const r of lost) {
+      const why = (r as any).lost_reason?.trim();
+      if (why) lostTally.set(why, (lostTally.get(why) ?? 0) + 1);
+    }
+    const topLost = [...lostTally.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+
+    return {
+      name,
+      email,
+      open: mine.filter((r) => OPEN_STAGES.includes(r.stage)).length,
+      consultations: mine.filter((r) => r.booked_at || r.stage === 'Consultation booked').length,
+      converted: won.length,
+      revenue: won.reduce((a, r) => a + (n(r.deal_value_inr) ?? 0), 0),
+      notConverted: lost.length,
+      closed,
+      winRate: closed ? won.length / closed : null,
+      medianFirstContactMin: times.length ? Math.round(times[Math.floor(times.length / 2)] / 60000) : null,
+      needsAttention: overdue.length + stuckHot.length,
+      attentionReasons: reasons,
+      topLostReason: topLost,
+    };
+  };
+
+  const designers = users
     .filter((u) => u.role === 'designer')
-    .map((u) => {
-      const mine = rows.filter((r) => r.assigned_to === u.email);
-      const times = mine
-        .filter((r) => r.first_contact_at)
-        .map((r) => new Date(r.first_contact_at!).getTime() - new Date(r.created_at).getTime())
-        .sort((a, b) => a - b);
-      const median = times.length ? times[Math.floor(times.length / 2)] / 60000 : null;
-      return {
-        name: u.name,
-        email: u.email,
-        claimed: mine.length,
-        medianFirstContactMin: median == null ? null : Math.round(median),
-        consultations: mine.filter((r) => r.booked_at || r.stage === 'Consultation booked').length,
-        conversions: mine.filter((r) => WON_STAGES.includes(r.stage)).length,
-      };
-    })
-    .sort((a, b) => b.claimed - a.claimed);
+    .map((u) => build(u.name, u.email, rows.filter((r) => r.assigned_to === u.email)))
+    .sort((a, b) => b.open + b.converted - (a.open + a.converted));
+
+  const unassigned = rows.filter((r) => !r.assigned_to && !WON_STAGES.includes(r.stage) && r.stage !== 'Not converted');
+  if (unassigned.length) designers.push(build('Unclaimed', null, unassigned));
+
+  return designers;
 }
 
 /** The health strip — the four numbers that say whether the system is behaving. */

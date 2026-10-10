@@ -162,32 +162,87 @@ export default async function OwnerPage() {
 
       {/* team */}
       <section className="mt-3 card p-4 overflow-x-auto scrollbar-thin">
-        <p className="label mb-3">Team</p>
-        <table className="w-full text-sm min-w-[520px]">
+        <div className="mb-3">
+          <p className="text-sm font-medium">Designers</p>
+          <p className="text-xs text-ink-3">
+            What each person is carrying, what they closed, and what is being let down right now.
+          </p>
+        </div>
+
+        <table className="w-full text-sm min-w-[760px]">
           <thead>
-            <tr className="text-left text-ink-3 text-xs">
+            <tr className="text-left text-ink-3 text-[11px] uppercase tracking-wider">
               <th className="font-medium pb-2">Designer</th>
-              <th className="font-medium pb-2 text-right">Claimed</th>
-              <th className="font-medium pb-2 text-right">Median time to first contact</th>
-              <th className="font-medium pb-2 text-right">Consultations</th>
-              <th className="font-medium pb-2 text-right">Conversions</th>
+              <th className="font-medium pb-2 text-right">Open</th>
+              <th className="font-medium pb-2 text-right">Consults</th>
+              <th className="font-medium pb-2 text-right">Converted</th>
+              <th className="font-medium pb-2 text-right">Not converted</th>
+              <th className="font-medium pb-2 text-right">Win rate</th>
+              <th className="font-medium pb-2 text-right">1st contact</th>
+              <th className="font-medium pb-2">Needs attention</th>
             </tr>
           </thead>
           <tbody>
             {team(rows, users).map((t) => (
-              <tr key={t.email} className="border-t border-line">
-                <td className="py-2">{t.name}</td>
-                <td className="py-2 text-right tabular-nums">{t.claimed}</td>
-                <td className="py-2 text-right tabular-nums">{t.medianFirstContactMin == null ? '—' : `${t.medianFirstContactMin}m`}</td>
-                <td className="py-2 text-right tabular-nums">{t.consultations}</td>
-                <td className="py-2 text-right tabular-nums">{t.conversions}</td>
+              <tr key={t.email ?? t.name} className="border-t border-line align-top">
+                <td className="py-2.5">
+                  <span className={cn('font-medium', !t.email && 'text-ink-2 italic')}>{t.name}</span>
+                  {t.topLostReason && (
+                    <span className="block text-[11px] text-ink-3 mt-0.5 max-w-[230px] truncate" title={t.topLostReason}>
+                      most often lost: {t.topLostReason}
+                    </span>
+                  )}
+                </td>
+                <td className="py-2.5 text-right tabular-nums">{t.open}</td>
+                <td className="py-2.5 text-right tabular-nums">{t.consultations}</td>
+                <td className="py-2.5 text-right tabular-nums">
+                  {t.converted}
+                  {t.revenue > 0 && <span className="block text-[11px]" style={{ color: 'var(--ok)' }}>{inr(t.revenue)}</span>}
+                </td>
+                <td className="py-2.5 text-right tabular-nums">{t.notConverted}</td>
+                <td className="py-2.5 text-right">
+                  {t.winRate == null ? (
+                    <span className="text-ink-3">—</span>
+                  ) : (
+                    <span className="inline-flex flex-col items-end gap-1">
+                      <span className="tabular-nums">{Math.round(t.winRate * 100)}%</span>
+                      <span className="h-1 w-14 rounded-chip bg-surface-2 overflow-hidden">
+                        <span
+                          className="block h-full rounded-chip"
+                          style={{ width: `${t.winRate * 100}%`, background: 'linear-gradient(90deg, var(--navy-700), var(--blue-500))' }}
+                        />
+                      </span>
+                    </span>
+                  )}
+                </td>
+                <td className="py-2.5 text-right tabular-nums">
+                  {t.medianFirstContactMin == null ? <span className="text-ink-3">—</span> : fmtMins(t.medianFirstContactMin)}
+                </td>
+                <td className="py-2.5">
+                  {t.needsAttention === 0 ? (
+                    <span className="chip fit-fits">Nothing waiting</span>
+                  ) : (
+                    <span className="chip fit-below" title={t.attentionReasons.join(' · ')}>
+                      {t.attentionReasons.join(' · ')}
+                    </span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </section>
+
     </Chrome>
   );
+}
+
+/** 95m reads worse than 1h 35m when you are scanning a column. */
+function fmtMins(m: number): string {
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return m % 60 ? `${h}h ${m % 60}m` : `${h}h`;
+  return `${Math.round(h / 24)}d`;
 }
 
 function pct(now: number, before: number): number | null {

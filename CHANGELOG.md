@@ -212,3 +212,14 @@ The locality tooltip was a navy card on a navy hero, so the figure under the cur
 **Two bugs found while testing it, both fixed:**
 - A job seeker was being told *"Claim and call"*. `NOT_ENQUIRY` and wrong numbers now ask for nobody's time, while still staying on the board.
 - After *"no answer"* the card kept nagging *"Callback 3d overdue"* — the promise outranked the attempt. The last thing the designer did now wins, with an hour's grace before the next attempt is suggested.
+
+## phase-15 — designer snapshot for Nikhil
+The team table was four columns of activity (claimed, median contact, consultations, conversions) and said nothing about outcomes. It is now a performance snapshot:
+
+**Open · Consultations · Converted (with ₹) · Not converted · Win rate · Median time to first contact · Needs attention.**
+
+- **Win rate** is converted ÷ closed, so a designer carrying a lot of open work is not punished for it, with a small bar to make the column scannable.
+- **Needs attention** is the column a claimed-count hides: overdue callbacks and hot leads left untouched over an hour, named rather than totalled — *"3 callbacks overdue · 1 hot untouched"*.
+- **Most often lost** surfaces each designer's commonest `lost_reason`, which is where a coaching conversation actually starts.
+- **An "Unclaimed" row** is included deliberately. Work nobody owns is precisely what a per-person table tends to hide; on the seeded board it immediately shows 8 open leads and 3 overdue callbacks belonging to no one.
+- Times read as `1h 35m` rather than `95m`.
